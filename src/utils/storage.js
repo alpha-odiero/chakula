@@ -1,0 +1,231 @@
+const PREFIX = 'chakula_'
+
+const KEYS = {
+  theme: `${PREFIX}theme`,
+  installDismissed: `${PREFIX}install_dismissed`,
+  mealPlans: `${PREFIX}meal_plans`,
+  shoppingChecks: `${PREFIX}shopping_checks`,
+  personalShopping: `${PREFIX}personal_shopping`,
+  preferences: `${PREFIX}preferences`,
+  cookieConsent: `${PREFIX}cookie_consent`
+}
+
+export const DEFAULT_PREFERENCES = {
+  onboarded: false,
+  mealsPerDay: 3,
+  cookingTime: 'any',
+  preferredMealTypes: ['breakfast', 'lunch', 'dinner'],
+  dietaryPreference: 'any',
+  reduceMotion: false,
+  acceptedDisclaimer: false
+}
+
+function isStorageAvailable() {
+  try {
+    const testKey = `${PREFIX}__test__`
+    window.localStorage.setItem(testKey, '1')
+    window.localStorage.removeItem(testKey)
+    return true
+  } catch {
+    return false
+  }
+}
+
+function read(key, fallback) {
+  if (!isStorageAvailable()) return fallback
+  try {
+    const raw = window.localStorage.getItem(key)
+    if (raw === null) return fallback
+    return JSON.parse(raw)
+  } catch {
+    return fallback
+  }
+}
+
+function write(key, value) {
+  if (!isStorageAvailable()) return
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value))
+  } catch {
+    // Storage full or blocked — fail quietly, app continues in-memory.
+  }
+}
+
+function remove(key) {
+  if (!isStorageAvailable()) return
+  window.localStorage.removeItem(key)
+}
+
+/* ---------- Theme ---------- */
+
+export function getTheme() {
+  return read(KEYS.theme, 'system')
+}
+
+export function saveTheme(theme) {
+  write(KEYS.theme, theme)
+}
+
+/* ---------- Install prompt ---------- */
+
+export function getInstallDismissed() {
+  return read(KEYS.installDismissed, false) === true
+}
+
+export function setInstallDismissed(value = true) {
+  write(KEYS.installDismissed, value)
+}
+
+export function clearInstallDismissed() {
+  remove(KEYS.installDismissed)
+}
+
+/* ---------- Meal plans ---------- */
+
+export function getMealPlans() {
+  const value = read(KEYS.mealPlans, [])
+  return Array.isArray(value) ? value : []
+}
+
+export function saveMealPlans(plans) {
+  write(KEYS.mealPlans, plans)
+}
+
+export function addMealPlan(plan) {
+  const plans = getMealPlans()
+  const next = [plan, ...plans.filter((p) => p.id !== plan.id)]
+  saveMealPlans(next)
+  return next
+}
+
+export function removeMealPlan(id) {
+  const plans = getMealPlans()
+  const next = plans.filter((p) => p.id !== id)
+  saveMealPlans(next)
+  return next
+}
+
+export function clearMealPlans() {
+  saveMealPlans([])
+  return []
+}
+
+/* ---------- Shopping list check-offs ---------- */
+
+export function getShoppingChecks() {
+  const value = read(KEYS.shoppingChecks, {})
+  return value && typeof value === 'object' ? value : {}
+}
+
+export function saveShoppingChecks(checks) {
+  write(KEYS.shoppingChecks, checks)
+}
+
+export function setShoppingItemChecked(planId, itemId, checked) {
+  const checks = getShoppingChecks()
+  const planChecks = { ...(checks[planId] || {}) }
+  if (checked) planChecks[itemId] = true
+  else delete planChecks[itemId]
+  const next = { ...checks, [planId]: planChecks }
+  saveShoppingChecks(next)
+  return next
+}
+
+export function clearShoppingChecks() {
+  saveShoppingChecks({})
+  return {}
+}
+
+/* ---------- Personal shopping list ---------- */
+
+export function getPersonalShopping() {
+  const value = read(KEYS.personalShopping, [])
+  return Array.isArray(value) ? value : []
+}
+
+export function savePersonalShopping(items) {
+  write(KEYS.personalShopping, items)
+}
+
+export function addPersonalShoppingItem(name) {
+  const items = getPersonalShopping()
+  const cleaned = String(name || '').trim()
+  if (!cleaned) return items
+  if (items.some((item) => item.name.toLowerCase() === cleaned.toLowerCase())) return items
+  const next = [...items, { id: `p-${Date.now()}-${items.length}`, name: cleaned, checked: false }]
+  savePersonalShopping(next)
+  return next
+}
+
+export function togglePersonalShoppingItem(id) {
+  const next = getPersonalShopping().map((item) =>
+    item.id === id ? { ...item, checked: !item.checked } : item
+  )
+  savePersonalShopping(next)
+  return next
+}
+
+export function removePersonalShoppingItem(id) {
+  const next = getPersonalShopping().filter((item) => item.id !== id)
+  savePersonalShopping(next)
+  return next
+}
+
+export function clearPersonalShoppingCollected() {
+  const next = getPersonalShopping().filter((item) => !item.checked)
+  savePersonalShopping(next)
+  return next
+}
+
+/* ---------- Preferences ---------- */
+
+export function getPreferences() {
+  const stored = read(KEYS.preferences, null)
+  if (!stored || typeof stored !== 'object') return { ...DEFAULT_PREFERENCES }
+  return { ...DEFAULT_PREFERENCES, ...stored }
+}
+
+export function savePreferences(preferences) {
+  write(KEYS.preferences, preferences)
+}
+
+/* ---------- Cookie consent ---------- */
+
+export function getCookieConsent() {
+  return read(KEYS.cookieConsent, null)
+}
+
+export function saveCookieConsent(value) {
+  write(KEYS.cookieConsent, value)
+}
+
+export function clearPreferences() {
+  remove(KEYS.preferences)
+}
+
+export function resetAllPreferences() {
+  remove(KEYS.preferences)
+  remove(KEYS.theme)
+  remove(KEYS.mealPlans)
+  remove(KEYS.shoppingChecks)
+  remove(KEYS.installDismissed)
+  remove(KEYS.cookieConsent)
+}
+
+/* ---------- General ---------- */
+
+export function clearLocalData() {
+  if (!isStorageAvailable()) return
+  Object.values(KEYS).forEach((key) => window.localStorage.removeItem(key))
+}
+
+export function getStorageUsage() {
+  if (!isStorageAvailable()) return 0
+  let total = 0
+  for (let i = 0; i < window.localStorage.length; i++) {
+    const key = window.localStorage.key(i)
+    const value = window.localStorage.getItem(key)
+    total += (key ? key.length : 0) + (value ? value.length : 0)
+  }
+  return total
+}

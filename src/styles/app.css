@@ -1,0 +1,165 @@
+@import './variables.css';
+@import './base.css';
+@import './navigation.css';
+@import './components.css';
+@import './pages.css';
+@import './features.css';
+
+/* ============ App level ============ */
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.app-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============ Installed-mode (standalone PWA) adjustments ============ */
+
+.installed-mode {
+  --header-h: 52px;
+}
+
+.installed-mode .bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ============ Small screen refinements ============ */
+
+@media (max-width: 374px) {
+  .container {
+    padding: 0 14px;
+  }
+
+  .section {
+    padding: 36px 0;
+  }
+
+  .button {
+    padding: 0 16px;
+  }
+
+  .hero {
+    padding: 48px 0 52px;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.74rem;
+    letter-spacing: 0.07em;
+    padding: 6px 12px;
+  }
+
+  .hero-actions .button--large {
+    flex: 1;
+    max-width: 100%;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .settings-row .button {
+    align-self: flex-start;
+  }
+
+  .meal-detail-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .meal-detail-actions .button {
+    width: 100%;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .recipe-panel {
+    padding: 18px;
+  }
+
+  .explore-layout {
+    display: block;
+  }
+
+  .chip {
+    padding-block: 9px;
+  }
+
+  .segmented-btn {
+    height: 40px;
+  }
+
+  .quick-action-card {
+    padding: 14px;
+  }
+
+  .section-head {
+    gap: 12px;
+  }
+
+  .plan-summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .update-modal {
+    margin: 12px;
+    padding: 28px 20px;
+  }
+}
+
+/* ============ Rendering performance ============ */
+
+.category-section,
+.featured-section,
+.recipe-panel,
+.results-head + .meal-grid,
+.explore-results .meal-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}
+
+.category-grid,
+.meal-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 360px;
+}
+
+@media (min-width: 900px) {
+  .recipe-layout > .recipe-panel {
+    contain-intrinsic-size: auto 640px;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
