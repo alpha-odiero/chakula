@@ -243,7 +243,7 @@ function Settings() {
             <div>
               <p className="settings-label">Clear saved plans &amp; check-offs</p>
               <p className="settings-hint">
-                {getMealPlans().length} meal plan{getMealPlans().length === 1 ? '' : 's'} stored locally.
+                {getMealPlans().length} meal plan{getMealPlans().length === 1 ? '' : 's'} saved.
               </p>
             </div>
             <button
@@ -274,7 +274,7 @@ function Settings() {
           <div className="settings-row">
             <div>
               <p className="settings-label">Storage used</p>
-              <p className="settings-hint">{(storageBytes / 1024).toFixed(1)} KB stored on this device.</p>
+              <p className="settings-hint">{(storageBytes / 1024).toFixed(1)} KB used.</p>
             </div>
           </div>
 
