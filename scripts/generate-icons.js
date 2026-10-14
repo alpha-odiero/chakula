@@ -94,7 +94,7 @@ const pngs = await renderIcons()
 for (const [name, dataUrl] of Object.entries(pngs)) {
   if (name === 'favicon-16' || name === 'favicon-32' || name === 'favicon-48') continue
   const base64 = dataUrl.slice('data:image/png;base64,'.length)
-  writeFileSync(join(outDir, name === 'logo' ? '../../src/assets/logo.png' : `${name}.png`), Buffer.from(base64, 'base64'))
+  writeFileSync(join(outDir, name === 'logo' ? '../../src/assets/LOGO.png' : `${name}.png`), Buffer.from(base64, 'base64'))
 }
 
 writeIco(join(root, 'public', 'favicon.ico'), [
