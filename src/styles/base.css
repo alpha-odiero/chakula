@@ -23,6 +23,12 @@ html {
   }
 }
 
+@media (max-width: 767px) {
+  html {
+    zoom: 0.9;
+  }
+}
+
 img,
 picture,
 video,
