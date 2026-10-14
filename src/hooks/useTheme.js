@@ -14,7 +14,7 @@ function listenToSystemTheme(listener) {
 export function useTheme() {
   const [pref, setPref] = useState(() => {
     const stored = getTheme()
-    return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system'
+    return stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'light'
   })
 
   useEffect(() => {

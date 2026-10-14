@@ -1,79 +1,38 @@
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import puppeteer from 'puppeteer-core'
+import sharp from 'sharp'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, '..')
 const outDir = join(root, 'public', 'icons')
 mkdirSync(outDir, { recursive: true })
 
-const logoPath = join(root, 'src', 'assets', 'logo.svg')
-const svgText = readFileSync(logoPath, 'utf8')
-const dataUrl = `data:image/svg+xml;base64,${Buffer.from(svgText).toString('base64')}`
+const LOGO = join(root, 'src', 'assets', 'LOGO.png')
+const BG = { r: 0x1c, g: 0x1a, b: 0x17, alpha: 1 }
 
-const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-
-async function renderIcons() {
-  const browser = await puppeteer.launch({
-    executablePath: CHROME,
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-gpu']
-  })
-  const page = await browser.newPage()
-  const result = await page.evaluate(async ({ dataUrl, sizes }) => {
-    const img = new Image()
-    img.src = dataUrl
-    await new Promise((resolve, reject) => {
-      img.onload = resolve
-      img.onerror = reject
-    })
-    const out = {}
-    for (const { size, name, fraction, opaque } of sizes) {
-      const canvas = document.createElement('canvas')
-      canvas.width = size
-      canvas.height = size
-      const ctx = canvas.getContext('2d')
-      ctx.imageSmoothingQuality = 'high'
-      if (opaque) {
-        ctx.fillStyle = '#e8590c'
-        ctx.fillRect(0, 0, size, size)
-      }
-      const dw = size * fraction
-      const dh = (dw * img.naturalHeight) / img.naturalWidth
-      ctx.drawImage(img, (size - dw) / 2, (size - dh) / 2, dw, dh)
-      out[name] = canvas.toDataURL('image/png')
-    }
-    return out
-  }, {
-    dataUrl,
-    sizes: [
-      { size: 16, name: 'favicon-16', fraction: 1 },
-      { size: 32, name: 'favicon-32', fraction: 1 },
-      { size: 48, name: 'favicon-48', fraction: 1 },
-      { size: 32, name: 'icon-32', fraction: 1 },
-      { size: 192, name: 'icon-192', fraction: 1 },
-      { size: 512, name: 'icon-512', fraction: 1 },
-      { size: 192, name: 'icon-maskable-192', fraction: 0.86 },
-      { size: 512, name: 'icon-maskable-512', fraction: 0.86 },
-      { size: 180, name: 'apple-touch-icon', fraction: 1, opaque: true },
-      { size: 256, name: 'logo', fraction: 1, opaque: true }
-    ]
-  })
-  await browser.close()
-  return result
+async function renderSquare(size, fraction) {
+  const meta = await sharp(LOGO).metadata()
+  const box = Math.round(size * fraction)
+  const scale = Math.min(box / meta.width, box / meta.height)
+  const w = Math.max(1, Math.round(meta.width * scale))
+  const h = Math.max(1, Math.round(meta.height * scale))
+  const logo = await sharp(LOGO).resize(w, h, { fit: 'inside' }).png().toBuffer()
+  return sharp({ create: { width: size, height: size, channels: 4, background: BG } })
+    .composite([{ input: logo, left: Math.round((size - w) / 2), top: Math.round((size - h) / 2) }])
+    .png()
+    .toBuffer()
 }
 
-function writeIco(filePath, sizes) {
+function writeIco(filePath, entries) {
   const header = Buffer.alloc(6)
   header.writeUInt16LE(0, 0) // reserved
   header.writeUInt16LE(1, 2) // type: icon
-  header.writeUInt16LE(sizes.length, 4)
-  const entries = []
+  header.writeUInt16LE(entries.length, 4)
+  const dirEntries = []
   const pngBuffers = []
-  let offset = 6 + sizes.length * 16
-  for (const { size, dataUrl } of sizes) {
-    const buf = Buffer.from(dataUrl.slice('data:image/png;base64,'.length), 'base64')
+  let offset = 6 + entries.length * 16
+  for (const { size, buffer } of entries) {
     const entry = Buffer.alloc(16)
     entry.writeUInt8(size >= 256 ? 0 : size, 0)
     entry.writeUInt8(size >= 256 ? 0 : size, 1)
@@ -81,26 +40,32 @@ function writeIco(filePath, sizes) {
     entry.writeUInt8(0, 3)
     entry.writeUInt16LE(1, 4)
     entry.writeUInt16LE(32, 6)
-    entry.writeUInt32LE(buf.length, 8)
+    entry.writeUInt32LE(buffer.length, 8)
     entry.writeUInt32LE(offset, 12)
-    offset += buf.length
-    entries.push(entry)
-    pngBuffers.push(buf)
+    offset += buffer.length
+    dirEntries.push(entry)
+    pngBuffers.push(buffer)
   }
-  writeFileSync(filePath, Buffer.concat([header, ...entries, ...pngBuffers]))
+  writeFileSync(filePath, Buffer.concat([header, ...dirEntries, ...pngBuffers]))
 }
 
-const pngs = await renderIcons()
-for (const [name, dataUrl] of Object.entries(pngs)) {
-  if (name === 'favicon-16' || name === 'favicon-32' || name === 'favicon-48') continue
-  const base64 = dataUrl.slice('data:image/png;base64,'.length)
-  writeFileSync(join(outDir, name === 'logo' ? '../../src/assets/LOGO.png' : `${name}.png`), Buffer.from(base64, 'base64'))
+const sizes = [
+  { name: 'icon-32', size: 32, fraction: 0.9 },
+  { name: 'icon-192', size: 192, fraction: 0.86 },
+  { name: 'icon-512', size: 512, fraction: 0.86 },
+  { name: 'icon-maskable-192', size: 192, fraction: 0.68 },
+  { name: 'icon-maskable-512', size: 512, fraction: 0.68 },
+  { name: 'apple-touch-icon', size: 180, fraction: 0.86 }
+]
+
+for (const { name, size, fraction } of sizes) {
+  writeFileSync(join(outDir, `${name}.png`), await renderSquare(size, fraction))
 }
 
-writeIco(join(root, 'public', 'favicon.ico'), [
-  { size: 16, dataUrl: pngs['favicon-16'] },
-  { size: 32, dataUrl: pngs['favicon-32'] },
-  { size: 48, dataUrl: pngs['favicon-48'] }
-])
+const faviconEntries = []
+for (const size of [16, 32, 48]) {
+  faviconEntries.push({ size, buffer: await renderSquare(size, 0.9) })
+}
+writeIco(join(root, 'public', 'favicon.ico'), faviconEntries)
 
-console.log('Chakula brand icons generated in', outDir)
+console.log('Pikawise icons generated from LOGO.png in', outDir)

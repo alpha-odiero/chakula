@@ -59,7 +59,7 @@ function remove(key) {
 /* ---------- Theme ---------- */
 
 export function getTheme() {
-  return read(KEYS.theme, 'system')
+  return read(KEYS.theme, 'light')
 }
 
 export function saveTheme(theme) {

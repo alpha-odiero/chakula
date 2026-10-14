@@ -17,6 +17,12 @@ html {
   scroll-behavior: smooth;
 }
 
+@media (min-width: 1024px) {
+  html {
+    zoom: 0.8;
+  }
+}
+
 img,
 picture,
 video,
