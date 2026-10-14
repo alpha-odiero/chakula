@@ -15,7 +15,7 @@ function RandomMeal() {
     try {
       const meal = await getRandomMeal()
       setState({ data: meal, loading: false, error: null })
-      if (meal) document.title = `${meal.strMeal} — Chakula`
+      if (meal) document.title = `${meal.strMeal} — Pikawise`
     } catch (error) {
       setState({ data: null, loading: false, error })
     }
@@ -35,7 +35,7 @@ function RandomMeal() {
             </div>
             <h1 className="page-title">Feeling hungry but don&apos;t know what to cook?</h1>
             <p className="page-subtitle">
-              Let Chakula pick a delicious meal for you at random.
+              Let Pikawise pick a delicious meal for you at random.
             </p>
             <button type="button" className="button button--primary button--large" onClick={discover}>
               <Icon name="random" size={20} />

@@ -37,7 +37,7 @@ function Developer() {
 
         <div className="developer-section">
           <h2 className="settings-group-title">
-            <Icon name="sparkles" size={20} /> Why Chakula
+            <Icon name="sparkles" size={20} /> Why Pikawise
           </h2>
           <p className="developer-text">{DEVELOPER.why}</p>
         </div>
@@ -77,7 +77,7 @@ function Developer() {
 
         <div className="developer-note">
           <p>
-            Chakula is a free, offline-capable progressive web app. Ideas, recipe suggestions, and
+            Pikawise is a free, offline-capable progressive web app. Ideas, recipe suggestions, and
             the meal plan generator are provided for general use and are not professional dietary
             advice.
           </p>

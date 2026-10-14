@@ -72,7 +72,7 @@ function Settings() {
       }
       await registration.update()
       setUpdateState('current')
-      showMessage('Chakula is up to date.')
+      showMessage('Pikawise is up to date.')
     } catch {
       setUpdateState('error')
       showMessage('Could not check for updates. You may be offline.')
@@ -162,7 +162,7 @@ function Settings() {
           <div className="settings-row">
             <div>
               <p className="settings-label">Planned meals per day</p>
-              <p className="settings-hint">Chakula pre-fills your meal plan with this many meals.</p>
+              <p className="settings-hint">Pikawise pre-fills your meal plan with this many meals.</p>
             </div>
             <div className="segmented" role="group" aria-label="Meals per day">
               {[2, 3, 4].map((opt) => (
@@ -345,14 +345,11 @@ function Settings() {
             Information
           </h2>
           <nav className="settings-links" aria-label="Information">
-            <Link to="/about" className="settings-link">
-              About Chakula
-              <Icon name="arrowRight" size={16} />
-            </Link>
-            <Link to="/developer" className="settings-link">
-              Developer
-              <Icon name="arrowRight" size={16} />
-            </Link>
+              <Link to="/about" className="settings-link">
+                About Pikawise
+                <Icon name="arrowRight" size={16} />
+              </Link>
+
             <Link to="/privacy" className="settings-link">
               Privacy Policy
               <Icon name="arrowRight" size={16} />

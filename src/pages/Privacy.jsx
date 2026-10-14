@@ -8,8 +8,8 @@ function Privacy() {
         <div className="prose">
           <h2>Overview</h2>
           <p>
-            Chakula is a meal discovery app. This policy explains what information is stored or
-            shared when you use it. The short version: Chakula is designed to work privately on
+            Pikawise is a meal discovery app. This policy explains what information is stored or
+            shared when you use it. The short version: Pikawise is designed to work privately on
             your device, and it doesn't need an account or your personal details.
           </p>
 
@@ -20,7 +20,7 @@ function Privacy() {
           </p>
 
           <h2>What is stored on your device</h2>
-          <p>Chakula stores the following data locally in your browser:</p>
+          <p>Pikawise stores the following data locally in your browser:</p>
           <ul>
             <li>
               <strong>Meal plans and shopping lists</strong> — the plans you build and the items you
@@ -40,7 +40,7 @@ function Privacy() {
             </li>
           </ul>
           <p>
-            This data stays on your device. It isn't sent to Chakula or to any third party, and you
+            This data stays on your device. It isn't sent to Pikawise or to any third party, and you
             can remove it any time from Settings → Data &amp; storage.
           </p>
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import Icon from './Icon'
 import MobileMenu from './MobileMenu'
-import logo from '../assets/logo.svg'
+import logo from '../assets/LOGO.png'
 
 const desktopNavItems = [
   { to: '/', label: 'Home', end: true },
@@ -29,9 +29,9 @@ function Navbar() {
     <>
       <header className="site-header">
         <div className="container header-inner">
-          <Link to="/" className="brand" aria-label="Chakula — go to Home">
+          <Link to="/" className="brand" aria-label="Pikawise — go to Home">
             <img src={logo} alt="" className="brand-logo" width="47" height="38" aria-hidden="true" />
-            <span className="brand-name">Chakula</span>
+            <span className="brand-name">Pikawise</span>
           </Link>
 
           <nav className="desktop-nav" aria-label="Main navigation">
@@ -51,12 +51,13 @@ function Navbar() {
           </nav>
 
           <div className="header-actions">
-            <Link to="/search" className="search-shortcut" aria-label="Search meals">
+            <Link to="/search" className="header-action search-shortcut" aria-label="Search meals">
               <Icon name="search" size={20} />
             </Link>
-            <Link to="/settings" className="header-settings desktop-settings" aria-label="Settings">
+            <Link to="/settings" className="header-action header-settings desktop-settings" aria-label="Settings">
               <Icon name="settings" size={20} />
             </Link>
+            <Link to="/balanced-diet" className="header-cta">Plan a meal</Link>
             <button
               type="button"
               className="menu-toggle"

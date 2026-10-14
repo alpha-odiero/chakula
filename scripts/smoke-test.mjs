@@ -11,7 +11,7 @@ const routes = [
   ['/meal/52772', null],
   ['/random', 'Feeling hungry'],
   ['/settings', 'Settings'],
-  ['/about', 'About Chakula'],
+  ['/about', 'About Pikawise'],
   ['/privacy', 'Privacy Policy'],
   ['/terms', 'Terms'],
   ['/does-not-exist', 'Meal not found']

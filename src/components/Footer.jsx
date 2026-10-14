@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import logo from '../assets/logo.svg'
+import logo from '../assets/LOGO.png'
 import Icon from './Icon'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
 
@@ -21,15 +21,14 @@ const infoLinks = [
   { to: '/about', label: 'About' },
   { to: '/privacy', label: 'Privacy' },
   { to: '/privacy#cookies', label: 'Cookies' },
-  { to: '/terms', label: 'Terms' },
-  { to: '/developer', label: 'Developer' }
+  { to: '/terms', label: 'Terms' }
 ]
 
 function Footer() {
   const year = new Date().getFullYear()
   const { canInstall, isInstalled, install } = useInstallPrompt()
-
-  if (isInstalled) return null
+  const standalone = typeof window !== 'undefined' && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)
+  if (isInstalled || standalone) return null
 
   return (
     <footer className="site-footer">
@@ -39,11 +38,11 @@ function Footer() {
             <img src={logo} alt="" className="brand-logo brand-logo--lg" width="58" height="48" aria-hidden="true" />
             <span className="brand-name">Chakula</span>
           </div>
-          <p>Discover meals. Plan better. Cook smarter.</p>
+          <p>Discover meals. Plan balanced diets. Cook smarter.</p>
           <div className="footer-install">
-            <p className="footer-install-text">
-              Get Chakula as a fast, offline-capable app on your device.
-            </p>
+              <p className="footer-install-text">
+                Get Pikawise as a fast, offline-capable app on your device.
+              </p>
             {canInstall ? (
               <button type="button" className="button button--primary footer-install-btn" onClick={install}>
                 <Icon name="install" size={18} />
@@ -96,7 +95,7 @@ function Footer() {
         <div className="container footer-bottom-inner">
           <p>Built by Alpha Odiero</p>
           <p>·</p>
-          <p>© {year} Chakula</p>
+          <p>© {year} Pikawise</p>
         </div>
       </div>
     </footer>

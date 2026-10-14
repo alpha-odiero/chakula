@@ -3,15 +3,15 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 const manifest = {
-  name: 'Chakula',
-  short_name: 'Chakula',
-  description: 'Discover meals. Plan better. Cook smarter.',
+  name: 'Pikawise',
+  short_name: 'Pikawise',
+  description: 'Discover meals. Plan balanced diets. Build shopping lists. Cook smarter with offline access.',
   display: 'standalone',
   start_url: '/',
   scope: '/',
   orientation: 'portrait-primary',
-  theme_color: '#e8590c',
-  background_color: '#fff8f2',
+  theme_color: '#1c1a17',
+  background_color: '#f7f1e6',
   categories: ['food', 'lifestyle', 'utilities'],
   icons: [
     {

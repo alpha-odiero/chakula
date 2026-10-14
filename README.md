@@ -1,4 +1,4 @@
-# Chakula
+# Pikawise
 
 **Discover Meals. Plan Better. Cook Smarter.**
 

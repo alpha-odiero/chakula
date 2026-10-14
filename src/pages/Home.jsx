@@ -91,14 +91,14 @@ function Home() {
             <>
               <p className="hero-eyebrow">
                 <Icon name="cookingPot" size={16} />
-                {timeGreeting()} · Let's cook something delicious
+                {timeGreeting()} — Let's cook something delicious
               </p>
               <h1 className="hero-title">
                 Discover Your Next <span className="hero-accent">Meal</span>
               </h1>
               <p className="hero-subtitle">{greetingHint(preferences)}</p>
               <div className="hero-search">
-                <SearchBar placeholder="Search chicken, rice, pasta…" size="large" />
+                <SearchBar placeholder="Search chicken, rice, ugali, sukuma wiki..." size="large" />
               </div>
               <div className="hero-actions">
                 <Link to="/explore" className="button button--primary button--large">
@@ -110,9 +110,9 @@ function Home() {
                   Surprise me
                 </Link>
               </div>
-              <div className="hero-features" role="list" aria-label="Why Chakula">
+              <div className="hero-features" role="list" aria-label="Why Pikawise">
                 <p className="hero-feature" role="listitem">
-                  Search by name or ingredient
+                  Inspired by Kenyan & African flavours
                 </p>
                 <p className="hero-feature" role="listitem">
                   Plan from the food you have

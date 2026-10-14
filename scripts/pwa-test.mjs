@@ -31,7 +31,7 @@ const check = (cond, label) => {
 const manifestResp = await page.goto(BASE + '/manifest.webmanifest', { timeout: 10000 })
 check(manifestResp.status() === 200, 'manifest served')
 const manifestJson = await manifestResp.json()
-check(manifestJson.name === 'Chakula', 'manifest name')
+check(manifestJson.name === 'Pikawise', 'manifest name')
 check(manifestJson.display === 'standalone', 'manifest display: standalone')
 check(manifestJson.display === 'standalone' && manifestJson.start_url === '/', 'manifest start_url')
 
@@ -64,7 +64,7 @@ await sleep(500)
 await page.goto(BASE + '/about', { waitUntil: 'networkidle2', timeout: 20000 })
 await sleep(2000)
 const aboutContent = await page.evaluate(() => document.body.innerText)
-check(aboutContent.includes('About Chakula'), 'about page loads offline')
+check(aboutContent.includes('About Pikawise'), 'about page loads offline')
 
 await page.goto(BASE + '/settings', { waitUntil: 'networkidle2', timeout: 20000 })
 await sleep(1500)

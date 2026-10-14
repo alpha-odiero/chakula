@@ -301,10 +301,18 @@
 
 .random-result-image-button {
   display: block;
-  width: 100%;
+  width: min(520px, 92vw);
+  margin-inline: auto;
   border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 768px) {
+  .random-result-image-button {
+    width: 100%;
+    max-width: 420px;
+  }
 }
 
 .random-result-image-button:focus-visible {
@@ -467,9 +475,16 @@
 }
 
 .explore-results .meal-grid {
-  grid-template-columns: repeat(auto-fit, 180px);
+  grid-template-columns: repeat(2, 1fr);
   justify-content: center;
-  gap: 16px;
+  gap: 12px;
+}
+
+@media (min-width: 480px) {
+  .explore-results .meal-grid {
+    grid-template-columns: repeat(auto-fit, 180px);
+    gap: 16px;
+  }
 }
 
 .explore-body {

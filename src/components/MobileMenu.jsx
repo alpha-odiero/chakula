@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import Icon from './Icon'
-import logo from '../assets/logo.svg'
+import logo from '../assets/LOGO.png'
 
 const menuItems = [
   { to: '/', label: 'Home', icon: 'home', end: true },
@@ -44,7 +44,7 @@ function MobileMenu({ open, onClose }) {
         <div className="mobile-menu-header">
           <span className="mobile-brand">
             <img src={logo} alt="" className="brand-logo brand-logo--sm" width="37" height="30" aria-hidden="true" />
-            <span className="brand-name">Chakula</span>
+            <span className="brand-name">Pikawise</span>
           </span>
           <button type="button" className="menu-close" aria-label="Close menu" onClick={onClose}>
             <Icon name="close" size={22} />

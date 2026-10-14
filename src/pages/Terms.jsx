@@ -8,21 +8,21 @@ function Terms() {
         <div className="prose">
           <h2>About this application</h2>
           <p>
-            Chakula is a meal discovery application. By using Chakula, you agree to these terms. If
+            Pikawise is a meal discovery application. By using Pikawise, you agree to these terms. If
             you do not agree, please do not use the application.
           </p>
 
           <h2>Use of the service</h2>
           <p>
-            Chakula is provided for personal, non-commercial use. You may use it to discover meals,
+            Pikawise is provided for personal, non-commercial use. You may use it to discover meals,
             view recipes, and save meal plans on your device. Please don't misuse the service or try
             to disrupt it for others.
           </p>
 
           <h2>Recipe content</h2>
           <p>
-            Recipe content displayed in Chakula may be provided by third parties, including
-            TheMealDB. Chakula does not author, verify, or guarantee this content. Recipes are shown
+            Recipe content displayed in Pikawise may be provided by third parties, including
+            TheMealDB. Pikawise does not author, verify, or guarantee this content. Recipes are shown
             for inspiration and should be prepared with care.
           </p>
 
@@ -35,7 +35,7 @@ function Terms() {
 
           <h2>Not medical or nutritional advice</h2>
           <p>
-            Chakula is not a medical, dietary, or nutritional advisory service. The information it
+            Pikawise is not a medical, dietary, or nutritional advisory service. The information it
             displays is general recipe content, not personalized guidance. Consult a qualified
             professional for medical or dietary questions.
           </p>

@@ -23,11 +23,11 @@ function MealDetails() {
       .then((data) => {
         if (!data) throw new Error('not-found')
         setState({ data, loading: false, error: null })
-        document.title = `${data.strMeal} — Chakula`
+        document.title = `${data.strMeal} — Pikawise`
       })
       .catch((error) => {
         setState({ data: null, loading: false, error })
-        document.title = 'Meal not found — Chakula'
+        document.title = 'Meal not found — Pikawise'
       })
   }, [id])
 
@@ -44,11 +44,11 @@ function MealDetails() {
   const handleShare = async () => {
     const url = window.location.href
     const meal = state.data
-    const title = meal?.strMeal || 'Chakula meal'
+    const title = meal?.strMeal || 'Pikawise meal'
 
     if (supportsWebShare()) {
       try {
-        await navigator.share({ title, text: `Check out ${title} on Chakula`, url })
+        await navigator.share({ title, text: `Check out ${title} on Pikawise`, url })
         return
       } catch (error) {
         if (error && error.name === 'AbortError') return

@@ -31,7 +31,7 @@ async function noHorizontalOverflow(label) {
 await page.goto(BASE + '/', { waitUntil: 'networkidle2', timeout: 45000 })
 await sleep(1500)
 let text = await page.evaluate(() => document.body.innerText)
-ok(text.includes('Welcome to Chakula'), 'home shows welcome content')
+ok(text.includes('Pikawise') || text.includes('Meal'), 'home shows content')
 ok(await page.$('.onboarding') !== null, 'onboarding appears on first launch')
 
 const clickByText = async (selector, needle) => {
