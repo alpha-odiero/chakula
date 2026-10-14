@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import logo from '../assets/LOGO.png'
 import Icon from './Icon'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
+import { isStandalone } from '../utils/platform'
 
 const exploreLinks = [
   { to: '/', label: 'Home' },
@@ -27,7 +28,7 @@ const infoLinks = [
 function Footer() {
   const year = new Date().getFullYear()
   const { canInstall, isInstalled, install } = useInstallPrompt()
-  const standalone = typeof window !== 'undefined' && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true)
+  const standalone = isStandalone()
   if (isInstalled || standalone) return null
 
   return (

@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react'
+import { isStandalone } from '../utils/platform'
 
 export function useInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [isInstalled, setIsInstalled] = useState(false)
 
   useEffect(() => {
-    const checkStandalone = () => {
-      const standalone = window.matchMedia('(display-mode: standalone)').matches
-      const navigatorState = window.navigator.standalone === true
-      setIsInstalled(standalone || navigatorState)
-    }
+    const checkStandalone = () => setIsInstalled(isStandalone())
 
     const handleBeforeInstallPrompt = (event) => {
       event.preventDefault()

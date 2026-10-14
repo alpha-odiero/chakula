@@ -1,6 +1,15 @@
 export function isStandalone() {
   if (typeof window === 'undefined') return false
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true
+  const matches = (query) => typeof window.matchMedia === 'function' && window.matchMedia(query).matches
+
+  if (matches('(display-mode: standalone)') || matches('(display-mode: fullscreen)')) return true
+
+  // navigator.standalone only means "installed" on iOS home-screen web clips.
+  // Guard against quirky browsers that expose it in a normal tab by requiring
+  // the browser display mode to be absent (or unsupported, e.g. old iOS).
+  if (getIOSDevice() && window.navigator.standalone === true && !matches('(display-mode: browser)')) return true
+
+  return false
 }
 
 export function getIOSDevice() {
