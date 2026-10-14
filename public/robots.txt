@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+
+Sitemap: https://pikawise.vercel.app/sitemap.xml
