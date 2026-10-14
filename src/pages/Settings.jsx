@@ -274,7 +274,7 @@ function Settings() {
           <div className="settings-row">
             <div>
               <p className="settings-label">Storage used</p>
-              <p className="settings-hint">{(storageBytes / 1024).toFixed(1)} KB in local storage.</p>
+              <p className="settings-hint">{(storageBytes / 1024).toFixed(1)} KB stored on this device.</p>
             </div>
           </div>
 

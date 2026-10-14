@@ -44,12 +44,12 @@ function Privacy() {
             can remove it any time from Settings → Data &amp; storage.
           </p>
 
-          <h2 id="cookies">Cookies and local storage</h2>
+          <h2 id="cookies">Cookies</h2>
           <p>
-            Chakula uses a few small bits of browser storage to remember who you are on this device
-            — never to track you. These are "essential" types of storage: local storage for the data
-            listed above, and service worker caches that keep the app working offline. The first
-            time you visit, we show a short cookie notice so you know what's going on.
+            Chakula uses a few essential cookies to remember your choices on this device — never to
+            track you. These cookies keep your meal plans, preferences, and shopping lists in place,
+            and service worker caches keep the app working offline. The first time you visit, we show
+            a short cookie notice so you know what's going on.
           </p>
           <p>
             We don't use advertising cookies, analytics trackers, or anything that can identify you

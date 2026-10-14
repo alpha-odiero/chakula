@@ -18,8 +18,8 @@ function CookieConsent() {
       <div className="cookie-consent-inner">
         <Icon name="info" size={18} className="cookie-consent-icon" />
         <p className="cookie-consent-text">
-          Chakula keeps everything on your device — no tracking cookies. We do use a little local
-          storage so your meal plans, preferences, and shopping lists stick around.{' '}
+          Chakula keeps everything on your device — no tracking cookies. We do use a few essential
+          cookies so your meal plans, preferences, and shopping lists stick around.{' '}
           <Link to="/privacy#cookies">Learn more</Link>
         </p>
         <div className="cookie-consent-actions">
