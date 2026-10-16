@@ -55,6 +55,19 @@
         } catch (e) {
           document.documentElement.classList.add('theme-light')
         }
+        try {
+          var mq = function (q) {
+            return typeof window.matchMedia === 'function' && window.matchMedia(q).matches
+          }
+          var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+          var standalone =
+            mq('(display-mode: standalone)') ||
+            mq('(display-mode: fullscreen)') ||
+            (ios && navigator.standalone === true && !mq('(display-mode: browser)'))
+          if (standalone) document.documentElement.classList.add('app-standalone')
+        } catch (e) {
+          /* ignore */
+        }
       })()
     </script>
     <style>
@@ -142,6 +155,9 @@
       #app-splash.app-splash--hidden {
         opacity: 0;
         pointer-events: none;
+      }
+      html.app-standalone #app-splash {
+        display: none;
       }
       @keyframes app-splash-pop {
         from {

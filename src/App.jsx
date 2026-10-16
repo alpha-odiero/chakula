@@ -56,6 +56,10 @@ function AppShell() {
   useEffect(() => {
     const splash = document.getElementById('app-splash')
     if (!splash) return undefined
+    if (isStandalone()) {
+      splash.remove()
+      return undefined
+    }
     const MIN_VISIBLE = 1200
     const elapsed = performance.now()
     const wait = Math.max(0, MIN_VISIBLE - elapsed)
