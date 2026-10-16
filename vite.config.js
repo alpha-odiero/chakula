@@ -5,13 +5,13 @@ import { VitePWA } from 'vite-plugin-pwa'
 const manifest = {
   name: 'Pikawise',
   short_name: 'Pikawise',
-  description: 'Discover meals. Plan balanced diets. Build shopping lists. Cook smarter with offline access.',
+  description: 'Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with offline access.',
   display: 'standalone',
   start_url: '/',
   scope: '/',
   orientation: 'portrait-primary',
-  theme_color: '#1c1a17',
-  background_color: '#f7f1e6',
+  theme_color: '#198a43',
+  background_color: '#f7f8f5',
   categories: ['food', 'lifestyle', 'utilities'],
   icons: [
     {

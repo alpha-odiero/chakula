@@ -16,7 +16,7 @@ function Privacy() {
           <h2>No account required</h2>
           <p>
             You don't need to create an account, sign in, or hand over any personal information to
-            use Chakula. Scroll, search, and cook.
+            use Pikawise. Scroll, search, and cook.
           </p>
 
           <h2>What is stored on your device</h2>
@@ -46,7 +46,7 @@ function Privacy() {
 
           <h2 id="cookies">Cookies</h2>
           <p>
-            Chakula uses a few essential cookies to remember your choices on this device — never to
+            Pikawise uses a few essential cookies to remember your choices on this device — never to
             track you. These cookies keep your meal plans, preferences, and shopping lists in place,
             and service worker caches keep the app working offline. The first time you visit, we show
             a short cookie notice so you know what's going on.
@@ -54,12 +54,12 @@ function Privacy() {
           <p>
             We don't use advertising cookies, analytics trackers, or anything that can identify you
             across websites. Clearing your browser data, or removing the app, wipes everything
-            Chakula saved.
+            Pikawise saved.
           </p>
 
           <h2>API communication</h2>
           <p>
-            When you search, filter, or open a recipe, Chakula communicates directly with TheMealDB,
+            When you search, filter, or open a recipe, Pikawise communicates directly with TheMealDB,
             a third-party recipe provider, to fetch recipe data and images. Requests are made from
             your browser to TheMealDB's public API. Only the search terms, filters, or recipe IDs you
             request are sent as part of these requests.
@@ -68,13 +68,13 @@ function Privacy() {
           <h2>Third-party recipe provider</h2>
           <p>
             Recipe content, including names, images, ingredients, and instructions, is provided by
-            TheMealDB. Chakula does not control or edit this content. Please review TheMealDB's own
+            TheMealDB. Pikawise does not control or edit this content. Please review TheMealDB's own
             terms and privacy policy for how they handle data.
           </p>
 
           <h2>Contact</h2>
           <p>
-            Chakula is provided as-is. If you have questions about this policy, contact the
+            Pikawise is provided as-is. If you have questions about this policy, contact the
             application operator directly.
           </p>
         </div>

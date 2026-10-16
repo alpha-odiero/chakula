@@ -1,16 +1,19 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { registerSW } from 'virtual:pwa-register'
-import Icon from './Icon'
+import { useToast } from './Toast'
+import { addNotification, dismissNotification, unacknowledgeNotification } from '../utils/storage'
 
-const PwaContext = createContext({ updateAvailable: false, update: () => {} })
+const UPDATE_NOTIFICATION_ID = 'app-update'
+
+const PwaContext = createContext({ updateAvailable: false, update: () => {}, dismiss: () => {} })
 
 export function usePwa() {
   return useContext(PwaContext)
 }
 
 function PwaProvider({ children }) {
+  const { notify } = useToast()
   const [updateAvailable, setUpdateAvailable] = useState(false)
-  const [offlineReady, setOfflineReady] = useState(false)
   const [updateReg, setUpdateReg] = useState(null)
 
   useEffect(() => {
@@ -20,11 +23,21 @@ function PwaProvider({ children }) {
     let watchInterval = null
     const updateSW = registerSW({
       onNeedRefresh() {
+        // A new service worker has downloaded and is waiting. Surface it in the
+        // notification centre instead of interrupting the user with a popup.
+        // Un-acknowledge first so a freshly downloaded update re-surfaces even
+        // if the user dismissed a previous one.
+        unacknowledgeNotification(UPDATE_NOTIFICATION_ID)
+        addNotification({
+          id: UPDATE_NOTIFICATION_ID,
+          type: 'update',
+          title: 'Update available',
+          body: 'A new Pikawise update is available. Apply it when you are ready.'
+        })
         setUpdateAvailable(true)
       },
       onOfflineReady() {
-        setOfflineReady(true)
-        setTimeout(() => setOfflineReady(false), 4000)
+        notify('Pikawise is ready to work offline.', { variant: 'success' })
       },
       onRegisteredSW(_swUrl, registration) {
         if (registration) {
@@ -39,75 +52,42 @@ function PwaProvider({ children }) {
     return () => {
       if (watchInterval) clearInterval(watchInterval)
     }
-  }, [])
+  }, [notify])
 
   const applyUpdate = async () => {
+    const cooking = typeof document !== 'undefined' && document.body.classList.contains('cooking-mode-active')
+    if (cooking) {
+      notify('Finish cooking first — the update will be ready as soon as you are done.', {
+        variant: 'info'
+      })
+      return false
+    }
+
+    // Acknowledge before reloading so the notification is not re-shown as unread.
+    dismissNotification(UPDATE_NOTIFICATION_ID)
+    setUpdateAvailable(false)
+
     if (updateReg) {
+      // vite-plugin-pwa posts the skip-waiting message and reloads only once the
+      // new service worker actually takes control of the page.
       await updateReg(true)
-      setUpdateAvailable(false)
     } else {
       window.location.reload()
     }
+    return true
   }
 
-  const dismissUpdate = () => setUpdateAvailable(false)
+  const dismissUpdate = () => {
+    dismissNotification(UPDATE_NOTIFICATION_ID)
+    setUpdateAvailable(false)
+  }
 
   return (
-    <PwaContext.Provider value={{ updateAvailable, offlineReady, update: applyUpdate, dismiss: dismissUpdate }}>
+    <PwaContext.Provider
+      value={{ updateAvailable, update: applyUpdate, dismiss: dismissUpdate }}
+    >
       {children}
-      {updateAvailable && <UpdateModal onUpdate={applyUpdate} onDismiss={dismissUpdate} />}
-      {offlineReady && (
-        <div className="toast toast--info" role="status">
-          Chakula is ready to work offline.
-        </div>
-      )}
     </PwaContext.Provider>
-  )
-}
-
-function UpdateModal({ onUpdate, onDismiss }) {
-  return (
-    <div className="update-overlay" role="dialog" aria-label="Update available" onClick={onDismiss}>
-      <div className="update-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="update-modal-brand">
-          <div className="update-modal-logo" aria-hidden="true">
-            <Icon name="cookingPot" size={22} />
-          </div>
-        </div>
-        <h2 className="update-modal-title">New version available</h2>
-        <p className="update-modal-desc">
-          Chakula has been updated with improvements and bug fixes. Reload to get the latest version.
-        </p>
-        <ul className="update-features">
-          <li className="update-feature">
-            <span className="update-feature-check" aria-hidden="true">
-              <Icon name="check" size={14} />
-            </span>
-            Performance improvements
-          </li>
-          <li className="update-feature">
-            <span className="update-feature-check" aria-hidden="true">
-              <Icon name="check" size={14} />
-            </span>
-            Bug fixes and stability
-          </li>
-          <li className="update-feature">
-            <span className="update-feature-check" aria-hidden="true">
-              <Icon name="check" size={14} />
-            </span>
-            Updated meal database
-          </li>
-        </ul>
-        <div className="update-modal-actions">
-          <button type="button" className="button button--primary" onClick={onUpdate}>
-            Reload now
-          </button>
-          <button type="button" className="button button--ghost" onClick={onDismiss}>
-            Later
-          </button>
-        </div>
-      </div>
-    </div>
   )
 }
 

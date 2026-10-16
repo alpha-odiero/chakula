@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar'
+import WebHeader from './components/WebHeader'
+import AppHeader from './components/AppHeader'
 import BottomNavigation from './components/BottomNavigation'
 import Footer from './components/Footer'
 import OfflineBanner from './components/OfflineBanner'
@@ -9,6 +10,7 @@ import Onboarding from './components/Onboarding'
 import CookieConsent from './components/CookieConsent'
 import PreferencesProvider, { usePreferences } from './components/PreferencesProvider'
 import PwaProvider from './components/PwaProvider'
+import ToastProvider, { useToast } from './components/Toast'
 import { useNetworkState } from './hooks/useNetworkState'
 import { useInstallPrompt } from './hooks/useInstallPrompt'
 import { useTheme } from './hooks/useTheme'
@@ -45,10 +47,36 @@ function AppShell() {
   const isOnline = useNetworkState()
   const { isInstalled } = useInstallPrompt()
   const { preferences } = usePreferences()
+  const toast = useToast()
   useTheme()
   useScrollToTop()
 
   const inStandaloneMode = isStandalone()
+
+  useEffect(() => {
+    const splash = document.getElementById('app-splash')
+    if (!splash) return undefined
+    const MIN_VISIBLE = 1200
+    const elapsed = performance.now()
+    const wait = Math.max(0, MIN_VISIBLE - elapsed)
+    let fadeTimer
+    const hideTimer = setTimeout(() => {
+      splash.classList.add('app-splash--hidden')
+      fadeTimer = setTimeout(() => splash.remove(), 600)
+    }, wait)
+    return () => {
+      clearTimeout(hideTimer)
+      clearTimeout(fadeTimer)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleInstalled = () => {
+      toast.success('Thanks for installing Pikawise!')
+    }
+    window.addEventListener('appinstalled', handleInstalled)
+    return () => window.removeEventListener('appinstalled', handleInstalled)
+  }, [toast])
 
   useEffect(() => {
     const root = document.documentElement
@@ -64,11 +92,12 @@ function AppShell() {
   }, [isInstalled, inStandaloneMode])
 
   const showAppUI = isInstalled || inStandaloneMode
+  const onboardingOpen = preferences.onboarded === false
 
   return (
     <PwaProvider>
       <div className={`app-shell${showAppUI ? ' app-shell--app' : ''}`}>
-        <Navbar />
+        {showAppUI ? <AppHeader /> : <WebHeader />}
         {!isOnline && <OfflineBanner />}
         <div className={`app-body${showAppUI ? ' app-body--app' : ''}`}>
           <Suspense fallback={<PageFallback />}>
@@ -95,9 +124,9 @@ function AppShell() {
         </div>
         {!showAppUI && <Footer />}
         {showAppUI && <BottomNavigation />}
-        <InstallPrompt />
+        {!onboardingOpen && <InstallPrompt />}
         <CookieConsent />
-        {preferences.onboarded === false && <Onboarding />}
+        {onboardingOpen && <Onboarding />}
       </div>
     </PwaProvider>
   )
@@ -106,7 +135,9 @@ function AppShell() {
 function App() {
   return (
     <PreferencesProvider>
-      <AppShell />
+      <ToastProvider>
+        <AppShell />
+      </ToastProvider>
     </PreferencesProvider>
   )
 }

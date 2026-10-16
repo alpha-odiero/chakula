@@ -7,7 +7,9 @@ const KEYS = {
   shoppingChecks: `${PREFIX}shopping_checks`,
   personalShopping: `${PREFIX}personal_shopping`,
   preferences: `${PREFIX}preferences`,
-  cookieConsent: `${PREFIX}cookie_consent`
+  cookieConsent: `${PREFIX}cookie_consent`,
+  notifications: `${PREFIX}notifications`,
+  notificationsAck: `${PREFIX}notifications_ack`
 }
 
 export const DEFAULT_PREFERENCES = {
@@ -191,12 +193,113 @@ export function savePreferences(preferences) {
 
 /* ---------- Cookie consent ---------- */
 
+// Bump only when the technologies used or the consent requirements change,
+// so returning users are asked again solely for a genuinely new decision.
+export const COOKIE_CONSENT_VERSION = 1
+
+// Older builds stored a bare string. Closing a banner was never consent.
+const LEGACY_ACCEPTED = ['accepted', 'essential', 'accepted_all']
+
 export function getCookieConsent() {
   return read(KEYS.cookieConsent, null)
 }
 
-export function saveCookieConsent(value) {
-  write(KEYS.cookieConsent, value)
+export function hasValidCookieConsent() {
+  const stored = getCookieConsent()
+  if (stored === null || stored === undefined) return false
+  if (typeof stored === 'object') {
+    return Number(stored.version) >= COOKIE_CONSENT_VERSION && Boolean(stored.choice)
+  }
+  return LEGACY_ACCEPTED.includes(stored)
+}
+
+export function getCookieConsentChoice() {
+  const stored = getCookieConsent()
+  if (stored && typeof stored === 'object') return stored.choice || null
+  if (typeof stored === 'string' && LEGACY_ACCEPTED.includes(stored)) return 'accepted'
+  return null
+}
+
+export function saveCookieConsent(choice) {
+  write(KEYS.cookieConsent, {
+    version: COOKIE_CONSENT_VERSION,
+    choice,
+    timestamp: Date.now()
+  })
+}
+
+/* ---------- Notifications ---------- */
+
+const NOTIFICATIONS_LIMIT = 20
+
+export function getNotifications() {
+  const value = read(KEYS.notifications, [])
+  return Array.isArray(value) ? value : []
+}
+
+function saveNotifications(list) {
+  write(KEYS.notifications, Array.isArray(list) ? list.slice(0, NOTIFICATIONS_LIMIT) : [])
+}
+
+function getAcknowledgedIds() {
+  const value = read(KEYS.notificationsAck, [])
+  return Array.isArray(value) ? value : []
+}
+
+export function acknowledgeNotification(id) {
+  if (!id) return
+  const acknowledged = getAcknowledgedIds()
+  if (acknowledged.includes(id)) return
+  write(KEYS.notificationsAck, [...acknowledged, id])
+}
+
+// Allow a fixed-id notification (e.g. "app-update") to resurface for a genuinely
+// new event after an earlier one was dismissed.
+export function unacknowledgeNotification(id) {
+  if (!id) return
+  const acknowledged = getAcknowledgedIds()
+  if (!acknowledged.includes(id)) return
+  write(
+    KEYS.notificationsAck,
+    acknowledged.filter((item) => item !== id)
+  )
+}
+
+export function addNotification(notification) {
+  if (!notification || !notification.id) return getNotifications()
+  if (getAcknowledgedIds().includes(notification.id)) return getNotifications()
+  const list = getNotifications()
+  if (list.some((item) => item.id === notification.id)) return list
+  const next = [{ timestamp: Date.now(), read: false, ...notification }, ...list]
+  saveNotifications(next)
+  return next
+}
+
+export function markNotificationRead(id) {
+  const next = getNotifications().map((item) =>
+    item.id === id ? { ...item, read: true } : item
+  )
+  saveNotifications(next)
+  return next
+}
+
+export function markAllNotificationsRead() {
+  const next = getNotifications().map((item) => (item.read ? item : { ...item, read: true }))
+  saveNotifications(next)
+  return next
+}
+
+export function dismissNotification(id) {
+  if (!id) return getNotifications()
+  acknowledgeNotification(id)
+  const next = getNotifications().filter((item) => item.id !== id)
+  saveNotifications(next)
+  return next
+}
+
+export function clearNotifications() {
+  saveNotifications([])
+  return []
 }
 
 export function clearPreferences() {

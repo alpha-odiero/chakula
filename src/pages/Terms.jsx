@@ -42,14 +42,14 @@ function Terms() {
 
           <h2>Availability</h2>
           <p>
-            Chakula depends on third-party services, including TheMealDB. Recipes may be
+            Pikawise depends on third-party services, including TheMealDB. Recipes may be
             unavailable at times, and the application may be offline. The application is provided
             "as is" and "as available" without warranties of any kind.
           </p>
 
           <h2>Changes</h2>
           <p>
-            These terms may be updated from time to time. Continued use of Chakula after changes
+            These terms may be updated from time to time. Continued use of Pikawise after changes
             means you accept the updated terms.
           </p>
         </div>

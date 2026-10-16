@@ -4,6 +4,7 @@
 @import './components.css';
 @import './pages.css';
 @import './features.css';
+@import './apphome.css';
 @import './landing.css';
 
 /* ============ App level ============ */
@@ -49,21 +50,6 @@
 
   .button {
     padding: 0 16px;
-  }
-
-  .hero {
-    padding: 48px 0 52px;
-  }
-
-  .hero-eyebrow {
-    font-size: 0.74rem;
-    letter-spacing: 0.07em;
-    padding: 6px 12px;
-  }
-
-  .hero-actions .button--large {
-    flex: 1;
-    max-width: 100%;
   }
 
   .category-grid {
@@ -122,34 +108,6 @@
   .plan-summary {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .update-modal {
-    margin: 12px;
-    padding: 28px 20px;
-  }
-}
-
-/* ============ Rendering performance ============ */
-
-.category-section,
-.featured-section,
-.recipe-panel,
-.results-head + .meal-grid,
-.explore-results .meal-grid {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 480px;
-}
-
-.category-grid,
-.meal-grid {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 360px;
-}
-
-@media (min-width: 900px) {
-  .recipe-layout > .recipe-panel {
-    contain-intrinsic-size: auto 640px;
   }
 }
 

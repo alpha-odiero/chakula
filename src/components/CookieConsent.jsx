@@ -1,41 +1,65 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from './Icon'
-import { getCookieConsent, saveCookieConsent } from '../utils/storage'
+import { hasValidCookieConsent, saveCookieConsent } from '../utils/storage'
 
 function CookieConsent() {
-  const [dismissed, setDismissed] = useState(() => getCookieConsent() !== null)
+  const [consented, setConsented] = useState(() => hasValidCookieConsent())
+  const [managing, setManaging] = useState(false)
 
-  if (dismissed) return null
+  if (consented) return null
 
-  const choose = (value) => {
-    saveCookieConsent(value)
-    setDismissed(true)
+  const choose = (choice) => {
+    saveCookieConsent(choice)
+    setConsented(true)
   }
 
   return (
     <aside className="cookie-consent" role="region" aria-label="Cookie notice">
       <div className="cookie-consent-inner">
         <Icon name="info" size={18} className="cookie-consent-icon" />
-        <p className="cookie-consent-text">
-          Chakula keeps everything on your device — no tracking cookies. We do use a few essential
-          cookies so your meal plans, preferences, and shopping lists stick around.{' '}
-          <Link to="/privacy#cookies">Learn more</Link>
-        </p>
+        <div className="cookie-consent-text">
+          <p>
+            Pikawise keeps your favorites, preferences, meal plans and shopping list on this device
+            only — no tracking or advertising cookies.{' '}
+            <Link to="/privacy#cookies">Learn more</Link>
+          </p>
+          {managing && (
+            <div className="cookie-consent-details" id="cookie-consent-details">
+              <p>
+                <strong>Essential storage only:</strong> theme, saved recipes, meal plans, shopping
+                list and this consent choice. Nothing is shared with third parties.
+              </p>
+              <p>
+                You can review or clear this data at any time in{' '}
+                <Link to="/settings">Settings</Link>.
+              </p>
+            </div>
+          )}
+        </div>
         <div className="cookie-consent-actions">
           <button
             type="button"
-            className="button button--primary button--small"
+            className="button button--primary"
             onClick={() => choose('accepted')}
           >
-            Got it
+            Accept
           </button>
           <button
             type="button"
-            className="button button--ghost button--small"
-            onClick={() => choose('dismissed')}
+            className="button button--secondary"
+            onClick={() => choose('essential')}
           >
-            Close
+            Essential only
+          </button>
+          <button
+            type="button"
+            className="button button--ghost cookie-manage"
+            aria-expanded={managing}
+            aria-controls="cookie-consent-details"
+            onClick={() => setManaging((value) => !value)}
+          >
+            {managing ? 'Hide details' : 'Manage preferences'}
           </button>
         </div>
       </div>

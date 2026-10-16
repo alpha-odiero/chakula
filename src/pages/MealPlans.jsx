@@ -5,6 +5,7 @@ import Icon from '../components/Icon'
 import EmptyState from '../components/EmptyState'
 import ConfirmDialog from '../components/ConfirmDialog'
 import InteractiveShoppingList from '../components/ShoppingList'
+import { useToast } from '../components/Toast'
 import { getMealPlans, removeMealPlan, clearMealPlans } from '../utils/storage'
 import { supportsWebShare, supportsClipboard } from '../utils/platform'
 
@@ -13,12 +14,9 @@ function MealPlans() {
   const [expandedId, setExpandedId] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false)
-  const [message, setMessage] = useState(null)
+  const toast = useToast()
 
-  const showMessage = (text) => {
-    setMessage(text)
-    window.setTimeout(() => setMessage(null), 2500)
-  }
+  const showMessage = (text, variant = 'success') => toast.notify(text, { variant })
 
   const handleDelete = (id) => {
     const next = removeMealPlan(id)
@@ -63,7 +61,7 @@ function MealPlans() {
       document.body.removeChild(textArea)
       showMessage('Plan copied!')
     } catch {
-      /* clipboard unavailable */
+      showMessage('Could not copy the plan.', 'error')
     }
   }
 
@@ -76,8 +74,6 @@ function MealPlans() {
       </PageHeader>
 
       <section className="container">
-        {message && <p className="toast toast--success" role="status">{message}</p>}
-
         {plans.length === 0 ? (
           <EmptyState
             title="No saved plans yet"

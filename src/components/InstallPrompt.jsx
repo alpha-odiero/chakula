@@ -38,12 +38,12 @@ function InstallPrompt({ autoShow = true }) {
   if (!canInstall && !showIOSGuide) return null
 
   return (
-    <div className="install-prompt" role="dialog" aria-modal="false" aria-label="Install Chakula">
+    <div className="install-prompt" role="dialog" aria-modal="false" aria-label="Install Pikawise">
       {showIOSGuide && !canInstall ? (
         <>
           <div className="install-prompt-title">
             <Icon name="install" size={20} />
-            Install Chakula
+            Install Pikawise
           </div>
           <ol className="install-steps">
             <li>Tap the Share button <span aria-hidden="true">↗</span></li>
@@ -60,7 +60,7 @@ function InstallPrompt({ autoShow = true }) {
         <>
           <div className="install-prompt-title">
             <Icon name="install" size={20} />
-            Install Chakula
+            Install Pikawise
           </div>
           <p className="install-prompt-text">Get a faster app-like experience on your device.</p>
           <div className="install-prompt-actions">

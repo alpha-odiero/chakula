@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import Icon from './Icon'
+import { useToast } from './Toast'
 import { getShoppingChecks, setShoppingItemChecked, saveShoppingChecks } from '../utils/storage'
 import { supportsWebShare, supportsClipboard } from '../utils/platform'
 
 function InteractiveShoppingList({ plan }) {
   const checks = getShoppingChecks()[plan.id] || {}
   const [checked, setChecked] = useState(checks)
-  const [message, setMessage] = useState(null)
+  const toast = useToast()
 
   const shopping = plan.shopping || { required: [], have: [], need: [] }
 
@@ -35,7 +36,7 @@ function InteractiveShoppingList({ plan }) {
     const text = lines.join('\n')
     if (supportsWebShare()) {
       try {
-        await navigator.share({ title: 'Chakula Shopping List', text })
+        await navigator.share({ title: 'Pikawise Shopping List', text })
         return
       } catch {
         /* fall through to copy */
@@ -44,8 +45,7 @@ function InteractiveShoppingList({ plan }) {
     if (supportsClipboard()) {
       try {
         await navigator.clipboard.writeText(text)
-        setMessage('Shopping list copied!')
-        setTimeout(() => setMessage(null), 2500)
+        toast.success('Shopping list copied.')
         return
       } catch {
         /* fall through */
@@ -58,10 +58,9 @@ function InteractiveShoppingList({ plan }) {
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
-      setMessage('Shopping list copied!')
-      setTimeout(() => setMessage(null), 2500)
+      toast.success('Shopping list copied.')
     } catch {
-      /* clipboard unavailable */
+      toast.error('Could not copy the shopping list.')
     }
   }
 
@@ -80,7 +79,6 @@ function InteractiveShoppingList({ plan }) {
           </button>
         </div>
       </div>
-      {message && <p className="share-confirmation" role="status">{message}</p>}
 
       {have.length > 0 && (
         <>

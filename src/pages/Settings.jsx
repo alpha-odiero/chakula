@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import Icon from '../components/Icon'
 import ConfirmDialog from '../components/ConfirmDialog'
+import logo from '../assets/LOGO.png'
 import { usePreferences } from '../components/PreferencesProvider'
+import { useToast } from '../components/Toast'
 import { useTheme } from '../hooks/useTheme'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
 import {
@@ -38,18 +40,15 @@ function Settings() {
   const [iosGuide, setIosGuide] = useState(false)
   const [updateState, setUpdateState] = useState('idle')
   const [storageBytes, setStorageBytes] = useState(() => getStorageUsage())
-  const [message, setMessage] = useState(null)
+  const toast = useToast()
 
-  const showMessage = (text) => {
-    setMessage(text)
-    setTimeout(() => setMessage(null), 3000)
-  }
+  const showMessage = (text, variant = 'success') => toast.notify(text, { variant })
 
   const handleInstall = async () => {
     const ok = await install()
     if (!ok) {
       if (getIOSDevice() && !isInstalled) setIosGuide(true)
-      else showMessage('Installation is not available in this browser right now.')
+      else showMessage('Installation is not available in this browser right now.', 'info')
     }
   }
 
@@ -67,7 +66,7 @@ function Settings() {
       const registration = await navigator.serviceWorker?.getRegistration()
       if (!registration || !registration.update) {
         setUpdateState('error')
-        showMessage('Could not check for updates.')
+        showMessage('Could not check for updates.', 'error')
         return
       }
       await registration.update()
@@ -75,7 +74,7 @@ function Settings() {
       showMessage('Pikawise is up to date.')
     } catch {
       setUpdateState('error')
-      showMessage('Could not check for updates. You may be offline.')
+      showMessage('Could not check for updates. You may be offline.', 'error')
     }
   }
 
@@ -87,21 +86,42 @@ function Settings() {
       showMessage(`Cleared ${keys.length} cached file set${keys.length === 1 ? '' : 's'}.`)
     } catch {
       setClearCheckConfirm(false)
-      showMessage('Could not clear cached data.')
+      showMessage('Could not clear cached data.', 'error')
     }
   }
 
   return (
     <main className="settings-page">
-      <PageHeader eyebrow="Settings" title="Settings" />
+      <PageHeader
+        eyebrow="Settings"
+        title="Settings"
+        subtitle="Manage how Pikawise looks, plans your meals, and stores data on this device."
+      />
       <section className="container settings-body">
-        {message && (
-          <p className="toast toast--success" role="status">{message}</p>
-        )}
+        <div className="settings-hero">
+          <img
+            src={logo}
+            alt=""
+            className="settings-hero-logo"
+            width="88"
+            height="62"
+            aria-hidden="true"
+          />
+          <div className="settings-hero-info">
+            <h2 className="settings-hero-name">Pikawise</h2>
+            <p className="settings-hero-tagline">Discover meals. Cook with what you have.</p>
+            <span className="settings-hero-version">
+              <Icon name="check" size={13} />
+              Version {APP_VERSION}
+            </span>
+          </div>
+        </div>
 
         <div className="settings-group">
           <h2 className="settings-group-title">
-            <Icon name="sun" size={20} />
+            <span className="settings-group-icon">
+              <Icon name="sliders" size={17} />
+            </span>
             Appearance
           </h2>
           <div className="settings-row">
@@ -156,7 +176,9 @@ function Settings() {
 
         <div className="settings-group">
           <h2 className="settings-group-title">
-            <Icon name="leaf" size={20} />
+            <span className="settings-group-icon">
+              <Icon name="leaf" size={17} />
+            </span>
             Meal preferences
           </h2>
           <div className="settings-row">
@@ -179,42 +201,38 @@ function Settings() {
             </div>
           </div>
 
-          <div className="settings-row">
-            <div>
-              <p className="settings-label">Dietary preference</p>
+          <div className="settings-field">
+            <p className="settings-label">Dietary preference</p>
+            <div className="settings-chip-row">
+              {DIET_OPTIONS.map((opt) => (
+                <button
+                  type="button"
+                  key={opt.value}
+                  className={`chip${preferences.dietaryPreference === opt.value ? ' chip--active' : ''}`}
+                  aria-pressed={preferences.dietaryPreference === opt.value}
+                  onClick={() => update({ dietaryPreference: opt.value })}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
-          </div>
-          <div className="settings-chip-row">
-            {DIET_OPTIONS.map((opt) => (
-              <button
-                type="button"
-                key={opt.value}
-                className={`chip${preferences.dietaryPreference === opt.value ? ' chip--active' : ''}`}
-                aria-pressed={preferences.dietaryPreference === opt.value}
-                onClick={() => update({ dietaryPreference: opt.value })}
-              >
-                {opt.label}
-              </button>
-            ))}
           </div>
 
-          <div className="settings-row">
-            <div>
-              <p className="settings-label">Cooking time</p>
+          <div className="settings-field">
+            <p className="settings-label">Cooking time</p>
+            <div className="settings-chip-row">
+              {TIME_OPTIONS.map((opt) => (
+                <button
+                  type="button"
+                  key={opt.value}
+                  className={`chip${preferences.cookingTime === opt.value ? ' chip--active' : ''}`}
+                  aria-pressed={preferences.cookingTime === opt.value}
+                  onClick={() => update({ cookingTime: opt.value })}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
-          </div>
-          <div className="settings-chip-row">
-            {TIME_OPTIONS.map((opt) => (
-              <button
-                type="button"
-                key={opt.value}
-                className={`chip${preferences.cookingTime === opt.value ? ' chip--active' : ''}`}
-                aria-pressed={preferences.cookingTime === opt.value}
-                onClick={() => update({ cookingTime: opt.value })}
-              >
-                {opt.label}
-              </button>
-            ))}
           </div>
 
           <div className="settings-row">
@@ -236,7 +254,9 @@ function Settings() {
 
         <div className="settings-group">
           <h2 className="settings-group-title">
-            <Icon name="database" size={20} />
+            <span className="settings-group-icon">
+              <Icon name="database" size={17} />
+            </span>
             Data &amp; storage
           </h2>
           <div className="settings-row">
@@ -298,16 +318,18 @@ function Settings() {
 
         <div className="settings-group">
           <h2 className="settings-group-title">
-            <Icon name="install" size={20} />
+            <span className="settings-group-icon">
+              <Icon name="install" size={17} />
+            </span>
             Application
           </h2>
           <div className="settings-row">
             <div>
-              <p className="settings-label">Install Chakula</p>
+              <p className="settings-label">Install Pikawise</p>
               <p className="settings-hint">
                 {isInstalled
-                  ? 'Chakula is installed on this device.'
-                  : 'Install Chakula to open it like a native app.'}
+                  ? 'Pikawise is installed on this device.'
+                  : 'Install Pikawise to open it like a native app.'}
               </p>
             </div>
             <button
@@ -322,7 +344,7 @@ function Settings() {
 
           {iosGuide && (
             <div className="settings-guide" role="note">
-              <h3>To install Chakula on iOS:</h3>
+              <h3>To install Pikawise on iOS:</h3>
               <ol>
                 <li>Tap the Share button</li>
                 <li>Select “Add to Home Screen”</li>
@@ -330,26 +352,20 @@ function Settings() {
               </ol>
             </div>
           )}
-
-          <div className="settings-row">
-            <div>
-              <p className="settings-label">Version</p>
-              <p className="settings-hint">Chakula v{APP_VERSION}</p>
-            </div>
-          </div>
         </div>
 
         <div className="settings-group">
           <h2 className="settings-group-title">
-            <Icon name="info" size={20} />
+            <span className="settings-group-icon">
+              <Icon name="info" size={17} />
+            </span>
             Information
           </h2>
           <nav className="settings-links" aria-label="Information">
-              <Link to="/about" className="settings-link">
-                About Pikawise
-                <Icon name="arrowRight" size={16} />
-              </Link>
-
+            <Link to="/about" className="settings-link">
+              About Pikawise
+              <Icon name="arrowRight" size={16} />
+            </Link>
             <Link to="/privacy" className="settings-link">
               Privacy Policy
               <Icon name="arrowRight" size={16} />

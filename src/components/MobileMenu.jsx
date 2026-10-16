@@ -43,7 +43,7 @@ function MobileMenu({ open, onClose }) {
       >
         <div className="mobile-menu-header">
           <span className="mobile-brand">
-            <img src={logo} alt="" className="brand-logo brand-logo--sm" width="37" height="30" aria-hidden="true" />
+            <img src={logo} alt="" className="brand-logo brand-logo--sm" width="34" height="24" aria-hidden="true" />
             <span className="brand-name">Pikawise</span>
           </span>
           <button type="button" className="menu-close" aria-label="Close menu" onClick={onClose}>
@@ -69,7 +69,7 @@ function MobileMenu({ open, onClose }) {
             ))}
           </ul>
         </nav>
-        <p className="mobile-menu-footer">Discover meals. Plan better. Cook smarter.</p>
+        <p className="mobile-menu-footer">Discover meals. Cook what you have.</p>
       </aside>
     </div>
   )

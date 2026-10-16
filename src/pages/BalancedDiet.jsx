@@ -5,6 +5,7 @@ import Icon from '../components/Icon'
 import EmptyState from '../components/EmptyState'
 import ErrorState from '../components/ErrorState'
 import { usePreferences } from '../components/PreferencesProvider'
+import { useToast } from '../components/Toast'
 import { useNetworkState } from '../hooks/useNetworkState'
 import { generateMealPlan, COMMON_INGREDIENTS, normalizeIngredient, inferMealType, evaluateBalance, calculateIngredientMatch } from '../utils/recommendations'
 import { addMealPlan } from '../utils/storage'
@@ -48,7 +49,7 @@ function BalancedDiet() {
   const [plan, setPlan] = useState(null)
   const [generating, setGenerating] = useState(false)
   const [generationError, setGenerationError] = useState(null)
-  const [message, setMessage] = useState(null)
+  const toast = useToast()
   const poolRef = useRef([])
   const resultRef = useRef(null)
 
@@ -64,10 +65,7 @@ function BalancedDiet() {
     if (resultRef.current) resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [plan])
 
-  const showMessage = (text) => {
-    setMessage(text)
-    window.setTimeout(() => setMessage(null), 3000)
-  }
+  const showMessage = (text, variant = 'success') => toast.notify(text, { variant })
 
   const addIngredient = (value, quiet = false) => {
     const cleaned = normalizeIngredient(value)
@@ -172,8 +170,11 @@ function BalancedDiet() {
         /* fall back to copy */
       }
     }
-    await copyText(text)
-    showMessage('Meal plan copied!')
+    const copied = await copyText(text)
+    showMessage(
+      copied ? 'Meal plan copied!' : 'Could not copy the meal plan.',
+      copied ? 'success' : 'error'
+    )
   }
 
   const generationLoading = generating
@@ -210,17 +211,13 @@ function BalancedDiet() {
           </div>
         )}
 
-        {message && (
-          <p className="toast toast--success" role="status">{message}</p>
-        )}
-
         <div className="builder-layout">
           <div className="builder-ingredients-panel" id="what-do-you-have">
             <h2 className="builder-section-title">
               <Icon name="shoppingBag" size={20} /> What food do you have?
             </h2>
             <p className="panel-subtitle">
-              Add the ingredients available at home and Chakula will look for meals you can make.
+              Add the ingredients available at home and Pikawise will look for meals you can make.
             </p>
 
             <div className="ingredient-input-row">
@@ -418,7 +415,7 @@ function BalancedDiet() {
           <div className="plan-results" ref={resultRef}>
             <PlanResults plan={plan} onReplace={replaceMeal} onSave={savePlan} onShare={sharePlan} onReset={() => setPlan(null)} />
             <div className="balanced-info-box plan-note">
-              <strong>Note:</strong> Chakula provides general meal-planning ideas and is not medical or
+              <strong>Note:</strong> Pikawise provides general meal-planning ideas and is not medical or
               professional dietary advice. Individual nutritional needs vary.
             </div>
           </div>
@@ -605,7 +602,7 @@ async function copyText(text) {
   if (supportsClipboard()) {
     try {
       await navigator.clipboard.writeText(text)
-      return
+      return true
     } catch {
       /* fall back below */
     }
@@ -617,8 +614,9 @@ async function copyText(text) {
     textArea.select()
     document.execCommand('copy')
     document.body.removeChild(textArea)
+    return true
   } catch {
-    /* clipboard unavailable */
+    return false
   }
 }
 

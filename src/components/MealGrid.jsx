@@ -4,11 +4,22 @@ import EmptyState from './EmptyState'
 import ErrorState from './ErrorState'
 import { getErrorMessage } from '../hooks/useApi'
 
-function MealGrid({ meals, loading = false, error = null, emptyTitle = 'No meals found', emptyMessage = 'Try a different search.', onRetry }) {
+function MealGrid({
+  meals,
+  loading = false,
+  error = null,
+  emptyTitle = 'No recipes found',
+  emptyMessage = 'Try a different search.',
+  onRetry,
+  fallbackCategory = null,
+  fallbackArea = null,
+  className = '',
+  skeletonCount = 4
+}) {
   if (loading) {
     return (
-      <div className="meal-grid" role="status" aria-label="Loading meals">
-        {Array.from({ length: 8 }).map((_, i) => (
+      <div className={`meal-grid ${className}`.trim()} role="status" aria-label="Loading recipes">
+        {Array.from({ length: skeletonCount }).map((_, i) => (
           <LoadingSkeleton key={i} variant="meal" />
         ))}
       </div>
@@ -34,9 +45,14 @@ function MealGrid({ meals, loading = false, error = null, emptyTitle = 'No meals
   }
 
   return (
-    <div className="meal-grid">
-      {uniqueMeals.map((meal, index) => (
-        <MealCard key={meal.idMeal || meal.id} meal={meal} index={index} />
+    <div className={`meal-grid ${className}`.trim()}>
+      {uniqueMeals.map((meal) => (
+        <MealCard
+          key={meal.idMeal || meal.id}
+          meal={meal}
+          fallbackCategory={fallbackCategory}
+          fallbackArea={fallbackArea}
+        />
       ))}
     </div>
   )

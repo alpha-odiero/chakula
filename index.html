@@ -3,20 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="Pikawise — discover meals, plan balanced diets, build shopping lists, and cook smarter with offline access." />
-    <meta name="theme-color" content="#1c1a17" />
+    <meta name="description" content="Pikawise — discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with offline access." />
+    <meta name="theme-color" content="#198a43" />
     <meta name="application-name" content="Pikawise" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Pikawise" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Pikawise — Discover Meals. Plan Better. Cook Smarter." />
-    <meta property="og:description" content="Discover meals, build balanced meal plans, and create smart shopping lists with Pikawise." />
+    <meta property="og:title" content="Pikawise — Discover meals. Cook with what you have." />
+    <meta property="og:description" content="Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with Pikawise." />
     <meta property="og:site_name" content="Pikawise" />
     <meta property="og:url" content="https://pikawise.vercel.app" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Pikawise — Discover Meals. Plan Better. Cook Smarter." />
-    <meta name="twitter:description" content="Discover meals, build balanced meal plans, and create smart shopping lists with Pikawise." />
+    <meta name="twitter:title" content="Pikawise — Discover meals. Cook with what you have." />
+    <meta name="twitter:description" content="Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with Pikawise." />
     <link rel="canonical" href="https://pikawise.vercel.app" />
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
     <meta name="google-site-verification" content="Qb5fvAevj_gqHvjdykTMA47MyFueviCSqU1SmmBWbGM" />
@@ -28,7 +28,7 @@
         "url": "https://pikawise.vercel.app",
         "applicationCategory": "LifestyleApplication",
         "operatingSystem": "Android, iOS, Windows, macOS",
-        "description": "Discover meals, plan balanced diets, build shopping lists, and cook smarter with offline access.",
+        "description": "Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with offline access.",
         "offers": {
           "@type": "Offer",
           "price": "0",
@@ -38,9 +38,164 @@
     </script>
     <link rel="preconnect" href="https://www.themealdb.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.themealdb.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    />
+    <script>
+      ;(function () {
+        try {
+          var pref = JSON.parse(localStorage.getItem('chakula_theme') || '"light"')
+          var dark =
+            pref === 'dark' ||
+            (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          document.documentElement.classList.add(dark ? 'theme-dark' : 'theme-light')
+        } catch (e) {
+          document.documentElement.classList.add('theme-light')
+        }
+      })()
+    </script>
     <style>
       html {
-        background: #f7f1e6;
+        background: #f7f8f5;
+      }
+      html.theme-dark {
+        background: #0f1310;
+      }
+      #app-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(120% 90% at 50% 18%, #ffffff 0%, #f4f8f2 55%, #eaf6ed 100%);
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+        animation: app-splash-auto 1.4s ease 2.8s forwards;
+      }
+      .app-splash-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+      }
+      .app-splash-logo {
+        position: relative;
+        display: grid;
+        place-items: center;
+        animation: app-splash-pop 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+      }
+      .app-splash-logo::before {
+        content: '';
+        position: absolute;
+        width: 172px;
+        height: 172px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(25, 138, 67, 0.16) 0%, rgba(25, 138, 67, 0) 68%);
+        animation: app-splash-pulse 1.9s ease-in-out infinite;
+      }
+      .app-splash-mark {
+        position: relative;
+        width: 132px;
+        height: auto;
+        animation: app-splash-float 2.3s ease-in-out infinite;
+      }
+      .app-splash-name {
+        font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        font-weight: 800;
+        font-size: 20px;
+        letter-spacing: -0.02em;
+        color: #0f1310;
+      }
+      .app-splash-bar {
+        width: 148px;
+        height: 5px;
+        border-radius: 999px;
+        background: #dcefdc;
+        overflow: hidden;
+      }
+      .app-splash-bar > span {
+        display: block;
+        height: 100%;
+        width: 42%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #157739, #2fa75c);
+        animation: app-splash-slide 1.15s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      }
+      html.theme-dark #app-splash {
+        background: radial-gradient(120% 90% at 50% 18%, #141a15 0%, #10150f 55%, #0f1310 100%);
+      }
+      html.theme-dark .app-splash-name {
+        color: #eef2ec;
+      }
+      html.theme-dark .app-splash-mark {
+        filter: brightness(0) invert(1);
+      }
+      html.theme-dark .app-splash-bar {
+        background: #1c2a20;
+      }
+      html.theme-dark .app-splash-logo::before {
+        background: radial-gradient(circle, rgba(47, 167, 92, 0.22) 0%, rgba(47, 167, 92, 0) 68%);
+      }
+      #app-splash.app-splash--hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      @keyframes app-splash-pop {
+        from {
+          opacity: 0;
+          transform: scale(0.86) translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      @keyframes app-splash-float {
+        0%, 100% {
+          transform: translateY(-3px);
+        }
+        50% {
+          transform: translateY(3px);
+        }
+      }
+      @keyframes app-splash-pulse {
+        0%, 100% {
+          transform: scale(0.9);
+          opacity: 0.6;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+      }
+      @keyframes app-splash-slide {
+        0% {
+          transform: translateX(-120%);
+        }
+        100% {
+          transform: translateX(320%);
+        }
+      }
+      @keyframes app-splash-auto {
+        to {
+          opacity: 0;
+          visibility: hidden;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #app-splash {
+          animation-delay: 0.2s;
+          animation-duration: 0.01s;
+        }
+        .app-splash-logo,
+        .app-splash-logo::before,
+        .app-splash-mark,
+        .app-splash-bar > span {
+          animation: none;
+        }
       }
     </style>
     <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -48,9 +203,18 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <title>Pikawise — Discover Meals. Plan Better. Cook Smarter.</title>
+    <title>Pikawise — Discover meals. Cook with what you have.</title>
   </head>
   <body>
+    <div id="app-splash" aria-hidden="true">
+      <div class="app-splash-inner">
+        <div class="app-splash-logo">
+          <img class="app-splash-mark" src="./src/assets/LOGO.png" alt="" width="132" height="93" aria-hidden="true" />
+        </div>
+        <span class="app-splash-name">Pikawise</span>
+        <span class="app-splash-bar"><span></span></span>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

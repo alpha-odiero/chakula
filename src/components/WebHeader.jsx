@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import Icon from './Icon'
-import MobileMenu from './MobileMenu'
 import logo from '../assets/LOGO.png'
+import MobileMenu from './MobileMenu'
+import NotificationCenter from './NotificationCenter'
 
 const desktopNavItems = [
   { to: '/', label: 'Home', end: true },
-  { to: '/explore', label: 'Explore' },
-  { to: '/balanced-diet', label: 'Balanced Diet' },
-  { to: '/categories', label: 'Categories' },
-  { to: '/random', label: 'Random' }
+  { to: '/explore', label: 'Discover' },
+  { to: '/categories', label: 'Recipes' },
+  { to: '/#how-it-works', label: 'How it works' },
+  { to: '/about', label: 'About' }
 ]
 
-function Navbar() {
+function WebHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
 
@@ -30,7 +31,7 @@ function Navbar() {
       <header className="site-header">
         <div className="container header-inner">
           <Link to="/" className="brand" aria-label="Pikawise — go to Home">
-            <img src={logo} alt="" className="brand-logo" width="47" height="38" aria-hidden="true" />
+            <img src={logo} alt="" className="brand-logo" width="43" height="30" aria-hidden="true" />
             <span className="brand-name">Pikawise</span>
           </Link>
 
@@ -41,7 +42,9 @@ function Navbar() {
                   <NavLink
                     to={item.to}
                     end={item.end}
-                    className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                    className={({ isActive }) =>
+                      `nav-link${isActive && item.to !== '/#how-it-works' ? ' active' : ''}`
+                    }
                   >
                     {item.label}
                   </NavLink>
@@ -51,13 +54,13 @@ function Navbar() {
           </nav>
 
           <div className="header-actions">
-            <Link to="/search" className="header-action search-shortcut" aria-label="Search meals">
+            <Link to="/search" className="header-action" aria-label="Search recipes">
               <Icon name="search" size={20} />
             </Link>
-            <Link to="/settings" className="header-action header-settings desktop-settings" aria-label="Settings">
-              <Icon name="settings" size={20} />
+            <NotificationCenter className="header-action" />
+            <Link to="/explore" className="header-cta">
+              Open Pikawise
             </Link>
-            <Link to="/balanced-diet" className="header-cta">Plan a meal</Link>
             <button
               type="button"
               className="menu-toggle"
@@ -77,4 +80,4 @@ function Navbar() {
   )
 }
 
-export default Navbar
+export default WebHeader

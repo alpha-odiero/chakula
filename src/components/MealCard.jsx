@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
+import Icon from './Icon'
+import SaveButton from './SaveButton'
 
-function MealCard({ meal, index = 0 }) {
+function MealCard({ meal, fallbackCategory = null, fallbackArea = null }) {
   if (!meal) return null
   const id = meal.idMeal || meal.id
   const name = meal.strMeal || meal.name
   const image = meal.strMealThumb || meal.image
-  const category = meal.strMealCategory || null
-  const area = meal.strArea || null
+  const category = meal.strCategory || meal.strMealCategory || fallbackCategory || null
+  const area = meal.strArea || fallbackArea || null
 
   return (
     <article className="meal-card">
@@ -25,9 +27,24 @@ function MealCard({ meal, index = 0 }) {
         </div>
         <div className="meal-card-body">
           <h3 className="meal-card-title">{name}</h3>
-          {area && <p className="meal-card-meta">{area}</p>}
+          {(area || category) && (
+            <p className="meal-card-meta">
+              {area ? (
+                <span>
+                  <Icon name="globe" size={13} />
+                  <em>{area}</em>
+                </span>
+              ) : (
+                <span>
+                  <Icon name="utensils" size={13} />
+                  <em>{category}</em>
+                </span>
+              )}
+            </p>
+          )}
         </div>
       </Link>
+      <SaveButton meal={meal} />
     </article>
   )
 }

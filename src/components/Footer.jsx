@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import logo from '../assets/LOGO.png'
+import StoreButtons from './StoreButtons'
 import Icon from './Icon'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
+import { useToast } from './Toast'
 import { isStandalone } from '../utils/platform'
 
 const exploreLinks = [
@@ -28,27 +30,50 @@ const infoLinks = [
 function Footer() {
   const year = new Date().getFullYear()
   const { canInstall, isInstalled, install } = useInstallPrompt()
+  const toast = useToast()
   const standalone = isStandalone()
   if (isInstalled || standalone) return null
 
+  const handleInstall = async () => {
+    const ok = await install()
+    if (ok) toast.success('Thanks for installing Pikawise!')
+  }
+
   return (
     <footer className="site-footer">
+      <div className="container footer-downloads" aria-labelledby="footer-downloads-title">
+        <div className="downloads-copy">
+          <h2 id="footer-downloads-title">Take Pikawise with you</h2>
+          <p>Discover meals and follow your favorite recipes wherever you go.</p>
+        </div>
+        <StoreButtons />
+      </div>
+
       <div className="container footer-inner">
         <div className="footer-brand">
           <div className="brand footer-logo">
-            <img src={logo} alt="" className="brand-logo brand-logo--lg" width="58" height="48" aria-hidden="true" />
-            <span className="brand-name">Chakula</span>
+            <img src={logo} alt="" className="brand-logo brand-logo--lg" width="54" height="38" aria-hidden="true" />
+            <span className="brand-name">Pikawise</span>
           </div>
-          <p>Discover meals. Plan balanced diets. Cook smarter.</p>
+          <p>Discover meals. Cook with what you have.</p>
           <div className="footer-install">
               <p className="footer-install-text">
                 Get Pikawise as a fast, offline-capable app on your device.
               </p>
             {canInstall ? (
-              <button type="button" className="button button--primary footer-install-btn" onClick={install}>
-                <Icon name="install" size={18} />
-                Install App
-              </button>
+              <div className="footer-install-action">
+                <button
+                  type="button"
+                  className="button button--primary footer-install-btn"
+                  onClick={handleInstall}
+                >
+                  <Icon name="install" size={18} />
+                  Install App
+                </button>
+                <span className="install-nudge" aria-hidden="true">
+                  <Icon name="pointer" size={26} />
+                </span>
+              </div>
             ) : isInstalled ? (
               <span className="footer-install-done">
                 <Icon name="check" size={16} />

@@ -1,4 +1,4 @@
-/* ============ Chakula Features ============ */
+/* ============ Pikawise Features ============ */
 
 /* ---------- Onboarding ---------- */
 .onboarding-overlay {
@@ -399,6 +399,7 @@
 
 .ingredient-input {
   flex: 1;
+  min-width: 0;
   height: 42px;
   padding: 0 14px;
   border: 1px solid var(--border);
@@ -607,7 +608,7 @@
 }
 
 .plan-meal-balance--good { color: var(--success); }
-.plan-meal-balance--warn { color: var(--warning); }
+.plan-meal-balance--warn { color: var(--warning-ink); }
 
 .plan-meal-actions {
   display: flex;
@@ -1197,7 +1198,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-top: 12px;
 }
 
 .chip--active {
@@ -1210,14 +1211,19 @@
 .toggle {
   position: relative;
   display: inline-flex;
+  align-items: center;
   width: 48px;
-  height: 28px;
+  height: 44px;
   flex-shrink: 0;
 }
 
 .toggle-track {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 28px;
   border-radius: 999px;
   background: var(--border);
   transition: background var(--duration-normal) var(--ease-out);
@@ -1241,12 +1247,6 @@
 
 /* ---------- Onboarding tagline ---------- */
 .onboarding-mark .icon { color: var(--accent); }
-
-.share-confirmation {
-  font-size: 0.85rem;
-  color: var(--success);
-  margin-bottom: 10px;
-}
 
 .home-tip { margin-bottom: 12px; }
 

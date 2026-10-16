@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import SearchBar from '../components/SearchBar'
 import MealGrid from '../components/MealGrid'
 import ErrorState from '../components/ErrorState'
@@ -17,17 +17,29 @@ import {
 
 const POPULAR_CATEGORIES = ['Beef', 'Chicken', 'Seafood', 'Vegetarian', 'Pasta', 'Dessert']
 
+const FILTER_LABELS = { category: 'Category', area: 'Cuisine', ingredient: 'Ingredient' }
+
 function Explore() {
   const [categories, setCategories] = useState({ data: null, loading: true, error: null })
   const [areas, setAreas] = useState({ data: [], loading: true, error: null })
   const [ingredients, setIngredients] = useState({ data: [], loading: true, error: null })
   const [meals, setMeals] = useState({ data: null, loading: true, error: null })
-  const [activeFilter, setActiveFilter] = useState({ type: null, value: null })
+  const [searchParams, setSearchParams] = useSearchParams()
   const [ingredientSearch, setIngredientSearch] = useState('')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const filtersRef = useRef(null)
   const [shopping, setShopping] = useState(getPersonalShopping)
   const [shoppingInput, setShoppingInput] = useState('')
+
+  const activeFilter = useMemo(() => {
+    const category = searchParams.get('category')
+    const area = searchParams.get('area')
+    const ingredient = searchParams.get('ingredient')
+    if (category) return { type: 'category', value: category }
+    if (area) return { type: 'area', value: area }
+    if (ingredient) return { type: 'ingredient', value: ingredient }
+    return { type: null, value: null }
+  }, [searchParams])
 
   const loadMeals = useCallback((filter = activeFilter) => {
     setMeals((prev) => ({ ...prev, loading: true, error: null }))
@@ -84,14 +96,15 @@ function Explore() {
   }, [ingredients.data, ingredientSearch])
 
   const selectFilter = (type, value) => {
-    setActiveFilter((prev) => {
-      if (prev.type === type && prev.value === value) return { type: null, value: null }
-      return { type, value }
-    })
+    if (activeFilter.type === type && activeFilter.value === value) {
+      setSearchParams({}, { replace: true })
+      return
+    }
+    setSearchParams({ [type]: value }, { replace: true })
   }
 
   const clearAll = () => {
-    setActiveFilter({ type: null, value: null })
+    setSearchParams({}, { replace: true })
     setIngredientSearch('')
   }
 
@@ -132,7 +145,7 @@ function Explore() {
         <p className="browse-label">Popular categories</p>
         <div className="browse-chips">
           {POPULAR_CATEGORIES.map((cat) => (
-            <Link key={cat} to={`/categories/${cat}`} className="chip chip--browse">
+            <Link key={cat} to={`/explore?category=${encodeURIComponent(cat)}`} className="chip chip--browse">
               {cat}
             </Link>
           ))}
@@ -234,11 +247,26 @@ function Explore() {
           <div className="explore-results">
             <div className="results-head" role="status" aria-live="polite">
               <h2>{activeFilter.value ? `${activeFilter.value} meals` : 'Meals'}</h2>
-              {!meals.loading && meals.data && (
-                <span className="results-count">
-                  {meals.data.length} {meals.data.length === 1 ? 'meal' : 'meals'}
-                </span>
-              )}
+              <div className="results-head-meta">
+                {activeFilter.value && (
+                  <button
+                    type="button"
+                    className="chip chip--active chip--removable"
+                    onClick={clearAll}
+                    aria-label={`Remove ${activeFilter.value} filter`}
+                  >
+                    <span>{`${FILTER_LABELS[activeFilter.type] || activeFilter.type}: ${activeFilter.value}`}</span>
+                    <span className="chip-remove">
+                      <Icon name="close" size={13} />
+                    </span>
+                  </button>
+                )}
+                {!meals.loading && meals.data && (
+                  <span className="results-count">
+                    {meals.data.length} {meals.data.length === 1 ? 'meal' : 'meals'}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="results-body">
@@ -247,7 +275,11 @@ function Explore() {
               ) : meals.error ? (
                 <ErrorState onRetry={() => loadMeals(activeFilter)} />
               ) : meals.data && meals.data.length > 0 ? (
-                <MealGrid meals={meals.data} />
+                <MealGrid
+                  meals={meals.data}
+                  fallbackCategory={activeFilter.type === 'category' ? activeFilter.value : null}
+                  fallbackArea={activeFilter.type === 'area' ? activeFilter.value : null}
+                />
               ) : (
                 <EmptyState
                   title="No meals found"

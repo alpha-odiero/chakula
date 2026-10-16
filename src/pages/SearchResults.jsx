@@ -50,7 +50,7 @@ function SearchResults() {
   }, [results.data, sort])
 
   useEffect(() => {
-    if (query.trim()) document.title = `Search results for "${query}" — Chakula`
+    if (query.trim()) document.title = `Search results for "${query}" — Pikawise`
   }, [query])
 
   return (

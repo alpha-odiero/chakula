@@ -47,7 +47,7 @@ function Onboarding({ onClose }) {
         className="onboarding"
         role="dialog"
         aria-modal="true"
-        aria-label="Welcome to Chakula"
+        aria-label="Welcome to Pikawise"
         tabIndex="-1"
         ref={dialogRef}
       >
@@ -57,7 +57,7 @@ function Onboarding({ onClose }) {
 
         {step === 0 && (
           <>
-            <h2 className="onboarding-title">Welcome to Chakula</h2>
+            <h2 className="onboarding-title">Welcome to Pikawise</h2>
             <p className="onboarding-text">
               Let's personalize your meal discovery experience. It only takes a moment.
             </p>

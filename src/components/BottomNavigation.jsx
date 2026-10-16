@@ -3,10 +3,10 @@ import Icon from './Icon'
 
 const items = [
   { to: '/', label: 'Home', icon: 'home', end: true },
-  { to: '/explore', label: 'Explore', icon: 'explore' },
-  { to: '/balanced-diet', label: 'Plan', icon: 'calendar' },
-  { to: '/favorites', label: 'Favorites', icon: 'heart' },
-  { to: '/settings', label: 'Settings', icon: 'settings' }
+  { to: '/explore', label: 'Discover', icon: 'explore' },
+  { to: '/search', label: 'Search', icon: 'search' },
+  { to: '/favorites', label: 'Saved', icon: 'heart' },
+  { to: '/settings', label: 'Profile', icon: 'user' }
 ]
 
 function BottomNavigation() {
@@ -21,7 +21,7 @@ function BottomNavigation() {
               className={({ isActive }) => `bottom-nav-link${isActive ? ' active' : ''}`}
             >
               <span className="bottom-nav-icon" aria-hidden="true">
-                <Icon name={item.icon} size={22} />
+                <Icon name={item.icon} size={21} />
               </span>
               <span className="bottom-nav-label">{item.label}</span>
             </NavLink>
