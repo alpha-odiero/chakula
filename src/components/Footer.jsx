@@ -32,7 +32,7 @@ function blinkInstallButton(el) {
     }
     el.animate(FLASH_KEYFRAMES, {
       id: 'pikawise-install-blink',
-      duration: 550,
+      duration: 900,
       delay: 250,
       iterations: 3,
       easing: 'ease-in-out'
