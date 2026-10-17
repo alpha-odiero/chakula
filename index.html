@@ -74,7 +74,7 @@
         justify-content: center;
         padding: calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right))
           calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
-        background: radial-gradient(120% 90% at 50% 15%, #ffffff 0%, #f3f8f2 52%, #e7f4ea 100%);
+        background: #ffffff;
         transition: opacity 0.45s ease, visibility 0.45s ease;
       }
       .pw-splash-inner {
@@ -83,56 +83,11 @@
         align-items: center;
         gap: 16px;
       }
-      .pw-splash-badge {
-        --ring-w: 3.5px;
-        position: relative;
-        display: grid;
-        place-items: center;
-        width: 76px;
-        height: 76px;
+      .pw-splash-logo {
+        display: block;
+        width: auto;
+        height: 34px;
         animation: pw-splash-pop 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
-      }
-      .pw-splash-ring {
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: conic-gradient(
-          from 0turn,
-          rgba(25, 138, 67, 1) 0turn 0.4turn,
-          rgba(25, 138, 67, 0) 0.4turn 0.5turn,
-          rgba(25, 138, 67, 0.34) 0.5turn 0.9turn,
-          rgba(25, 138, 67, 0) 0.9turn 1turn
-        );
-        -webkit-mask: radial-gradient(
-          farthest-side,
-          #0000 calc(100% - var(--ring-w)),
-          #000 calc(100% - var(--ring-w))
-        );
-        mask: radial-gradient(
-          farthest-side,
-          #0000 calc(100% - var(--ring-w)),
-          #000 calc(100% - var(--ring-w))
-        );
-        animation: pw-splash-spin 0.85s linear infinite;
-      }
-      .pw-splash-ring--inner {
-        --ring-w: 2px;
-        inset: 10px;
-        background: conic-gradient(
-          from 0.5turn,
-          rgba(25, 138, 67, 0.55) 0turn 0.35turn,
-          rgba(25, 138, 67, 0) 0.35turn 0.5turn,
-          rgba(25, 138, 67, 0.55) 0.5turn 0.85turn,
-          rgba(25, 138, 67, 0) 0.85turn 1turn
-        );
-        animation: pw-splash-spin 1.35s linear infinite reverse;
-      }
-      .pw-splash-mark {
-        position: relative;
-        width: 44px;
-        height: 44px;
-        border-radius: 13px;
-        box-shadow: 0 8px 20px rgba(25, 138, 67, 0.24);
       }
       .pw-splash-name {
         font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -142,14 +97,41 @@
         color: #0f1310;
         animation: pw-splash-pop 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) 0.05s both;
       }
+      .pw-splash-dots {
+        display: inline-flex;
+        align-items: flex-end;
+        gap: 7px;
+        height: 14px;
+      }
+      .pw-splash-dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #198a43;
+        opacity: 0.45;
+        animation: pw-splash-dot 1.2s ease-in-out infinite;
+      }
+      .pw-splash-dots span:nth-child(1) {
+        animation-delay: 0s;
+      }
+      .pw-splash-dots span:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .pw-splash-dots span:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .pw-splash-dots span:nth-child(4) {
+        animation-delay: 0.45s;
+      }
       html.theme-dark #app-splash {
-        background: radial-gradient(120% 90% at 50% 15%, #151b16 0%, #11170f 55%, #0f1310 100%);
+        background: #0f1310;
       }
       html.theme-dark .pw-splash-name {
         color: #eef2ec;
       }
-      html.theme-dark .pw-splash-mark {
-        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
+      html.theme-dark .pw-splash-logo,
+      html.theme-dark .pw-splash-dots span {
+        filter: brightness(0) invert(1);
       }
       #app-splash.pw-splash--hidden {
         opacity: 0;
@@ -166,15 +148,22 @@
           transform: scale(1) translateY(0);
         }
       }
-      @keyframes pw-splash-spin {
-        to {
-          transform: rotate(1turn);
+      @keyframes pw-splash-dot {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+          opacity: 0.45;
+        }
+        30% {
+          transform: translateY(-8px);
+          opacity: 1;
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        .pw-splash-badge,
-        .pw-splash-ring,
-        .pw-splash-name {
+        .pw-splash-logo,
+        .pw-splash-name,
+        .pw-splash-dots span {
           animation: none;
         }
       }
@@ -189,19 +178,18 @@
   <body>
     <div id="app-splash" role="status" aria-live="polite" aria-label="Pikawise is loading">
       <div class="pw-splash-inner">
-        <span class="pw-splash-badge">
-          <span class="pw-splash-ring" aria-hidden="true"></span>
-          <span class="pw-splash-ring pw-splash-ring--inner" aria-hidden="true"></span>
-          <img
-            class="pw-splash-mark"
-            src="./src/assets/logo.svg"
-            alt=""
-            width="44"
-            height="44"
-            aria-hidden="true"
-          />
-        </span>
+        <img
+          class="pw-splash-logo"
+          src="./src/assets/LOGO.png"
+          alt=""
+          width="48"
+          height="34"
+          aria-hidden="true"
+        />
         <span class="pw-splash-name">Pikawise</span>
+        <span class="pw-splash-dots" aria-hidden="true"
+          ><span></span><span></span><span></span><span></span
+        ></span>
       </div>
     </div>
     <script>

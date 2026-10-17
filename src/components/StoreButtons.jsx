@@ -62,7 +62,7 @@ const STORES = [
   }
 ]
 
-function StoreButtons() {
+function StoreButtons({ onStoreUnavailable }) {
   const { info } = useToast()
 
   return (
@@ -98,7 +98,10 @@ function StoreButtons() {
             key={store.key}
             type="button"
             className="store-btn"
-            onClick={() => info(store.comingSoon)}
+            onClick={() => {
+              info(store.comingSoon)
+              onStoreUnavailable?.(store.key)
+            }}
           >
             {content}
           </button>

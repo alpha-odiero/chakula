@@ -673,7 +673,7 @@
   max-width: 420px;
 }
 
-@media (min-width: 760px) {
+@media (min-width: 768px) {
   .footer-downloads {
     flex-direction: row;
     align-items: center;
@@ -804,6 +804,24 @@
   gap: 8px;
 }
 
+/* Flashes orange three times to draw the eye to the install button after a
+   "coming soon" store button is tapped. */
+.footer-install-btn--flash {
+  animation: install-flash 0.55s ease-in-out 3;
+}
+
+@keyframes install-flash {
+  0%,
+  100% {
+    background-color: var(--accent);
+    box-shadow: none;
+  }
+  50% {
+    background-color: #f97316;
+    box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.3);
+  }
+}
+
 .install-nudge {
   position: absolute;
   left: 100%;
@@ -894,4 +912,96 @@
 
 .footer-bottom a:hover {
   color: var(--on-dark);
+}
+
+/* ---------- Footer on small screens ---------- */
+/* Keep the footer compact and tidy on phones: tighter spacing, a two-column
+   link grid, and the two store buttons always sitting side by side. */
+@media (max-width: 767px) {
+  .footer-downloads {
+    padding-top: 26px;
+    padding-bottom: 24px;
+    gap: 14px;
+  }
+
+  .footer-downloads h2 {
+    font-size: 17px;
+  }
+
+  .footer-downloads p {
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
+  .store-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .store-btn {
+    width: 100%;
+    min-height: 46px;
+    padding: 7px 12px;
+    gap: 9px;
+  }
+
+  .store-btn-logo {
+    width: 21px;
+    height: 23px;
+  }
+
+  .store-btn-kicker {
+    font-size: 9px;
+  }
+
+  .store-btn-name {
+    font-size: 14px;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 20px;
+    padding-top: 26px;
+    padding-bottom: 24px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .footer-brand p {
+    margin-top: 10px;
+    font-size: 13px;
+    max-width: none;
+  }
+
+  .footer-install {
+    margin-top: 14px;
+  }
+
+  .footer-install-text {
+    font-size: 12px;
+    margin-bottom: 10px;
+    max-width: none;
+  }
+
+  .footer-col h2 {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+
+  .footer-col a {
+    min-height: 30px;
+    font-size: 13px;
+  }
+
+  .footer-bottom {
+    padding: 14px 0;
+  }
+
+  .footer-bottom-inner {
+    font-size: 12px;
+  }
 }

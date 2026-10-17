@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import logoMark from '../assets/logo.svg'
+import logo from '../assets/LOGO.png'
 import { APP_NAME } from '../config/app'
 
 function PikawiseLoader({
@@ -32,25 +32,22 @@ function PikawiseLoader({
 
   return (
     <div className={classes} {...statusProps}>
-      <span className="pw-loader-badge" aria-hidden="true">
-        <span className="pw-loader-ring" />
-        <span className="pw-loader-ring pw-loader-ring--inner" />
-        <img
-          className="pw-loader-mark"
-          src={logoMark}
-          alt=""
-          width="38"
-          height="38"
-          decoding="async"
-          aria-hidden="true"
-        />
-      </span>
+      <img
+        className="pw-loader-logo"
+        src={logo}
+        alt=""
+        width="48"
+        height="34"
+        decoding="async"
+        aria-hidden="true"
+      />
       {withName && (
         <span className="pw-loader-name" aria-hidden="true">
           {APP_NAME}
         </span>
       )}
       <span className="pw-loader-dots" aria-hidden="true">
+        <span />
         <span />
         <span />
         <span />

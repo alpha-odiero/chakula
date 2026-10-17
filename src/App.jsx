@@ -58,7 +58,7 @@ function AppShell() {
     // empty shell is never shown in standalone mode.
     const splash = document.getElementById('app-splash')
     if (!splash) return undefined
-    const MIN_VISIBLE = 1000
+    const MIN_VISIBLE = 2000
     const elapsed = performance.now()
     const wait = Math.max(0, MIN_VISIBLE - elapsed)
     let fadeTimer

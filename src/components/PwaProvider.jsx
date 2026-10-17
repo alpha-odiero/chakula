@@ -10,6 +10,9 @@ const AUTO_APPLY_DELAY_MS = 1500
 const AUTO_APPLY_RETRY_MS = 5000
 const AUTO_APPLY_COOLDOWN_MS = 30000
 
+// Updates are silent on the open web: the page reloads already up to date with
+// no notification. The in-app update prompt (notification centre) is reserved
+// for the installed app.
 const PwaContext = createContext({ updateAvailable: false, update: () => {}, dismiss: () => {} })
 
 export function usePwa() {
@@ -47,16 +50,6 @@ function PwaProvider({ children }) {
     if (typeof window === 'undefined') return undefined
     if (!('serviceWorker' in navigator)) return undefined
 
-    // If we just auto-applied an update on the web, let the user know once.
-    try {
-      if (sessionStorage.getItem(WEB_UPDATE_FLAG) === '1') {
-        sessionStorage.removeItem(WEB_UPDATE_FLAG)
-        notify('Pikawise is up to date.', { variant: 'success' })
-      }
-    } catch {
-      // sessionStorage may be unavailable; not worth failing the boot for.
-    }
-
     let watchInterval = null
     let retryTimer = null
 
@@ -70,7 +63,6 @@ function PwaProvider({ children }) {
         autoAppliedRef.current = true
         dismissNotification(UPDATE_NOTIFICATION_ID)
         try {
-          sessionStorage.setItem(WEB_UPDATE_FLAG, '1')
           sessionStorage.setItem(`${WEB_UPDATE_FLAG}-at`, String(Date.now()))
         } catch {
           // ignore storage failures

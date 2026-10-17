@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/LOGO.png'
 import StoreButtons from './StoreButtons'
@@ -32,11 +33,34 @@ function Footer() {
   const { canInstall, isInstalled, install } = useInstallPrompt()
   const toast = useToast()
   const standalone = isStandalone()
+  const installRef = useRef(null)
+  const flashTimer = useRef(null)
+
+  useEffect(() => () => window.clearTimeout(flashTimer.current), [])
+
   if (isInstalled || standalone) return null
 
   const handleInstall = async () => {
     const ok = await install()
     if (ok) toast.success('Thanks for installing Pikawise!')
+  }
+
+  // A store button was tapped but that app isn't published yet: the "coming
+  // soon" message has been shown, so guide the user to the install button and
+  // flash it orange a few times to make it obvious.
+  const handleStoreUnavailable = () => {
+    const button = installRef.current
+    if (!button) return
+    window.setTimeout(() => {
+      button.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      button.classList.remove('footer-install-btn--flash')
+      void button.offsetWidth
+      button.classList.add('footer-install-btn--flash')
+      window.clearTimeout(flashTimer.current)
+      flashTimer.current = window.setTimeout(() => {
+        button.classList.remove('footer-install-btn--flash')
+      }, 1900)
+    }, 700)
   }
 
   return (
@@ -46,7 +70,7 @@ function Footer() {
           <h2 id="footer-downloads-title">Take Pikawise with you</h2>
           <p>Discover meals and follow your favorite recipes wherever you go.</p>
         </div>
-        <StoreButtons />
+        <StoreButtons onStoreUnavailable={handleStoreUnavailable} />
       </div>
 
       <div className="container footer-inner">
@@ -63,6 +87,7 @@ function Footer() {
             {canInstall ? (
               <div className="footer-install-action">
                 <button
+                  ref={installRef}
                   type="button"
                   className="button button--primary footer-install-btn"
                   onClick={handleInstall}
