@@ -43,7 +43,7 @@ function defaultMeals() {
 export const DEFAULT_REMINDERS = {
   enabled: false,
   timezone: 'auto',
-  mode: 'both',
+  modes: ['question', 'suggestions'],
   suggestionCount: 3,
   quietHours: { enabled: true, start: '21:30', end: '07:00' },
   days: [0, 1, 2, 3, 4, 5, 6],
@@ -70,7 +70,20 @@ export function mergeReminders(base, override) {
       time: isValidTime(stored.time) ? stored.time : base.meals[period.id].time
     }
   }
-  if (!['question', 'suggestions', 'both'].includes(merged.mode)) merged.mode = base.mode
+  const validModes = REMINDER_MODES.map((mode) => mode.value)
+  let modes = Array.isArray(override?.modes)
+    ? override.modes.filter((mode) => validModes.includes(mode))
+    : null
+  if (!modes || !modes.length) {
+    // Back-compat with the old single "mode" field.
+    if (validModes.includes(merged.mode)) {
+      modes = merged.mode === 'both' ? ['question', 'suggestions'] : [merged.mode]
+    } else {
+      modes = base.modes
+    }
+  }
+  merged.modes = [...new Set(modes)]
+  delete merged.mode
   if (typeof merged.enabled !== 'boolean') merged.enabled = base.enabled
   if (typeof merged.timezone !== 'string' || !merged.timezone) merged.timezone = base.timezone
   return merged

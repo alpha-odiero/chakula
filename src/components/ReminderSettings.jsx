@@ -53,6 +53,23 @@ function ReminderSettings() {
     update({ meals: { ...reminders.meals, [id]: { ...reminders.meals[id], ...partial } } })
   }
 
+  const toggleMode = (value) => {
+    const modes = reminders.modes.includes(value)
+      ? reminders.modes.filter((mode) => mode !== value)
+      : [...reminders.modes, value]
+    if (!modes.length) {
+      toast.notify('Keep at least one reminder style selected.', { variant: 'info' })
+      return
+    }
+    update({ modes })
+  }
+
+  const saveChanges = () => {
+    update({})
+    refresh()
+    toast.success('Reminder settings saved.')
+  }
+
   const enableNotifications = async () => {
     if (!isNotificationSupported()) {
       toast.notify('This browser does not support notifications.', { variant: 'error' })
@@ -168,20 +185,24 @@ function ReminderSettings() {
 
           <div className="settings-field">
             <p className="settings-label">Reminder style</p>
-            <div className="settings-chip-row">
+            <p className="settings-hint">Pick one or more — you can mix them.</p>
+            <ul className="reminder-meals">
               {REMINDER_MODES.map((mode) => (
-                <button
-                  type="button"
-                  key={mode.value}
-                  className={`chip${reminders.mode === mode.value ? ' chip--active' : ''}`}
-                  aria-pressed={reminders.mode === mode.value}
-                  onClick={() => update({ mode: mode.value })}
-                  title={mode.hint}
-                >
-                  {mode.label}
-                </button>
+                <li key={mode.value} className="reminder-meal">
+                  <label className="reminder-meal-toggle">
+                    <input
+                      type="checkbox"
+                      checked={reminders.modes.includes(mode.value)}
+                      onChange={() => toggleMode(mode.value)}
+                    />
+                    <span className="reminder-style-text">
+                      <span className="reminder-meal-name">{mode.label}</span>
+                      <span className="reminder-style-hint">{mode.hint}</span>
+                    </span>
+                  </label>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
 
           <div className="settings-field">
@@ -241,6 +262,12 @@ function ReminderSettings() {
           <p className="settings-hint reminder-tz">
             <Icon name="globe" size={13} /> Times use your device time zone ({timeZone}).
           </p>
+
+          <div className="reminder-save">
+            <button type="button" className="button button--primary" onClick={saveChanges}>
+              Save changes
+            </button>
+          </div>
         </>
       )}
     </div>

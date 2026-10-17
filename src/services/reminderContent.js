@@ -50,28 +50,30 @@ export async function fetchReminderSuggestions(config, preferences, count) {
   return filtered.slice(0, wanted)
 }
 
-// Build the notification title/body for a period according to the chosen mode.
+// Build the notification title/body for a period according to the chosen
+// style(s). Several styles can be active at once, so "ask" and "suggest" are
+// resolved independently and then combined.
 export async function buildReminderPayload(period, config, preferences) {
   const label = period?.label || 'Meal'
   const lower = label.toLowerCase()
-  const mode = config?.mode || 'both'
+  const modes = Array.isArray(config?.modes) && config.modes.length ? config.modes : ['question']
+  const ask = modes.includes('question') || modes.includes('both')
+  const suggest = modes.includes('suggestions') || modes.includes('both')
 
-  if (mode === 'question') {
-    return { title: `What are you having for ${lower}?`, body: 'Tap to pick or log your meal.', suggestions: [] }
+  if (suggest) {
+    const suggestions = await fetchReminderSuggestions(config, preferences)
+    if (suggestions.length) {
+      const names = suggestions.map((meal) => meal.name).join(', ')
+      if (ask) {
+        return {
+          title: `${label} time`,
+          body: `What are you having? Ideas: ${names}.`,
+          suggestions
+        }
+      }
+      return { title: `${label} ideas`, body: `Try: ${names}.`, suggestions }
+    }
   }
 
-  const suggestions = await fetchReminderSuggestions(config, preferences)
-  if (!suggestions.length) {
-    return { title: `What are you having for ${lower}?`, body: 'Tap to pick or log your meal.', suggestions: [] }
-  }
-
-  const names = suggestions.map((meal) => meal.name).join(', ')
-  if (mode === 'suggestions') {
-    return { title: `${label} ideas`, body: `Try: ${names}.`, suggestions }
-  }
-  return {
-    title: `${label} time`,
-    body: `What are you having? Ideas: ${names}.`,
-    suggestions
-  }
+  return { title: `What are you having for ${lower}?`, body: 'Tap to pick or log your meal.', suggestions: [] }
 }

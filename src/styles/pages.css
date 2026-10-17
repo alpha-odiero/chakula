@@ -1580,6 +1580,24 @@
   gap: 8px;
 }
 
+.reminder-style-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reminder-style-hint {
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.reminder-save {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
 .reminder-meal input[type='time'],
 .reminder-time input[type='time'] {
   font: inherit;
