@@ -37,7 +37,7 @@ function MealDetails() {
       .then((data) => {
         if (!data) throw new Error('not-found')
         setState({ data, loading: false, error: null })
-        document.title = `${data.strMeal} — Pikawise`
+        document.title = `${data.name ?? data.strMeal} — Pikawise`
       })
       .catch((error) => {
         setState({ data: null, loading: false, error })
@@ -60,13 +60,13 @@ function MealDetails() {
 
   const meal = state.data
   const ingredients = useMemo(() => extractIngredients(meal), [meal])
-  const steps = useMemo(() => formatInstructionSteps(meal?.strInstructions), [meal])
-  const tags = useMemo(() => getMealTags(meal), [meal])
-  const videoId = getVideoId(meal?.strYoutube)
+    const steps = useMemo(() => formatInstructionSteps(meal?.instructions ?? meal?.strInstructions), [meal])
+    const tags = useMemo(() => getMealTags(meal), [meal])
+    const videoId = getVideoId(meal?.youtube ?? meal?.strYoutube)
 
   const handleShare = async () => {
     const url = window.location.href
-    const title = meal?.strMeal || 'Pikawise meal'
+    const title = meal?.name ?? meal?.strMeal ?? 'Pikawise meal'
 
     if (supportsWebShare()) {
       try {
@@ -102,7 +102,7 @@ function MealDetails() {
   const handleAnother = async () => {
     try {
       const next = await getRandomMeal()
-      if (next) navigate(`/meal/${next.idMeal}`)
+      if (next) navigate(`/meal/${next.id ?? next.idMeal}`)
     } catch {
       /* ignore, user can retry */
     }
@@ -128,8 +128,8 @@ function MealDetails() {
 
   const handleAddMissing = () => {
     ingredients
-      .filter(({ ingredient }) => !checked.has(ingredient))
-      .forEach(({ ingredient }) => addPersonalShoppingItem(ingredient))
+      .filter((item) => !checked.has(item.name))
+      .forEach((item) => addPersonalShoppingItem(item.name))
     toast.success('Added to your shopping list.')
   }
 
@@ -156,7 +156,7 @@ function MealDetails() {
   }
 
   const readyCount = checked.size
-  const meta = [meal.strCategory, meal.strArea].filter(Boolean).join(' · ')
+  const meta = [meal.category ?? meal.strCategory, meal.area ?? meal.strArea].filter(Boolean).join(' · ')
 
   return (
     <main className="meal-detail">
@@ -165,7 +165,7 @@ function MealDetails() {
           <button type="button" className="meal-detail-bar-button" onClick={() => navigate(-1)} aria-label="Go back">
             <Icon name="chevronLeft" size={20} />
           </button>
-          <p className="meal-detail-bar-title">{meal.strMeal}</p>
+          <p className="meal-detail-bar-title">{meal.name ?? meal.strMeal}</p>
           <div className="meal-detail-bar-actions">
             <button
               type="button"
@@ -193,15 +193,15 @@ function MealDetails() {
           <div className="meal-detail-media">
             <img
               className="meal-detail-img"
-              src={meal.strMealThumb}
-              alt={meal.strMeal}
+              src={meal.image ?? meal.strMealThumb}
+              alt={meal.name ?? meal.strMeal}
               width="1280"
               height="960"
             />
           </div>
           <div className="meal-detail-intro">
             <p className="page-eyebrow">{meta || 'Recipe'}</p>
-            <h1 className="meal-detail-title">{meal.strMeal}</h1>
+            <h1 className="meal-detail-title">{meal.name ?? meal.strMeal}</h1>
 
             {tags.length > 0 && (
               <ul className="meal-tags" aria-label="Tags">
@@ -279,7 +279,7 @@ function MealDetails() {
           )}
 
           <ul className="ingredients-list">
-            {ingredients.map(({ ingredient, measure }) => {
+            {ingredients.map(({ name: ingredient, measure }) => {
               const isChecked = checked.has(ingredient)
               const scaled = scaleMeasure(measure, servings)
               return (
@@ -366,7 +366,7 @@ function MealDetails() {
 
       {cooking && (
         <CookingMode
-          mealName={meal.strMeal}
+          mealName={meal.name ?? meal.strMeal}
           steps={steps}
           ingredients={ingredients}
           servings={servings}

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import Icon from '../components/Icon'
 import ErrorState from '../components/ErrorState'
+import PikawiseLoader from '../components/PikawiseLoader'
 import { getRandomMeal } from '../services/mealdb'
 import { getMealTags } from '../utils/meal'
 import { APP_TITLE } from '../config/app'
@@ -15,14 +16,14 @@ function RandomMeal() {
     try {
       const meal = await getRandomMeal()
       setState({ data: meal, loading: false, error: null })
-      if (meal) document.title = `${meal.strMeal} — Pikawise`
+      if (meal) document.title = `${meal.name ?? meal.strMeal} — Pikawise`
     } catch (error) {
       setState({ data: null, loading: false, error })
     }
   }, [])
 
   const openRecipe = () => {
-    if (state.data) navigate(`/meal/${state.data.idMeal}`)
+    if (state.data) navigate(`/meal/${state.data.id ?? state.data.idMeal}`)
   }
 
   return (
@@ -46,9 +47,7 @@ function RandomMeal() {
 
         {state.loading && (
           <div className="random-loading">
-            <div className="random-loader" role="status" aria-label="Choosing a meal for you">
-              <Icon name="cookingPot" size={40} />
-            </div>
+            <PikawiseLoader variant="inline" label="Choosing a meal for you" />
             <p>Choosing a delicious meal for you…</p>
           </div>
         )}
@@ -58,17 +57,17 @@ function RandomMeal() {
         )}
 
         {state.data && !state.loading && (
-          <div className="random-result" key={state.data.idMeal}>
+          <div className="random-result" key={state.data.id ?? state.data.idMeal}>
             <div className="random-result-media">
               <button
                 type="button"
                 className="random-result-image-button"
                 onClick={openRecipe}
-                aria-label={`Open ${state.data.strMeal} recipe`}
+                aria-label={`Open ${state.data.name ?? state.data.strMeal} recipe`}
               >
                 <img
-                  src={state.data.strMealThumb}
-                  alt={state.data.strMeal}
+                  src={state.data.image ?? state.data.strMealThumb}
+                  alt={state.data.name ?? state.data.strMeal}
                   loading="eager"
                   decoding="async"
                   width="1280"
@@ -78,9 +77,9 @@ function RandomMeal() {
             </div>
             <div className="random-result-body">
               <p className="page-eyebrow">
-                {[state.data.strCategory, state.data.strArea].filter(Boolean).join(' · ')}
+                {[state.data.category ?? state.data.strCategory, state.data.area ?? state.data.strArea].filter(Boolean).join(' · ')}
               </p>
-              <h1 className="random-result-title">{state.data.strMeal}</h1>
+              <h1 className="random-result-title">{state.data.name ?? state.data.strMeal}</h1>
               {getMealTags(state.data).length > 0 && (
                 <ul className="meal-tags" aria-label="Tags">
                   {getMealTags(state.data).slice(0, 4).map((tag) => (

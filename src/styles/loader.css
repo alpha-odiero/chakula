@@ -1,0 +1,189 @@
+/* ============ Pikawise branded loader ============ */
+/* Branded loading animation used for startup, route transitions, data
+   fetches and other operations that genuinely take time. A small,
+   full-colour Pikawise logo sits at the centre of a spinning two-arc
+   ring (TikTok-style spinner). */
+
+.pw-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text);
+}
+
+.pw-loader--section {
+  width: 100%;
+  min-height: 45vh;
+  padding: 40px 24px;
+}
+
+.pw-loader--full {
+  min-height: 100dvh;
+  padding: 40px 24px;
+}
+
+.pw-loader--inline {
+  flex-direction: row;
+  gap: 10px;
+}
+
+.pw-loader-badge {
+  --ring-w: 3.5px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+}
+
+.pw-loader--inline .pw-loader-badge {
+  --ring-w: 2px;
+  width: 26px;
+  height: 26px;
+}
+
+/* Spinning ring made of two brand-green arcs with a gap between them. */
+.pw-loader-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0turn,
+    rgba(25, 138, 67, 1) 0turn 0.4turn,
+    rgba(25, 138, 67, 0) 0.4turn 0.5turn,
+    rgba(25, 138, 67, 0.34) 0.5turn 0.9turn,
+    rgba(25, 138, 67, 0) 0.9turn 1turn
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    #0000 calc(100% - var(--ring-w)),
+    #000 calc(100% - var(--ring-w))
+  );
+  mask: radial-gradient(
+    farthest-side,
+    #0000 calc(100% - var(--ring-w)),
+    #000 calc(100% - var(--ring-w))
+  );
+  animation: pw-spin 0.85s linear infinite;
+}
+
+/* Second, fainter arc ring that counter-rotates for depth. */
+.pw-loader-ring--inner {
+  --ring-w: 2px;
+  inset: 9px;
+  background: conic-gradient(
+    from 0.5turn,
+    rgba(25, 138, 67, 0.55) 0turn 0.35turn,
+    rgba(25, 138, 67, 0) 0.35turn 0.5turn,
+    rgba(25, 138, 67, 0.55) 0.5turn 0.85turn,
+    rgba(25, 138, 67, 0) 0.85turn 1turn
+  );
+  animation: pw-spin 1.35s linear infinite reverse;
+}
+
+.pw-loader--inline .pw-loader-ring--inner {
+  inset: 4px;
+}
+
+/* The logo, shown small and in its real colours at the centre. */
+.pw-loader-mark {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  box-shadow: 0 6px 16px rgba(25, 138, 67, 0.22);
+}
+
+.pw-loader--inline .pw-loader-mark {
+  width: 15px;
+  height: 15px;
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.pw-loader-name {
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.pw-loader-dots {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 12px;
+}
+
+/* The detailed (section/full) loaders rely on the spinner alone. */
+.pw-loader:not(.pw-loader--inline) .pw-loader-dots {
+  display: none;
+}
+
+.pw-loader-dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+  animation: pw-dot 1.05s ease-in-out infinite;
+}
+
+.pw-loader--inline .pw-loader-dots span {
+  width: 6px;
+  height: 6px;
+}
+
+.pw-loader-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.pw-loader-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.pw-loader-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Inside buttons, show just the animated dots in the button's text colour
+   so the loader stays legible on filled (primary) buttons. */
+.button .pw-loader-badge {
+  display: none;
+}
+
+.button .pw-loader-dots span {
+  background: currentColor;
+}
+
+@keyframes pw-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes pw-dot {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.45;
+  }
+  40% {
+    transform: translateY(-6px) scale(1.15);
+    opacity: 1;
+  }
+}
+
+/* Respect the in-app "Reduce motion" preference as well as the OS setting. */
+.reduce-motion .pw-loader-ring,
+.reduce-motion .pw-loader-dots span {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pw-loader-ring,
+  .pw-loader-dots span {
+    animation: none;
+  }
+}

@@ -197,23 +197,21 @@ export function calculateIngredientMatch(recipeIngredients, availableIngredients
 }
 
 export function inferMealType(meal) {
-  const haystack = [
-    meal.strMeal || '',
-    meal.strCategory || '',
-    meal.strTags || '',
-    (meal.strMeal || '').toLowerCase()
-  ]
-    .join(' ')
-    .toLowerCase()
+  const mealName = meal.name ?? meal.strMeal ?? ''
+  const mealCategory = meal.category ?? meal.strCategory ?? ''
+  const mealTags = Array.isArray(meal.tags) ? meal.tags.join(' ') : (meal.strTags || '')
+  const haystack = [mealName, mealCategory, mealTags, mealName.toLowerCase()].join(' ').toLowerCase()
   if (BREAKFAST_KEYWORDS.some((k) => haystack.includes(k))) return 'breakfast'
   if (SNACK_KEYWORDS.some((k) => haystack.includes(k))) return 'snack'
   return 'main'
 }
 
 export function estimateCookingTime(meal) {
-  const haystack = [meal.strMeal || '', meal.strCategory || '', meal.strTags || '']
-    .join(' ')
-    .toLowerCase()
+  const haystack = [
+    meal.name ?? meal.strMeal ?? '',
+    meal.category ?? meal.strCategory ?? '',
+    Array.isArray(meal.tags) ? meal.tags.join(' ') : (meal.strTags || '')
+  ].join(' ').toLowerCase()
   if (QUICK_KEYWORDS.some((k) => haystack.includes(k))) return 'quick'
   if (LONGER_KEYWORDS.some((k) => haystack.includes(k))) return 'longer'
   return 'moderate'
@@ -221,8 +219,8 @@ export function estimateCookingTime(meal) {
 
 export function matchesDietaryPreference(meal, dietaryPreference) {
   if (!dietaryPreference || dietaryPreference === 'any') return true
-  const category = (meal.strCategory || '').toLowerCase()
-  const name = (meal.strMeal || '').toLowerCase()
+  const category = String(meal.category ?? meal.strCategory ?? '').toLowerCase()
+  const name = String(meal.name ?? meal.strMeal ?? '').toLowerCase()
   if (dietaryPreference === 'vegetarian') {
     if (category.includes('vegetarian') || category.includes('vegan')) return true
     const meatWords = ['chicken', 'beef', 'lamb', 'pork', 'meat', 'mutton', 'goat', 'fish', 'seafood', 'shrimp', 'duck', 'sausage', 'bacon', 'ham']
@@ -244,22 +242,28 @@ export function rankMeals(meals, availableIngredients) {
   return meals
     .map((meal) => {
       const ingredientList = (meal.ingredients || [])
-      const rawNames = ingredientList.map((i) => (typeof i === 'string' ? i : i?.ingredient)).filter(Boolean)
+      const rawNames = ingredientList.map((i) => (typeof i === 'string' ? i : (i?.name ?? i?.ingredient))).filter(Boolean)
       const match = rawNames.length
         ? calculateIngredientMatch(rawNames, available)
         : { matched: [], missing: [], ratio: available.length ? 1 : 0 }
       const groupCount = new Set(
-        Object.values(classifyByGroups([...(meal.ingredients || [])].map((i) => (typeof i === 'string' ? i : i?.ingredient)).filter(Boolean))).flat()
+        Object.values(
+          classifyByGroups(
+            [...(meal.ingredients || [])]
+              .map((i) => (typeof i === 'string' ? i : (i?.name ?? i?.ingredient)))
+              .filter(Boolean)
+          )
+        ).flat()
       ).size
       return {
         meal,
         match,
         dietary: { score: 0 },
         cookingPref: { score: 0 },
-        score: match.ratio + (groupCount ? groupCount / 10 : 0)
-      }
-    })
-    .sort((a, b) => b.match.ratio - a.match.ratio || b.meal.ingredients?.length - a.meal.ingredients?.length)
+    score: match.ratio + (groupCount ? groupCount / 10 : 0)
+  }
+})
+.sort((a, b) => b.match.ratio - a.match.ratio || (b.meal.ingredients?.length || 0) - (a.meal.ingredients?.length || 0))
 }
 
 export async function fetchCandidateMeals(ingredients, { signal } = {}) {
@@ -272,7 +276,10 @@ export async function fetchCandidateMeals(ingredients, { signal } = {}) {
       batch.map((ing) => filterByIngredient(ing).catch(() => []))
     )
     results.flat().forEach((meal) => {
-      if (meal && meal.idMeal) mealMap.set(meal.idMeal, meal)
+      if (meal && (meal.id ?? meal.idMeal)) {
+        const mealId = String(meal.id ?? meal.idMeal)
+        mealMap.set(mealId, meal)
+      }
     })
     if (mealMap.size >= 48) break
   }
@@ -281,7 +288,10 @@ export async function fetchCandidateMeals(ingredients, { signal } = {}) {
     const fallback = await getRandomMeal().catch(() => null)
     for (let i = 0; i < 4 && fallback; i++) {
       const meal = await getRandomMeal().catch(() => null)
-      if (meal && meal.idMeal) mealMap.set(meal.idMeal, meal)
+      if (meal && (meal.id ?? meal.idMeal)) {
+        const mealId = String(meal.id ?? meal.idMeal)
+        mealMap.set(mealId, meal)
+      }
     }
   }
 
@@ -315,17 +325,19 @@ export async function generateMealPlan(config) {
   const dayCategories = new Set()
 
   const pickForSlot = (slotType) => {
-    const still = ranked.filter((entry) => !usedIds.has(entry.meal.idMeal))
+    const getMealId = (m) => String(m.id ?? m.idMeal)
+    const getMealCategory = (m) => m.category ?? m.strCategory ?? null
+    const still = ranked.filter((entry) => !usedIds.has(getMealId(entry.meal)))
     const typeTarget = slotType === 'Breakfast' ? 'breakfast' : slotType === 'Snack' ? 'snack' : 'main'
     const tightened = still.filter(
       (entry) => inferMealType(entry.meal) === typeTarget || typeTarget === 'main'
     )
-    let chosen = tightened.find((entry) => !dayCategories.has(entry.meal.strCategory)) || tightened[0]
-    if (!chosen) chosen = still.find((entry) => !dayCategories.has(entry.meal.strCategory)) || still[0] || ranked[0]
+    let chosen = tightened.find((entry) => !dayCategories.has(getMealCategory(entry.meal))) || tightened[0]
+    if (!chosen) chosen = still.find((entry) => !dayCategories.has(getMealCategory(entry.meal))) || still[0] || ranked[0]
 
     if (!chosen) return null
-    usedIds.add(chosen.meal.idMeal)
-    if (chosen.meal.strCategory) dayCategories.add(chosen.meal.strCategory)
+    usedIds.add(getMealId(chosen.meal))
+    if (getMealCategory(chosen.meal)) dayCategories.add(getMealCategory(chosen.meal))
     return chosen
   }
 
@@ -337,13 +349,14 @@ export async function generateMealPlan(config) {
     const dayUsed = new Set()
     slots.forEach((slotType) => {
       let picked = pickForSlot(slotType)
-      if (picked && dayUsed.has(picked.meal.idMeal)) {
-        picked = ranked.find((e) => !usedIds.has(e.meal.idMeal) && !dayUsed.has(e.meal.idMeal)) || picked
+      const getMealId = (m) => String(m.id ?? m.idMeal)
+      if (picked && dayUsed.has(getMealId(picked.meal))) {
+        picked = ranked.find((e) => !usedIds.has(getMealId(e.meal)) && !dayUsed.has(getMealId(e.meal))) || picked
       }
       if (picked) {
-        dayUsed.add(picked.meal.idMeal)
+        dayUsed.add(getMealId(picked.meal))
         const rawIngredients = (picked.meal.ingredients || [])
-          .map((i) => (typeof i === 'string' ? i : i?.ingredient))
+          .map((i) => (typeof i === 'string' ? i : (i?.name ?? i?.ingredient)))
           .filter(Boolean)
         rawIngredients.forEach((ing) => allRequired.add(ing))
         dayPlan.push({
@@ -390,9 +403,10 @@ async function enrichMeals(meals) {
     const results = await Promise.all(
       batch.map(async (meal) => {
       try {
-        const detail = await getMeal(meal.idMeal)
+        const mealId = meal.id ?? meal.idMeal
+        const detail = await getMeal(mealId)
         if (!detail) return null
-        const ingredients = extractIngredients(detail).map((item) => item.ingredient)
+        const ingredients = extractIngredients(detail).map((item) => item.name ?? item.ingredient).filter(Boolean)
         return { ...detail, ingredients }
       } catch {
         return { ...meal, ingredients: [] }

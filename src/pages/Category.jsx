@@ -19,8 +19,8 @@ function Category() {
     setState((prev) => ({ ...prev, loading: true, error: null }))
     getCategories()
       .then((categories) => {
-        const match = categories.find((c) => slugify(c.strCategory) === slug)
-        const name = match ? match.strCategory : slug
+        const match = categories.find((c) => slugify(c.name ?? c.strCategory) === slug)
+        const name = match ? (match.name ?? match.strCategory) : slug
         setCategoryName(name)
         return filterByCategory(name)
       })

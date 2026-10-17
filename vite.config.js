@@ -6,6 +6,7 @@ const manifest = {
   name: 'Pikawise',
   short_name: 'Pikawise',
   description: 'Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with offline access.',
+  version: '1.1',
   display: 'standalone',
   start_url: '/',
   scope: '/',
@@ -58,6 +59,8 @@ export default defineConfig({
       manifest,
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        cleanupOutdatedCaches: true,
+        importScripts: ['sw-notifications.js'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/www\.themealdb\.com\/api\/json\/v1\/1\//,

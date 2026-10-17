@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader'
 import Icon from '../components/Icon'
 import EmptyState from '../components/EmptyState'
 import ErrorState from '../components/ErrorState'
+import PikawiseLoader from '../components/PikawiseLoader'
 import { usePreferences } from '../components/PreferencesProvider'
 import { useToast } from '../components/Toast'
 import { useNetworkState } from '../hooks/useNetworkState'
@@ -106,25 +107,25 @@ function BalancedDiet() {
 
   const replaceMeal = async (dayIndex, slotIndex) => {
     if (!plan) return
-    const usedIds = new Set(plan.meals.flatMap((d) => d.meals.map((m) => m.meal.idMeal)))
+    const usedIds = new Set(plan.meals.flatMap((d) => d.meals.map((m) => m.meal.id ?? m.meal.idMeal)))
     const current = plan.meals[dayIndex].meals[slotIndex]
     const slotType = current.slot
 
     let replacement = poolRef.current
-      .filter((entry) => !usedIds.has(entry.meal.idMeal))
+      .filter((entry) => !usedIds.has(entry.meal.id ?? entry.meal.idMeal))
       .map((entry) => entry.meal)
     replacement = findReplacement(replacement, slotType, dayIndex, plan, usedIds)
 
     if (!replacement) {
       const fallbackMeal = await getRandomMeal().catch(() => null)
       if (fallbackMeal) {
-        const ingredients = extractIngredients(fallbackMeal).map((i) => i.ingredient)
+        const ingredients = extractIngredients(fallbackMeal).map((i) => i.name)
         replacement = { ...fallbackMeal, ingredients }
       }
     }
     if (!replacement) return
 
-    const rawIngredientList = (replacement.ingredients || []).map(String)
+    const rawIngredientList = (replacement.ingredients || []).map((i) => i?.name ?? i).filter(Boolean)
     const match = rawIngredientList.length
       ? calculateIngredientMatch(rawIngredientList, plan.ingredients)
       : { matched: [], missing: [], ratio: 0 }
@@ -379,7 +380,7 @@ function BalancedDiet() {
               >
                 {generating ? (
                   <>
-                    <span className="spinner spinner--inline" aria-hidden="true" />
+                    <PikawiseLoader variant="inline" decorative />
                     Creating your meal plan…
                   </>
                 ) : (
@@ -398,7 +399,7 @@ function BalancedDiet() {
 
         {generationLoading && (
           <div className="plan-loading" role="status" aria-live="polite">
-            <span className="spinner spinner--large" aria-hidden="true" />
+            <PikawiseLoader variant="inline" decorative />
             <p>Matching your ingredients…</p>
             <p className="settings-hint">Searching recipes and organizing meals.</p>
           </div>
@@ -428,7 +429,7 @@ function BalancedDiet() {
     const requiredSet = new Set()
     dayMeals.forEach((day) => {
       day.meals.forEach((slot) => {
-        (slot.meal.ingredients || []).map(String).forEach((ing) => requiredSet.add(ing))
+        (slot.meal.ingredients || []).map((i) => i?.name ?? i).filter(Boolean).forEach((ing) => requiredSet.add(ing))
       })
     })
     const required = [...requiredSet]
@@ -445,13 +446,13 @@ function BalancedDiet() {
 
   function findReplacement(pool, slotType, dayIndex, currentPlan, usedIds) {
     const dayUsedCategories = new Set(
-      currentPlan.meals[dayIndex].meals.map((m) => m.meal.strCategory).filter(Boolean)
+      currentPlan.meals[dayIndex].meals.map((m) => m.meal.category ?? m.meal.strCategory).filter(Boolean)
     )
     const typeTarget = slotType.toLowerCase() === 'breakfast' ? 'breakfast' : slotType.toLowerCase() === 'snack' ? 'snack' : 'main'
-    const typed = pool.filter((m) => !usedIds.has(m.idMeal))
+    const typed = pool.filter((m) => !usedIds.has(m.id ?? m.idMeal))
     const matchingType = typed.filter((m) => inferMealType(m) === typeTarget)
-    const categoryDiverse = matchingType.find((m) => !dayUsedCategories.has(m.strCategory))
-    return categoryDiverse || matchingType[0] || typed.find((m) => !dayUsedCategories.has(m.strCategory)) || typed[0] || null
+    const categoryDiverse = matchingType.find((m) => !dayUsedCategories.has(m.category ?? m.strCategory))
+    return categoryDiverse || matchingType[0] || typed.find((m) => !dayUsedCategories.has(m.category ?? m.strCategory)) || typed[0] || null
   }
 }
 
@@ -488,7 +489,7 @@ function PlanResults({ plan, onReplace, onSave, onShare, onReset }) {
           <div className="plan-meals">
             {day.meals.map((slot, slotIndex) => (
               <PlanMeal
-                key={slot.meal.idMeal + slot.slot}
+                key={(slot.meal.id ?? slot.meal.idMeal) + slot.slot}
                 slot={slot}
                 onReplace={() => onReplace(day.day - 1, slotIndex)}
               />
@@ -512,7 +513,7 @@ function PlanMeal({ slot, onReplace }) {
     <article className="plan-meal-slot">
       <img
         className="plan-meal-img"
-        src={slot.meal.strMealThumb}
+        src={slot.meal.image ?? slot.meal.strMealThumb}
         alt=""
         loading="lazy"
         decoding="async"
@@ -524,8 +525,8 @@ function PlanMeal({ slot, onReplace }) {
           <Icon name="clock" size={14} />
           {canonicalSlot}
         </p>
-        <Link to={`/meal/${slot.meal.idMeal}`} className="plan-meal-name" aria-label={`View ${slot.meal.strMeal} recipe`}>
-          {slot.meal.strMeal}
+        <Link to={`/meal/${slot.meal.id ?? slot.meal.idMeal}`} className="plan-meal-name" aria-label={`View ${slot.meal.name ?? slot.meal.strMeal} recipe`}>
+          {slot.meal.name ?? slot.meal.strMeal}
         </Link>
         {matched.length > 0 && (
           <p className="plan-meal-match">
@@ -538,7 +539,7 @@ function PlanMeal({ slot, onReplace }) {
           {balanceNote}
         </p>
         <div className="plan-meal-actions">
-          <Link to={`/meal/${slot.meal.idMeal}`} className="button button--ghost button--small">
+          <Link to={`/meal/${slot.meal.id ?? slot.meal.idMeal}`} className="button button--ghost button--small">
             View Recipe
           </Link>
           <button type="button" className="button button--ghost button--small" onClick={onReplace}>
@@ -625,7 +626,7 @@ export function formatPlanText(plan) {
   plan.meals.forEach((day) => {
     lines.push(`\nDay ${day.day}`)
     day.meals.forEach((slot) => {
-      lines.push(`${slot.slot}: ${slot.meal.strMeal}`)
+      lines.push(`${slot.slot}: ${slot.meal.name ?? slot.meal.strMeal}`)
     })
   })
   return lines.join('\n')

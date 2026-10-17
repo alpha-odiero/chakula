@@ -30,8 +30,10 @@ const STEPS = [
 function SiteHome() {
   const { featured, recommended, category, categories, loading, error, reload } = useHomeData()
 
-  const featuredName = featured?.strMeal
-  const featuredMeta = [featured?.strCategory, featured?.strArea].filter(Boolean).join(' · ')
+  const featuredName = featured?.name ?? featured?.strMeal
+  const featuredCategory = featured?.category ?? featured?.strCategory
+  const featuredArea = featured?.area ?? featured?.strArea
+  const featuredMeta = [featuredCategory, featuredArea].filter(Boolean).join(' · ')
 
   return (
     <main className="site-home">
@@ -97,7 +99,7 @@ function SiteHome() {
                 <p className="site-hero-panel-eyebrow">Today&apos;s idea</p>
                 <p className="site-hero-panel-title">{featuredName}</p>
                 {featuredMeta && <p className="site-hero-panel-meta">{featuredMeta}</p>}
-                <Link to={`/meal/${featured.idMeal}`} className="site-hero-panel-link">
+                <Link to={`/meal/${featured.id ?? featured.idMeal}`} className="site-hero-panel-link">
                   View recipe
                   <Icon name="arrowRight" size={15} />
                 </Link>
@@ -130,7 +132,7 @@ function SiteHome() {
           ) : (
             <div className="category-grid category-grid--cards">
               {categories.slice(0, 6).map((cat) => (
-                <CategoryCard key={cat.strCategory} category={cat} />
+                <CategoryCard key={cat.name ?? cat.strCategory} category={cat} />
               ))}
             </div>
           )}

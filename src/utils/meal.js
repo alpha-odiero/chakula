@@ -1,38 +1,59 @@
 export function extractIngredients(meal) {
   if (!meal || typeof meal !== 'object') return []
 
+  // Prefer the normalised internal ingredients array.
+  if (Array.isArray(meal.ingredients)) {
+    return meal.ingredients
+      .map((item) => {
+        if (typeof item === 'string') return { name: item.trim(), measure: null }
+        if (!item || typeof item !== 'object') return null
+        const name = String(item.name ?? item.ingredient ?? '').trim()
+        if (!name) return null
+        return { name, measure: String(item.measure ?? item.amount ?? '').trim() || null }
+      })
+      .filter(Boolean)
+  }
+
   const ingredients = []
   for (let i = 1; i <= 20; i++) {
-    const ingredient = (meal[`strIngredient${i}`] || '').trim()
-    const measure = (meal[`strMeasure${i}`] || '').trim()
+    const ingredient = String(meal[`strIngredient${i}`] || '').trim()
+    const measure = String(meal[`strMeasure${i}`] || '').trim()
     if (ingredient) {
-      ingredients.push({ ingredient, measure: measure || null })
+      ingredients.push({ name: ingredient, measure: measure || null })
     }
   }
   return ingredients
 }
 
 export function getMealTags(meal) {
-  if (!meal || !meal.strTags) return []
-  return meal.strTags
-    .split(',')
-    .map((tag) => tag.trim())
-    .filter(Boolean)
+  if (!meal) return []
+  if (Array.isArray(meal.tags)) {
+    return meal.tags.map((tag) => String(tag || '').trim()).filter(Boolean)
+  }
+  if (typeof meal.strTags === 'string') {
+    return meal.strTags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean)
+  }
+  return []
 }
 
 export function getVideoId(url) {
-  if (!url) return null
-  const match = url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/)
+  const videoUrl = typeof url === 'string' ? url : ''
+  if (!videoUrl) return null
+  const match = videoUrl.match(/(?:v=|youtu\.be\/|embed\/)([\w-]{11})/)
   return match ? match[1] : null
 }
 
 export function mealToCardData(meal) {
+  if (!meal) return null
   return {
-    id: meal.idMeal,
-    name: meal.strMeal,
-    image: meal.strMealThumb,
-    category: meal.strCategory || null,
-    area: meal.strArea || null
+    id: meal.id ?? meal.idMeal,
+    name: meal.name ?? meal.strMeal,
+    image: meal.image ?? meal.strMealThumb,
+    category: meal.category ?? meal.strCategory ?? null,
+    area: meal.area ?? meal.strArea ?? null
   }
 }
 

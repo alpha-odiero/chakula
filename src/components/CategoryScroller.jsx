@@ -19,14 +19,14 @@ function CategoryScroller({ categories = [], loading = false }) {
           ))
         : categories.map((category) => (
             <Link
-              key={category.strCategory}
-              to={`/explore?category=${encodeURIComponent(category.strCategory)}`}
+              key={category.name ?? category.strCategory}
+              to={`/explore?category=${encodeURIComponent(category.name ?? category.strCategory)}`}
               className="category-scroll-item"
               role="listitem"
             >
               <span className="category-scroll-thumb">
                 <img
-                  src={category.strCategoryThumb}
+                  src={category.image ?? category.strCategoryThumb}
                   alt=""
                   loading="lazy"
                   decoding="async"
@@ -34,7 +34,7 @@ function CategoryScroller({ categories = [], loading = false }) {
                   height="80"
                 />
               </span>
-              <span className="category-scroll-label">{category.strCategory}</span>
+              <span className="category-scroll-label">{category.name ?? category.strCategory}</span>
             </Link>
           ))}
     </div>

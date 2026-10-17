@@ -38,10 +38,14 @@ function Privacy() {
               <strong>Cookie consent</strong> — your choice about the cookie notice, so we only ask
               you once.
             </li>
+            <li>
+              <strong>Meal reminders</strong> — your reminder times, days, and quiet hours, plus a
+              record of which reminders have already fired, so you are not notified twice.
+            </li>
           </ul>
           <p>
             This data stays on your device. It isn't sent to Pikawise or to any third party, and you
-            can remove it any time from Settings → Data &amp; storage.
+            can remove it any time from Settings → My Stuff.
           </p>
 
           <h2 id="cookies">Cookies</h2>
@@ -57,19 +61,27 @@ function Privacy() {
             Pikawise saved.
           </p>
 
-          <h2>API communication</h2>
+          <h2>Notifications</h2>
           <p>
-            When you search, filter, or open a recipe, Pikawise communicates directly with TheMealDB,
-            a third-party recipe provider, to fetch recipe data and images. Requests are made from
-            your browser to TheMealDB's public API. Only the search terms, filters, or recipe IDs you
-            request are sent as part of these requests.
+            Meal reminders are optional and off by default. If you turn them on, Pikawise asks your
+            browser for permission to show notifications. Notifications are generated on your device
+            from your own settings and the recipe data already on your device; no reminder details
+            are sent to Pikawise or anyone else. You can turn reminders off at any time in Settings.
           </p>
 
-          <h2>Third-party recipe provider</h2>
+          <h2>Recipe data requests</h2>
+          <p>
+            When you search, filter, or open a recipe, Pikawise fetches recipe data and images from a
+            third-party recipe service. These requests are made directly from your browser and include
+            only the search terms, filters, or recipe IDs you choose to request.
+          </p>
+
+          <h2>Third-party recipe content</h2>
           <p>
             Recipe content, including names, images, ingredients, and instructions, is provided by
-            TheMealDB. Pikawise does not control or edit this content. Please review TheMealDB's own
-            terms and privacy policy for how they handle data.
+            third-party recipe sources. Pikawise does not author, control, or edit this content, and
+            does not claim ownership of it. Please refer to the original source&apos;s own terms for
+            how their content may be used.
           </p>
 
           <h2>Contact</h2>

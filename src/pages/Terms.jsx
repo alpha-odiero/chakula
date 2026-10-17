@@ -21,9 +21,9 @@ function Terms() {
 
           <h2>Recipe content</h2>
           <p>
-            Recipe content displayed in Pikawise may be provided by third parties, including
-            TheMealDB. Pikawise does not author, verify, or guarantee this content. Recipes are shown
-            for inspiration and should be prepared with care.
+            Recipe content displayed in Pikawise may be provided by third-party recipe sources.
+            Pikawise does not author, verify, or guarantee this content, and does not claim ownership
+            of it. Recipes are shown for inspiration and should be prepared with care.
           </p>
 
           <h2>Ingredients and allergens</h2>
@@ -42,9 +42,9 @@ function Terms() {
 
           <h2>Availability</h2>
           <p>
-            Pikawise depends on third-party services, including TheMealDB. Recipes may be
-            unavailable at times, and the application may be offline. The application is provided
-            "as is" and "as available" without warranties of any kind.
+            Pikawise depends on third-party recipe services. Recipes may be unavailable at times,
+            and the application may be offline. The application is provided &ldquo;as is&rdquo; and
+            &ldquo;as available&rdquo; without warranties of any kind.
           </p>
 
           <h2>Changes</h2>

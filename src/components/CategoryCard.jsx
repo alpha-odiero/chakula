@@ -1,15 +1,19 @@
 import { Link } from 'react-router-dom'
 
+import { slugify as slugifyCategory } from '../services/meals'
+
 function CategoryCard({ category }) {
-  const str = category.strCategory
-  const slug = str ? str.toLowerCase().replace(/[^a-z0-9]+/g, '') : ''
+  const str = category.name ?? category.strCategory
+  const slug = str ? slugifyCategory(str) : ''
+  const thumb = category.image ?? category.strCategoryThumb
+  const description = category.description ?? category.strCategoryDescription
 
   return (
     <Link className="category-card" to={`/categories/${slug}`}>
       <div className="category-card-media">
         <img
           className="category-card-img"
-          src={category.strCategoryThumb}
+          src={thumb}
           alt={str}
           loading="lazy"
           decoding="async"
@@ -19,8 +23,8 @@ function CategoryCard({ category }) {
       </div>
       <div className="category-card-body">
         <h3 className="category-card-title">{str}</h3>
-        {category.strCategoryDescription && (
-          <p className="category-card-desc">{category.strCategoryDescription}</p>
+        {description && (
+          <p className="category-card-desc">{description}</p>
         )}
         <span className="category-card-cta">
           Browse meals

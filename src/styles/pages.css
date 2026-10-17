@@ -259,18 +259,6 @@
   color: var(--text-secondary);
 }
 
-.random-loader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: var(--accent-light);
-  color: var(--accent);
-  animation: bounce 1.4s ease infinite;
-}
-
 .random-result {
   display: flex;
   flex-direction: column;
@@ -1501,4 +1489,145 @@
     flex: 0 0 auto;
     min-width: 190px;
   }
+}
+
+/* ============ Meal reminders ============ */
+
+.reminder-page .page-header {
+  margin-bottom: 8px;
+}
+
+.reminder-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reminder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.reminder-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.reminder-next {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.reminder-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.reminder-status--ok {
+  color: var(--success);
+}
+
+.reminder-meals {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reminder-meal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+}
+
+.reminder-meal-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.reminder-meal-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reminder-meal input[type='time'],
+.reminder-time input[type='time'] {
+  font: inherit;
+  padding: 7px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: var(--bg-surface);
+  color: var(--text);
+}
+
+.reminder-meal input[type='time']:disabled {
+  opacity: 0.5;
+}
+
+.reminder-quiet-times {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.reminder-tz {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.settings-tag-input {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.settings-tag-input input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text);
+}
+
+.settings-tag-input input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }

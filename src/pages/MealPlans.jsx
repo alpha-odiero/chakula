@@ -145,9 +145,9 @@ function MealPlans() {
                             <h4>Day {day.day}</h4>
                             <ul className="saved-plan-meals">
                               {day.meals.map((slot) => (
-                                <li key={slot.meal.idMeal + slot.slot}>
+                                <li key={(slot.meal.id ?? slot.meal.idMeal) + slot.slot}>
                                   <img
-                                    src={slot.meal.strMealThumb}
+                                    src={slot.meal.image ?? slot.meal.strMealThumb}
                                     alt=""
                                     loading="lazy"
                                     decoding="async"
@@ -156,7 +156,7 @@ function MealPlans() {
                                   />
                                   <span>
                                     <strong>{slot.slot}</strong>
-                                    <Link to={`/meal/${slot.meal.idMeal}`}>{slot.meal.strMeal}</Link>
+                                    <Link to={`/meal/${slot.meal.id ?? slot.meal.idMeal}`}>{slot.meal.name ?? slot.meal.strMeal}</Link>
                                   </span>
                                 </li>
                               ))}
@@ -202,7 +202,7 @@ function formatPlanText(plan) {
   plan.meals.forEach((day) => {
     lines.push(`\nDay ${day.day}`)
     day.meals.forEach((slot) => {
-      lines.push(`${slot.slot}: ${slot.meal.strMeal}`)
+      lines.push(`${slot.slot}: ${slot.meal.name ?? slot.meal.strMeal}`)
     })
   })
   return lines.join('\n')

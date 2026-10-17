@@ -4,11 +4,11 @@ import SaveButton from './SaveButton'
 
 function MealCard({ meal, fallbackCategory = null, fallbackArea = null }) {
   if (!meal) return null
-  const id = meal.idMeal || meal.id
-  const name = meal.strMeal || meal.name
-  const image = meal.strMealThumb || meal.image
-  const category = meal.strCategory || meal.strMealCategory || fallbackCategory || null
-  const area = meal.strArea || fallbackArea || null
+  const id = meal.id ?? meal.idMeal
+  const name = meal.name ?? meal.strMeal
+  const image = meal.image ?? meal.strMealThumb
+  const category = (meal.category ?? meal.strCategory ?? meal.strMealCategory ?? fallbackCategory) || null
+  const area = (meal.area ?? meal.strArea ?? fallbackArea) || null
 
   return (
     <article className="meal-card">

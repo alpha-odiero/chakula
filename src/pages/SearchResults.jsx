@@ -42,9 +42,9 @@ function SearchResults() {
 
   const sortedData = useMemo(() => {
     const data = results.data || []
-    if (sort === 'name') return [...data].sort((a, b) => a.strMeal.localeCompare(b.strMeal))
+    if (sort === 'name') return [...data].sort((a, b) => (a.name ?? a.strMeal ?? '').localeCompare(b.name ?? b.strMeal ?? ''))
     if (sort === 'category') {
-      return [...data].sort((a, b) => (a.strCategory || '').localeCompare(b.strCategory || ''))
+      return [...data].sort((a, b) => String(a.category ?? a.strCategory ?? '').localeCompare(String(b.category ?? b.strCategory ?? '')))
     }
     return data
   }, [results.data, sort])

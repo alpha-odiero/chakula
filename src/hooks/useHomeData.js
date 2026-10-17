@@ -9,9 +9,10 @@ const PREFERRED_CATEGORIES = ['Beef', 'Chicken', 'Seafood', 'Vegetarian', 'Pasta
 function dedupe(meals) {
   const seen = new Set()
   return meals.filter((meal) => {
-    if (!meal || !meal.idMeal) return false
-    if (seen.has(meal.idMeal)) return false
-    seen.add(meal.idMeal)
+    if (!meal) return false
+    const id = String(meal.id ?? meal.idMeal)
+    if (!id || seen.has(id)) return false
+    seen.add(id)
     return true
   })
 }
@@ -45,10 +46,11 @@ export function useHomeData() {
     picks
       .then(async (randomMeals) => {
         const [featured, ...rest] = randomMeals
+        const featuredCategory = featured?.category ?? featured?.strCategory
         const category =
-          featured?.strCategory ||
+          featuredCategory ||
           PREFERRED_CATEGORIES.find((name) =>
-            randomMeals.some((meal) => meal?.strCategory === name)
+            randomMeals.some((meal) => (meal?.category ?? meal?.strCategory) === name)
           ) ||
           null
 

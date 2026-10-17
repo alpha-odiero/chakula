@@ -1,9 +1,14 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { registerSW } from 'virtual:pwa-register'
 import { useToast } from './Toast'
+import { isStandalone } from '../utils/platform'
 import { addNotification, dismissNotification, unacknowledgeNotification } from '../utils/storage'
 
 const UPDATE_NOTIFICATION_ID = 'app-update'
+const WEB_UPDATE_FLAG = 'pikawise-updated'
+const AUTO_APPLY_DELAY_MS = 1500
+const AUTO_APPLY_RETRY_MS = 5000
+const AUTO_APPLY_COOLDOWN_MS = 30000
 
 const PwaContext = createContext({ updateAvailable: false, update: () => {}, dismiss: () => {} })
 
@@ -11,22 +16,79 @@ export function usePwa() {
   return useContext(PwaContext)
 }
 
+// Do not reload under the user's fingers: skip while cooking mode is open or a
+// form field is focused. The update is retried until the app is idle.
+function isUserBusy() {
+  if (typeof document === 'undefined') return false
+  if (document.body.classList.contains('cooking-mode-active')) return true
+  const active = document.activeElement
+  if (!active) return false
+  const tag = active.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true
+  return active.isContentEditable === true
+}
+
+function recentlyAutoApplied() {
+  try {
+    const last = Number(sessionStorage.getItem(`${WEB_UPDATE_FLAG}-at`) || 0)
+    return Date.now() - last < AUTO_APPLY_COOLDOWN_MS
+  } catch {
+    return false
+  }
+}
+
 function PwaProvider({ children }) {
   const { notify } = useToast()
   const [updateAvailable, setUpdateAvailable] = useState(false)
-  const [updateReg, setUpdateReg] = useState(null)
+  const updateSWRef = useRef(null)
+  const autoAppliedRef = useRef(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined
     if (!('serviceWorker' in navigator)) return undefined
 
+    // If we just auto-applied an update on the web, let the user know once.
+    try {
+      if (sessionStorage.getItem(WEB_UPDATE_FLAG) === '1') {
+        sessionStorage.removeItem(WEB_UPDATE_FLAG)
+        notify('Pikawise is up to date.', { variant: 'success' })
+      }
+    } catch {
+      // sessionStorage may be unavailable; not worth failing the boot for.
+    }
+
     let watchInterval = null
+    let retryTimer = null
+
+    const applyOnWeb = () => {
+      const attempt = () => {
+        if (autoAppliedRef.current) return
+        if (isUserBusy()) {
+          retryTimer = setTimeout(attempt, AUTO_APPLY_RETRY_MS)
+          return
+        }
+        autoAppliedRef.current = true
+        dismissNotification(UPDATE_NOTIFICATION_ID)
+        try {
+          sessionStorage.setItem(WEB_UPDATE_FLAG, '1')
+          sessionStorage.setItem(`${WEB_UPDATE_FLAG}-at`, String(Date.now()))
+        } catch {
+          // ignore storage failures
+        }
+        if (updateSWRef.current) updateSWRef.current(true)
+      }
+      retryTimer = setTimeout(attempt, AUTO_APPLY_DELAY_MS)
+    }
+
     const updateSW = registerSW({
       onNeedRefresh() {
-        // A new service worker has downloaded and is waiting. Surface it in the
-        // notification centre instead of interrupting the user with a popup.
-        // Un-acknowledge first so a freshly downloaded update re-surfaces even
-        // if the user dismissed a previous one.
+        // Installed apps (standalone) keep the explicit "Update now" prompt in
+        // the notification centre so a background update never surprises the
+        // user mid-task. Ordinary browser tabs update silently and seamlessly.
+        if (!isStandalone()) {
+          if (!recentlyAutoApplied()) applyOnWeb()
+          return
+        }
         unacknowledgeNotification(UPDATE_NOTIFICATION_ID)
         addNotification({
           id: UPDATE_NOTIFICATION_ID,
@@ -47,10 +109,11 @@ function PwaProvider({ children }) {
         }
       }
     })
-    setUpdateReg(() => updateSW)
+    updateSWRef.current = updateSW
 
     return () => {
       if (watchInterval) clearInterval(watchInterval)
+      if (retryTimer) clearTimeout(retryTimer)
     }
   }, [notify])
 
@@ -67,14 +130,13 @@ function PwaProvider({ children }) {
     dismissNotification(UPDATE_NOTIFICATION_ID)
     setUpdateAvailable(false)
 
-    if (updateReg) {
+    if (updateSWRef.current) {
       // vite-plugin-pwa posts the skip-waiting message and reloads only once the
       // new service worker actually takes control of the page.
-      await updateReg(true)
+      await updateSWRef.current(true)
     } else {
       window.location.reload()
     }
-    return true
   }
 
   const dismissUpdate = () => {
@@ -83,9 +145,7 @@ function PwaProvider({ children }) {
   }
 
   return (
-    <PwaContext.Provider
-      value={{ updateAvailable, update: applyUpdate, dismiss: dismissUpdate }}
-    >
+    <PwaContext.Provider value={{ updateAvailable, update: applyUpdate, dismiss: dismissUpdate }}>
       {children}
     </PwaContext.Provider>
   )

@@ -1,3 +1,5 @@
+import { DEFAULT_REMINDERS, mergeReminders } from '../config/reminders'
+
 const PREFIX = 'chakula_'
 
 const KEYS = {
@@ -9,7 +11,9 @@ const KEYS = {
   preferences: `${PREFIX}preferences`,
   cookieConsent: `${PREFIX}cookie_consent`,
   notifications: `${PREFIX}notifications`,
-  notificationsAck: `${PREFIX}notifications_ack`
+  notificationsAck: `${PREFIX}notifications_ack`,
+  reminders: `${PREFIX}reminders`,
+  reminderLog: `${PREFIX}reminder_log`
 }
 
 export const DEFAULT_PREFERENCES = {
@@ -18,6 +22,9 @@ export const DEFAULT_PREFERENCES = {
   cookingTime: 'any',
   preferredMealTypes: ['breakfast', 'lunch', 'dinner'],
   dietaryPreference: 'any',
+  allergies: [],
+  excludedIngredients: [],
+  preferredCuisines: [],
   reduceMotion: false,
   acceptedDisclaimer: false
 }
@@ -191,6 +198,55 @@ export function savePreferences(preferences) {
   write(KEYS.preferences, preferences)
 }
 
+/* ---------- Meal reminders ---------- */
+
+// Returns the stored reminder configuration merged over the defaults so new
+// fields always have a value and existing users keep their settings.
+export function getReminders() {
+  const stored = read(KEYS.reminders, null)
+  if (!stored || typeof stored !== 'object') return { ...DEFAULT_REMINDERS }
+  return mergeReminders(DEFAULT_REMINDERS, stored)
+}
+
+export function saveReminders(config) {
+  write(KEYS.reminders, mergeReminders(DEFAULT_REMINDERS, config))
+}
+
+export function clearReminders() {
+  remove(KEYS.reminders)
+}
+
+// Reminder firing bookkeeping. `fired` is keyed by `${localDate}:${periodId}` so
+// a period only ever fires once per day, even across reloads or multiple tabs.
+export function getReminderLog() {
+  const value = read(KEYS.reminderLog, null)
+  if (!value || typeof value !== 'object') return { fired: {} }
+  return { fired: value.fired && typeof value.fired === 'object' ? value.fired : {} }
+}
+
+export function saveReminderLog(log) {
+  write(KEYS.reminderLog, log)
+}
+
+export function markReminderFired(key, timestamp = Date.now()) {
+  if (!key) return getReminderLog()
+  const log = getReminderLog()
+  log.fired[key] = timestamp
+  // Keep the log small: drop entries older than 14 days.
+  const cutoff = timestamp - 14 * 24 * 60 * 60 * 1000
+  const fired = {}
+  for (const [entryKey, at] of Object.entries(log.fired)) {
+    if (Number(at) >= cutoff) fired[entryKey] = at
+  }
+  const next = { fired }
+  saveReminderLog(next)
+  return next
+}
+
+export function clearReminderLog() {
+  remove(KEYS.reminderLog)
+}
+
 /* ---------- Cookie consent ---------- */
 
 // Bump only when the technologies used or the consent requirements change,
@@ -320,15 +376,4 @@ export function resetAllPreferences() {
 export function clearLocalData() {
   if (!isStorageAvailable()) return
   Object.values(KEYS).forEach((key) => window.localStorage.removeItem(key))
-}
-
-export function getStorageUsage() {
-  if (!isStorageAvailable()) return 0
-  let total = 0
-  for (let i = 0; i < window.localStorage.length; i++) {
-    const key = window.localStorage.key(i)
-    const value = window.localStorage.getItem(key)
-    total += (key ? key.length : 0) + (value ? value.length : 0)
-  }
-  return total
 }

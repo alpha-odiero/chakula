@@ -38,7 +38,7 @@ function MealGrid({
   const seen = new Set()
   for (const meal of meals) {
     if (!meal) continue
-    const mealId = meal.idMeal || meal.id
+    const mealId = String(meal.id ?? meal.idMeal)
     if (!mealId || seen.has(mealId)) continue
     seen.add(mealId)
     uniqueMeals.push(meal)
@@ -48,7 +48,7 @@ function MealGrid({
     <div className={`meal-grid ${className}`.trim()}>
       {uniqueMeals.map((meal) => (
         <MealCard
-          key={meal.idMeal || meal.id}
+          key={meal.id ?? meal.idMeal}
           meal={meal}
           fallbackCategory={fallbackCategory}
           fallbackArea={fallbackArea}

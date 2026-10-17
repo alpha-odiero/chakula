@@ -4,7 +4,7 @@ import { useToast } from './Toast'
 import { isFavorite, toggleFavorite } from '../utils/favorites'
 
 function SaveButton({ meal, className = '' }) {
-  const id = meal?.idMeal || meal?.id
+  const id = meal?.id ?? meal?.idMeal
   const [saved, setSaved] = useState(() => (id ? isFavorite(id) : false))
   const toast = useToast()
 
@@ -14,7 +14,7 @@ function SaveButton({ meal, className = '' }) {
 
   if (!id) return null
 
-  const name = meal.strMeal || meal.name || 'recipe'
+  const name = meal.name ?? meal.strMeal ?? 'recipe'
 
   const handleClick = (event) => {
     event.preventDefault()

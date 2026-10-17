@@ -4,10 +4,12 @@ import Icon from './Icon'
 function FeaturedMealCard({ meal, eyebrow = "TODAY'S INSPIRATION" }) {
   if (!meal) return null
 
-  const id = meal.idMeal || meal.id
-  const name = meal.strMeal || meal.name
-  const image = meal.strMealThumb || meal.image
-  const meta = [meal.strCategory, meal.strArea].filter(Boolean).join(' · ')
+  const id = meal.id ?? meal.idMeal
+  const name = meal.name ?? meal.strMeal
+  const image = meal.image ?? meal.strMealThumb
+  const category = meal.category ?? meal.strCategory
+  const area = meal.area ?? meal.strArea
+  const meta = [category, area].filter(Boolean).join(' · ')
 
   return (
     <article className="featured-card">

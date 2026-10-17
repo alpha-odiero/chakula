@@ -30,14 +30,13 @@ function About() {
             <li>View complete recipes with ingredients, measurements, and instructions.</li>
           </ul>
 
-          <h2>Recipe data</h2>
+          <h2>Recipe library</h2>
           <p>
-            Recipes and images are provided through{' '}
-            <a href="https://www.themealdb.com" target="_blank" rel="noopener noreferrer">
-              TheMealDB
-            </a>
-            , a free, community-supported recipe database. Pikawise shows recipes as provided by
-            TheMealDB and credits their original sources where available.
+            Pikawise brings together a world of recipes — from quick breakfasts to slow weekend
+            dinners — and presents them in one clean, consistent place. Recipes and photos are
+            gathered from public recipe sources and shown for inspiration. Pikawise curates how they
+            are presented, but does not author the original dishes and does not claim ownership of
+            them.
           </p>
 
           <h2>Privacy by design</h2>
@@ -48,7 +47,10 @@ function About() {
           </p>
 
           <h2>Version</h2>
-          <p>Pikawise v{APP_VERSION} — a progressive web app built with React, Vite, and TheMealDB.</p>
+          <p>
+            You&apos;re using Pikawise v{APP_VERSION} — a progressive web app that works offline and
+            keeps your plans, preferences, and reminders on your device.
+          </p>
         </div>
       </section>
     </main>

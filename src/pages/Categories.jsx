@@ -32,7 +32,7 @@ function Categories() {
         {!state.loading && !state.error && (
           <div className="category-grid category-grid--cards">
             {state.data.map((category) => (
-              <CategoryCard key={category.strCategory} category={category} />
+              <CategoryCard key={category.name ?? category.strCategory} category={category} />
             ))}
           </div>
         )}

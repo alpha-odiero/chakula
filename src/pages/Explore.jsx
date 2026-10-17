@@ -186,14 +186,14 @@ function Explore() {
               {categories.loading && <p className="filter-note">Loading…</p>}
               <div className="filter-options">
                 {categories.data?.map((c) => (
-                  <label key={c.strCategory} className="filter-option">
+                  <label key={c.name ?? c.strCategory} className="filter-option">
                     <input
                       type="radio"
                       name="category"
-                      checked={activeFilter.type === 'category' && activeFilter.value === c.strCategory}
-                      onChange={() => selectFilter('category', c.strCategory)}
+                      checked={activeFilter.type === 'category' && activeFilter.value === (c.name ?? c.strCategory)}
+                      onChange={() => selectFilter('category', c.name ?? c.strCategory)}
                     />
-                    <span>{c.strCategory}</span>
+                    <span>{c.name ?? c.strCategory}</span>
                   </label>
                 ))}
               </div>

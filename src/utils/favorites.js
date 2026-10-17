@@ -38,19 +38,23 @@ export function getFavorites() {
 }
 
 export function isFavorite(mealId) {
-  return getFavorites().some((m) => (m.idMeal || m.id) === String(mealId))
+  const target = String(mealId)
+  return getFavorites().some((m) => String(m.id ?? m.idMeal) === target)
 }
 
 export function addFavorite(meal) {
   const list = getFavorites()
-  const id = meal.idMeal || meal.id
-  if (list.some((m) => (m.idMeal || m.id) === id)) return list
+  if (!meal) return list
+  const id = String(meal.id ?? meal.idMeal)
+  if (!id) return list
+  if (list.some((m) => String(m.id ?? m.idMeal) === id)) return list
   const next = [
     {
-      idMeal: id,
-      strMeal: meal.strMeal || meal.name,
-      strMealThumb: meal.strMealThumb || meal.image || meal.thumb,
-      strCategory: meal.strCategory || meal.category || null
+      id,
+      name: meal.name ?? meal.strMeal ?? 'Untitled',
+      image: meal.image ?? meal.strMealThumb ?? meal.thumb ?? null,
+      category: meal.category ?? meal.strCategory ?? null,
+      area: meal.area ?? meal.strArea ?? null
     },
     ...list
   ]
@@ -59,13 +63,14 @@ export function addFavorite(meal) {
 }
 
 export function removeFavorite(mealId) {
-  const next = getFavorites().filter((m) => (m.idMeal || m.id) !== String(mealId))
+  const target = String(mealId)
+  const next = getFavorites().filter((m) => String(m.id ?? m.idMeal) !== target)
   write(next)
   return next
 }
 
 export function toggleFavorite(meal) {
-  const id = meal.idMeal || meal.id
+  const id = meal?.id ?? meal?.idMeal
   if (isFavorite(id)) return removeFavorite(id)
   return addFavorite(meal)
 }

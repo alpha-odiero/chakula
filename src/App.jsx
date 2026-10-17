@@ -10,6 +10,8 @@ import Onboarding from './components/Onboarding'
 import CookieConsent from './components/CookieConsent'
 import PreferencesProvider, { usePreferences } from './components/PreferencesProvider'
 import PwaProvider from './components/PwaProvider'
+import ReminderProvider from './components/ReminderProvider'
+import PikawiseLoader from './components/PikawiseLoader'
 import ToastProvider, { useToast } from './components/Toast'
 import { useNetworkState } from './hooks/useNetworkState'
 import { useInstallPrompt } from './hooks/useInstallPrompt'
@@ -28,6 +30,7 @@ const BalancedDiet = lazy(() => import('./pages/BalancedDiet'))
 const MealPlans = lazy(() => import('./pages/MealPlans'))
 const ShoppingList = lazy(() => import('./pages/ShoppingListPage'))
 const Settings = lazy(() => import('./pages/Settings'))
+const Reminder = lazy(() => import('./pages/Reminder'))
 const About = lazy(() => import('./pages/About'))
 const Developer = lazy(() => import('./pages/Developer'))
 const Privacy = lazy(() => import('./pages/Privacy'))
@@ -36,11 +39,7 @@ const Favorites = lazy(() => import('./pages/Favorites'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function PageFallback() {
-  return (
-    <div className="page-fallback" role="status" aria-label="Loading page">
-      <div className="page-fallback-spinner" aria-hidden="true" />
-    </div>
-  )
+  return <PikawiseLoader variant="section" label="Loading page" delay={150} />
 }
 
 function AppShell() {
@@ -54,19 +53,20 @@ function AppShell() {
   const inStandaloneMode = isStandalone()
 
   useEffect(() => {
+    // Remove the pre-React branded splash once the app shell has mounted.
+    // This runs for the website and the installed app alike, so the old
+    // empty shell is never shown in standalone mode.
     const splash = document.getElementById('app-splash')
     if (!splash) return undefined
-    if (isStandalone()) {
-      splash.remove()
-      return undefined
-    }
-    const MIN_VISIBLE = 1200
+    const MIN_VISIBLE = 1000
     const elapsed = performance.now()
     const wait = Math.max(0, MIN_VISIBLE - elapsed)
     let fadeTimer
     const hideTimer = setTimeout(() => {
-      splash.classList.add('app-splash--hidden')
-      fadeTimer = setTimeout(() => splash.remove(), 600)
+      splash.classList.add('pw-splash--hidden')
+      fadeTimer = setTimeout(() => {
+        if (splash.isConnected) splash.remove()
+      }, 600)
     }, wait)
     return () => {
       clearTimeout(hideTimer)
@@ -118,6 +118,7 @@ function AppShell() {
               <Route path="/shopping-list" element={<ShoppingList />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/reminder" element={<Reminder />} />
               <Route path="/about" element={<About />} />
               <Route path="/developer" element={<Developer />} />
               <Route path="/privacy" element={<Privacy />} />
@@ -140,7 +141,9 @@ function App() {
   return (
     <PreferencesProvider>
       <ToastProvider>
-        <AppShell />
+        <ReminderProvider>
+          <AppShell />
+        </ReminderProvider>
       </ToastProvider>
     </PreferencesProvider>
   )

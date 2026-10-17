@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import Icon from '../components/Icon'
 import ConfirmDialog from '../components/ConfirmDialog'
+import ReminderSettings from '../components/ReminderSettings'
 import logo from '../assets/LOGO.png'
 import { usePreferences } from '../components/PreferencesProvider'
 import { useToast } from '../components/Toast'
@@ -11,8 +12,7 @@ import { useInstallPrompt } from '../hooks/useInstallPrompt'
 import {
   clearMealPlans,
   clearShoppingChecks,
-  getMealPlans,
-  getStorageUsage
+  getMealPlans
 } from '../utils/storage'
 import { getIOSDevice } from '../utils/platform'
 import { APP_VERSION } from '../config/app'
@@ -30,6 +30,69 @@ const TIME_OPTIONS = [
   { value: 'longer', label: 'Time is not a problem' }
 ]
 
+function TagField({ id, label, hint, values, onChange, placeholder }) {
+  const [draft, setDraft] = useState('')
+
+  const addFromDraft = () => {
+    const items = draft
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+    if (!items.length) return
+    onChange([...new Set([...values, ...items])])
+    setDraft('')
+  }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault()
+      addFromDraft()
+    } else if (event.key === 'Backspace' && !draft && values.length) {
+      onChange(values.slice(0, -1))
+    }
+  }
+
+  return (
+    <div className="settings-field">
+      <label className="settings-label" htmlFor={id}>
+        {label}
+      </label>
+      {hint && <p className="settings-hint">{hint}</p>}
+      {values.length > 0 && (
+        <div className="settings-chip-row">
+          {values.map((value) => (
+            <span key={value} className="chip chip--removable">
+              {value}
+              <button
+                type="button"
+                className="chip-remove"
+                aria-label={`Remove ${value}`}
+                onClick={() => onChange(values.filter((item) => item !== value))}
+              >
+                <Icon name="close" size={13} />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="settings-tag-input">
+        <input
+          id={id}
+          type="text"
+          value={draft}
+          placeholder={placeholder}
+          onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={addFromDraft}
+        />
+        <button type="button" className="button button--secondary" onClick={addFromDraft}>
+          Add
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function Settings() {
   const [theme, setTheme] = useTheme()
   const { preferences, update } = usePreferences()
@@ -39,7 +102,6 @@ function Settings() {
   const [reducedPrefsConfirm, setReducedPrefsConfirm] = useState(false)
   const [iosGuide, setIosGuide] = useState(false)
   const [updateState, setUpdateState] = useState('idle')
-  const [storageBytes, setStorageBytes] = useState(() => getStorageUsage())
   const toast = useToast()
 
   const showMessage = (text, variant = 'success') => toast.notify(text, { variant })
@@ -56,7 +118,6 @@ function Settings() {
     clearMealPlans()
     clearShoppingChecks()
     setClearAllConfirm(false)
-    setStorageBytes(getStorageUsage())
     showMessage('Saved plans cleared.')
   }
 
@@ -235,6 +296,33 @@ function Settings() {
             </div>
           </div>
 
+          <TagField
+            id="settings-allergies"
+            label="Allergies"
+            hint="Ingredient ideas containing these are hidden from reminders."
+            values={preferences.allergies || []}
+            onChange={(allergies) => update({ allergies })}
+            placeholder="e.g. peanuts, shellfish"
+          />
+
+          <TagField
+            id="settings-excluded"
+            label="Ingredients to avoid"
+            hint="Reminder suggestions skip these ingredients."
+            values={preferences.excludedIngredients || []}
+            onChange={(excludedIngredients) => update({ excludedIngredients })}
+            placeholder="e.g. mushrooms"
+          />
+
+          <TagField
+            id="settings-cuisines"
+            label="Preferred cuisines"
+            hint="Reminders lean toward these cuisines when possible."
+            values={preferences.preferredCuisines || []}
+            onChange={(preferredCuisines) => update({ preferredCuisines })}
+            placeholder="e.g. Italian, Thai"
+          />
+
           <div className="settings-row">
             <div>
               <p className="settings-label">Reset meal preferences</p>
@@ -252,12 +340,14 @@ function Settings() {
           </div>
         </div>
 
+        <ReminderSettings />
+
         <div className="settings-group">
           <h2 className="settings-group-title">
             <span className="settings-group-icon">
               <Icon name="database" size={17} />
             </span>
-            Data &amp; storage
+            My Stuff
           </h2>
           <div className="settings-row">
             <div>
@@ -289,13 +379,6 @@ function Settings() {
             >
               Clear
             </button>
-          </div>
-
-          <div className="settings-row">
-            <div>
-              <p className="settings-label">Storage used</p>
-              <p className="settings-hint">{(storageBytes / 1024).toFixed(1)} KB used.</p>
-            </div>
           </div>
 
           <div className="settings-row">

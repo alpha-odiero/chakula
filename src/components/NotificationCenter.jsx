@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Icon from './Icon'
 import { usePwa } from './PwaProvider'
 import { getNotifications, markAllNotificationsRead, dismissNotification } from '../utils/storage'
@@ -18,6 +19,7 @@ function formatTime(timestamp) {
 
 function NotificationCenter({ className = '' }) {
   const { updateAvailable, update } = usePwa()
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState(getNotifications)
   const wrapRef = useRef(null)
@@ -59,6 +61,17 @@ function NotificationCenter({ className = '' }) {
     setOpen(false)
     await update()
     setItems(getNotifications())
+  }
+
+  const handleReminder = (item) => {
+    setOpen(false)
+    const period = item.periodId ? `?period=${encodeURIComponent(item.periodId)}` : ''
+    navigate(`/reminder${period}`)
+  }
+
+  const handleOpenReminder = (periodId) => {
+    setOpen(false)
+    navigate(periodId ? `/reminder?period=${encodeURIComponent(periodId)}` : '/reminder')
   }
 
   return (
@@ -111,6 +124,15 @@ function NotificationCenter({ className = '' }) {
                         onClick={handleUpdate}
                       >
                         Update now
+                      </button>
+                    )}
+                    {item.type === 'reminder' && (
+                      <button
+                        type="button"
+                        className="button button--primary notif-item-action"
+                        onClick={() => handleReminder(item)}
+                      >
+                        Pick a meal
                       </button>
                     )}
                   </div>

@@ -70,7 +70,7 @@ function CookingMode({ mealName, steps, ingredients = [], servings = 1, baseServ
   }, [])
 
   const scaledIngredients = useMemo(
-    () => ingredients.map(({ ingredient, measure }) => ({
+    () => ingredients.map(({ name: ingredient, measure }) => ({
       ingredient,
       measure: scaleMeasure(measure, factor)
     })),

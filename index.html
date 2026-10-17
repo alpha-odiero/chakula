@@ -28,6 +28,7 @@
         "url": "https://pikawise.vercel.app",
         "applicationCategory": "LifestyleApplication",
         "operatingSystem": "Android, iOS, Windows, macOS",
+        "softwareVersion": "1.1",
         "description": "Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with offline access.",
         "offers": {
           "@type": "Offer",
@@ -36,8 +37,6 @@
         }
       }
     </script>
-    <link rel="preconnect" href="https://www.themealdb.com" crossorigin />
-    <link rel="dns-prefetch" href="https://www.themealdb.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -55,19 +54,6 @@
         } catch (e) {
           document.documentElement.classList.add('theme-light')
         }
-        try {
-          var mq = function (q) {
-            return typeof window.matchMedia === 'function' && window.matchMedia(q).matches
-          }
-          var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
-          var standalone =
-            mq('(display-mode: standalone)') ||
-            mq('(display-mode: fullscreen)') ||
-            (ios && navigator.standalone === true && !mq('(display-mode: browser)'))
-          if (standalone) document.documentElement.classList.add('app-standalone')
-        } catch (e) {
-          /* ignore */
-        }
       })()
     </script>
     <style>
@@ -77,139 +63,118 @@
       html.theme-dark {
         background: #0f1310;
       }
+      /* Pre-React Pikawise splash. Shown instantly on launch (web and
+         installed app) and removed by the app once it is ready. */
       #app-splash {
         position: fixed;
         inset: 0;
-        z-index: 9999;
+        z-index: 10000;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: radial-gradient(120% 90% at 50% 18%, #ffffff 0%, #f4f8f2 55%, #eaf6ed 100%);
-        transition: opacity 0.5s ease, visibility 0.5s ease;
-        animation: app-splash-auto 1.4s ease 2.8s forwards;
+        padding: calc(24px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right))
+          calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+        background: radial-gradient(120% 90% at 50% 15%, #ffffff 0%, #f3f8f2 52%, #e7f4ea 100%);
+        transition: opacity 0.45s ease, visibility 0.45s ease;
       }
-      .app-splash-inner {
+      .pw-splash-inner {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 18px;
+        gap: 16px;
       }
-      .app-splash-logo {
+      .pw-splash-badge {
+        --ring-w: 3.5px;
         position: relative;
         display: grid;
         place-items: center;
-        animation: app-splash-pop 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+        width: 76px;
+        height: 76px;
+        animation: pw-splash-pop 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
       }
-      .app-splash-logo::before {
-        content: '';
+      .pw-splash-ring {
         position: absolute;
-        width: 172px;
-        height: 172px;
+        inset: 0;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(25, 138, 67, 0.16) 0%, rgba(25, 138, 67, 0) 68%);
-        animation: app-splash-pulse 1.9s ease-in-out infinite;
+        background: conic-gradient(
+          from 0turn,
+          rgba(25, 138, 67, 1) 0turn 0.4turn,
+          rgba(25, 138, 67, 0) 0.4turn 0.5turn,
+          rgba(25, 138, 67, 0.34) 0.5turn 0.9turn,
+          rgba(25, 138, 67, 0) 0.9turn 1turn
+        );
+        -webkit-mask: radial-gradient(
+          farthest-side,
+          #0000 calc(100% - var(--ring-w)),
+          #000 calc(100% - var(--ring-w))
+        );
+        mask: radial-gradient(
+          farthest-side,
+          #0000 calc(100% - var(--ring-w)),
+          #000 calc(100% - var(--ring-w))
+        );
+        animation: pw-splash-spin 0.85s linear infinite;
       }
-      .app-splash-mark {
+      .pw-splash-ring--inner {
+        --ring-w: 2px;
+        inset: 10px;
+        background: conic-gradient(
+          from 0.5turn,
+          rgba(25, 138, 67, 0.55) 0turn 0.35turn,
+          rgba(25, 138, 67, 0) 0.35turn 0.5turn,
+          rgba(25, 138, 67, 0.55) 0.5turn 0.85turn,
+          rgba(25, 138, 67, 0) 0.85turn 1turn
+        );
+        animation: pw-splash-spin 1.35s linear infinite reverse;
+      }
+      .pw-splash-mark {
         position: relative;
-        width: 132px;
-        height: auto;
-        animation: app-splash-float 2.3s ease-in-out infinite;
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+        box-shadow: 0 8px 20px rgba(25, 138, 67, 0.24);
       }
-      .app-splash-name {
+      .pw-splash-name {
         font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
         font-weight: 800;
-        font-size: 20px;
-        letter-spacing: -0.02em;
+        font-size: 24px;
+        letter-spacing: -0.03em;
         color: #0f1310;
-      }
-      .app-splash-bar {
-        width: 148px;
-        height: 5px;
-        border-radius: 999px;
-        background: #dcefdc;
-        overflow: hidden;
-      }
-      .app-splash-bar > span {
-        display: block;
-        height: 100%;
-        width: 42%;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #157739, #2fa75c);
-        animation: app-splash-slide 1.15s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        animation: pw-splash-pop 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) 0.05s both;
       }
       html.theme-dark #app-splash {
-        background: radial-gradient(120% 90% at 50% 18%, #141a15 0%, #10150f 55%, #0f1310 100%);
+        background: radial-gradient(120% 90% at 50% 15%, #151b16 0%, #11170f 55%, #0f1310 100%);
       }
-      html.theme-dark .app-splash-name {
+      html.theme-dark .pw-splash-name {
         color: #eef2ec;
       }
-      html.theme-dark .app-splash-mark {
-        filter: brightness(0) invert(1);
+      html.theme-dark .pw-splash-mark {
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
       }
-      html.theme-dark .app-splash-bar {
-        background: #1c2a20;
-      }
-      html.theme-dark .app-splash-logo::before {
-        background: radial-gradient(circle, rgba(47, 167, 92, 0.22) 0%, rgba(47, 167, 92, 0) 68%);
-      }
-      #app-splash.app-splash--hidden {
+      #app-splash.pw-splash--hidden {
         opacity: 0;
+        visibility: hidden;
         pointer-events: none;
       }
-      html.app-standalone #app-splash {
-        display: none;
-      }
-      @keyframes app-splash-pop {
+      @keyframes pw-splash-pop {
         from {
           opacity: 0;
-          transform: scale(0.86) translateY(8px);
+          transform: scale(0.88) translateY(8px);
         }
         to {
           opacity: 1;
           transform: scale(1) translateY(0);
         }
       }
-      @keyframes app-splash-float {
-        0%, 100% {
-          transform: translateY(-3px);
-        }
-        50% {
-          transform: translateY(3px);
-        }
-      }
-      @keyframes app-splash-pulse {
-        0%, 100% {
-          transform: scale(0.9);
-          opacity: 0.6;
-        }
-        50% {
-          transform: scale(1.1);
-          opacity: 1;
-        }
-      }
-      @keyframes app-splash-slide {
-        0% {
-          transform: translateX(-120%);
-        }
-        100% {
-          transform: translateX(320%);
-        }
-      }
-      @keyframes app-splash-auto {
+      @keyframes pw-splash-spin {
         to {
-          opacity: 0;
-          visibility: hidden;
+          transform: rotate(1turn);
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        #app-splash {
-          animation-delay: 0.2s;
-          animation-duration: 0.01s;
-        }
-        .app-splash-logo,
-        .app-splash-logo::before,
-        .app-splash-mark,
-        .app-splash-bar > span {
+        .pw-splash-badge,
+        .pw-splash-ring,
+        .pw-splash-name {
           animation: none;
         }
       }
@@ -222,15 +187,38 @@
     <title>Pikawise — Discover meals. Cook with what you have.</title>
   </head>
   <body>
-    <div id="app-splash" aria-hidden="true">
-      <div class="app-splash-inner">
-        <div class="app-splash-logo">
-          <img class="app-splash-mark" src="./src/assets/LOGO.png" alt="" width="132" height="93" aria-hidden="true" />
-        </div>
-        <span class="app-splash-name">Pikawise</span>
-        <span class="app-splash-bar"><span></span></span>
+    <div id="app-splash" role="status" aria-live="polite" aria-label="Pikawise is loading">
+      <div class="pw-splash-inner">
+        <span class="pw-splash-badge">
+          <span class="pw-splash-ring" aria-hidden="true"></span>
+          <span class="pw-splash-ring pw-splash-ring--inner" aria-hidden="true"></span>
+          <img
+            class="pw-splash-mark"
+            src="./src/assets/logo.svg"
+            alt=""
+            width="44"
+            height="44"
+            aria-hidden="true"
+          />
+        </span>
+        <span class="pw-splash-name">Pikawise</span>
       </div>
     </div>
+    <script>
+      /* Safety net: never leave the splash on screen forever if the app
+         bundle fails to start. Removed normally by the React shell. */
+      ;(function () {
+        var splash = document.getElementById('app-splash')
+        if (!splash) return
+        window.setTimeout(function () {
+          if (!splash.isConnected || splash.classList.contains('pw-splash--hidden')) return
+          splash.classList.add('pw-splash--hidden')
+          window.setTimeout(function () {
+            if (splash.isConnected) splash.remove()
+          }, 600)
+        }, 8000)
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

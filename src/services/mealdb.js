@@ -1,3 +1,8 @@
+import { normalizeMeal, normalizeMeals, normalizeCategories } from './meals'
+
+// Provider connection details are an internal implementation detail. They are
+// deliberately kept in this adapter so the rest of the app only ever sees the
+// Pikawise meal model (see services/meals.js).
 const BASE_URL = import.meta.env.VITE_MEALDB_BASE_URL || 'https://www.themealdb.com/api/json/v1/1'
 const API_KEY = import.meta.env.VITE_MEALDB_API_KEY || '1'
 
@@ -73,36 +78,34 @@ async function fetchJson(endpoint, params = {}) {
   return data
 }
 
-const byMeal = (meal) => meal
-
 export function searchMeals(query) {
-  return fetchJson('search.php', { s: query }).then((data) => (data.meals || []).map(byMeal))
+  return fetchJson('search.php', { s: query }).then((data) => normalizeMeals(data.meals))
 }
 
 export function getMeal(id) {
   return fetchJson('lookup.php', { i: id }).then((data) => {
     const meals = data.meals || []
-    return meals.length ? meals[0] : null
+    return meals.length ? normalizeMeal(meals[0]) : null
   })
 }
 
 export function getRandomMeal() {
   return fetchJson('random.php').then((data) => {
     const meals = data.meals || []
-    return meals.length ? meals[0] : null
+    return meals.length ? normalizeMeal(meals[0]) : null
   })
 }
 
 export function getCategories() {
-  return fetchJson('categories.php').then((data) => data.categories || [])
+  return fetchJson('categories.php').then((data) => normalizeCategories(data.categories))
 }
 
 export function filterByCategory(category) {
-  return fetchJson('filter.php', { c: category }).then((data) => (data.meals || []).map(byMeal))
+  return fetchJson('filter.php', { c: category }).then((data) => normalizeMeals(data.meals))
 }
 
 export function filterByIngredient(ingredient) {
-  return fetchJson('filter.php', { i: ingredient }).then((data) => (data.meals || []).map(byMeal))
+  return fetchJson('filter.php', { i: ingredient }).then((data) => normalizeMeals(data.meals))
 }
 
 export function listAreas() {
@@ -110,7 +113,7 @@ export function listAreas() {
 }
 
 export function filterByArea(area) {
-  return fetchJson('filter.php', { a: area }).then((data) => (data.meals || []).map(byMeal))
+  return fetchJson('filter.php', { a: area }).then((data) => normalizeMeals(data.meals))
 }
 
 export function listIngredients() {
