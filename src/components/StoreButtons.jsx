@@ -1,4 +1,3 @@
-import { useToast } from './Toast'
 import { GOOGLE_PLAY_URL, APP_STORE_URL, isStoreLive } from '../config/stores'
 
 // Official Google Play prism (4-colour mark), sourced from the public-domain
@@ -63,8 +62,6 @@ const STORES = [
 ]
 
 function StoreButtons({ onStoreUnavailable }) {
-  const { info } = useToast()
-
   return (
     <div className="store-buttons">
       {STORES.map((store) => {
@@ -98,10 +95,7 @@ function StoreButtons({ onStoreUnavailable }) {
             key={store.key}
             type="button"
             className="store-btn"
-            onClick={() => {
-              info(store.comingSoon)
-              onStoreUnavailable?.(store.key)
-            }}
+            onClick={() => onStoreUnavailable?.(store)}
           >
             {content}
           </button>

@@ -804,21 +804,21 @@
   gap: 8px;
 }
 
-/* Flashes orange three times to draw the eye to the install button after a
-   "coming soon" store button is tapped. */
+/* Glows orange three times to draw the eye to the install button after a
+   "coming soon" store message has disappeared. */
 .footer-install-btn--flash {
-  animation: install-flash 0.55s ease-in-out 3;
+  animation: install-flash 0.7s ease-in-out 3;
 }
 
 @keyframes install-flash {
   0%,
   100% {
     background-color: var(--accent);
-    box-shadow: none;
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
   }
   50% {
     background-color: #f97316;
-    box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.3);
+    box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.35), 0 0 22px 8px rgba(249, 115, 22, 0.6);
   }
 }
 
