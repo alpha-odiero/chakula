@@ -51,24 +51,38 @@ function AppShell() {
   const inStandaloneMode = isStandalone()
 
   useEffect(() => {
-    // Remove the pre-React branded splash once the app shell has mounted.
-    // This runs for the website and the installed app alike, so the old
-    // empty shell is never shown in standalone mode.
+    // Remove the pre-React splash once the first page has actually rendered
+    // (or after a hard timeout), so the loader never hands over to a blank
+    // screen and never shows a second branded loading screen behind it.
     const splash = document.getElementById('app-splash')
     if (!splash) return undefined
-    const MIN_VISIBLE = 2000
-    const elapsed = performance.now()
-    const wait = Math.max(0, MIN_VISIBLE - elapsed)
-    let fadeTimer
-    const hideTimer = setTimeout(() => {
+    const MIN_VISIBLE = 650
+    const MAX_VISIBLE = 5000
+    const started = performance.now()
+    let frame = 0
+    let removeTimer
+    let hidden = false
+    const hide = () => {
+      if (hidden) return
+      hidden = true
       splash.classList.add('pw-splash--hidden')
-      fadeTimer = setTimeout(() => {
+      removeTimer = setTimeout(() => {
         if (splash.isConnected) splash.remove()
-      }, 600)
-    }, wait)
+      }, 500)
+    }
+    const tick = () => {
+      const elapsed = performance.now() - started
+      const pageReady = document.querySelector('main') !== null
+      if ((pageReady && elapsed >= MIN_VISIBLE) || elapsed >= MAX_VISIBLE) {
+        hide()
+        return
+      }
+      frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
     return () => {
-      clearTimeout(hideTimer)
-      clearTimeout(fadeTimer)
+      cancelAnimationFrame(frame)
+      clearTimeout(removeTimer)
     }
   }, [])
 

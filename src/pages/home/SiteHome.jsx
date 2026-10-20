@@ -131,9 +131,12 @@ function SiteHome() {
             </div>
           ) : (
             <div className="category-grid category-grid--cards">
-              {categories.slice(0, 6).map((cat) => (
-                <CategoryCard key={cat.name ?? cat.strCategory} category={cat} />
-              ))}
+              {categories
+                .slice(0, 6)
+                .filter((cat) => (cat.name ?? cat.strCategory) !== 'Pasta')
+                .map((cat) => (
+                  <CategoryCard key={cat.name ?? cat.strCategory} category={cat} />
+                ))}
             </div>
           )}
         </div>

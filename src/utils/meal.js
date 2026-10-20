@@ -57,12 +57,99 @@ export function mealToCardData(meal) {
   }
 }
 
-export function formatInstructionSteps(instructions) {
-  if (!instructions) return []
-  return instructions
-    .split(/\r?\n+/)
-    .map((step) => step.trim())
+const INLINE_STEP = /(?:^|\s)(?:step\s*)?(\d{1,2})\s*[.)]\s+/gi
+const STEP_PREFIX = /^(?:step\s*)?\d{1,2}\s*(?:[.):]\s*|[-–]\s+)/i
+const STEP_LABEL_ONLY = /^(?:step\s*)?\d{1,2}$/i
+const ABBREVIATION_END = /(?:^|\s)(?:approx|etc|vs|e\.g|i\.e|mr|mrs|ms|dr|st|co|inc)\.$/i
+
+// Some recipes put every numbered step in a single paragraph instead of one
+// per line. Recover those steps without touching numbers like "1.5" or "180C".
+function splitInlineNumbered(text) {
+  const markers = []
+  let match
+  INLINE_STEP.lastIndex = 0
+  while ((match = INLINE_STEP.exec(text))) {
+    const value = Number(match[1])
+    if (!Number.isFinite(value)) continue
+    const offset = match[0].search(/\d/)
+    markers.push({ value, index: match.index + offset })
+  }
+  if (markers.length < 2) return null
+
+  let best = null
+  for (let i = 0; i < markers.length; i += 1) {
+    const run = [markers[i]]
+    for (let j = i + 1; j < markers.length; j += 1) {
+      if (markers[j].value !== run[run.length - 1].value + 1) break
+      run.push(markers[j])
+    }
+    if (run.length >= 2 && (!best || run.length > best.length)) best = run
+  }
+  if (!best) return null
+
+  const segments = []
+  const preamble = text.slice(0, best[0].index).trim()
+  if (preamble.length > 12) segments.push(preamble)
+  for (let i = 0; i < best.length; i += 1) {
+    const end = i + 1 < best.length ? best[i + 1].index : text.length
+    const segment = text.slice(best[i].index, end).trim()
+    if (segment) segments.push(segment)
+  }
+  return segments.length > 1 ? segments : null
+}
+
+function isStepHeading(text) {
+  if (text.length > 72) return false
+  if (/:$/.test(text) && !/[.!?]$/.test(text)) return true
+  return /[A-Z]/.test(text) && text === text.toUpperCase() && !/[.!?]$/.test(text)
+}
+
+// Paragraph-only instructions (no line breaks) still need usable steps.
+function splitSentences(text) {
+  const parts = text
+    .replace(/([.!?])\s+(?=[A-Z(])/g, '$1\u0000')
+    .split('\u0000')
+    .map((part) => part.trim())
     .filter(Boolean)
+  const merged = []
+  for (const part of parts) {
+    const previous = merged[merged.length - 1]
+    if (previous && ABBREVIATION_END.test(previous)) merged[merged.length - 1] = `${previous} ${part}`
+    else merged.push(part)
+  }
+  return merged
+}
+
+export function formatInstructionSteps(instructions) {
+  if (typeof instructions !== 'string') return []
+  const normalized = instructions.replace(/\r\n?/g, '\n').replace(/\u00a0/g, ' ').trim()
+  if (!normalized) return []
+
+  const steps = []
+  let heading = ''
+  for (const rawLine of normalized.split(/\n+/)) {
+    const line = rawLine.trim()
+    if (!line) continue
+    const pieces = splitInlineNumbered(line) ?? [line]
+    for (const piece of pieces) {
+      const step = piece.replace(STEP_PREFIX, '').trim()
+      if (!step || STEP_LABEL_ONLY.test(step)) continue
+      if (isStepHeading(step)) {
+        heading = heading ? `${heading} ${step}` : step
+        continue
+      }
+      const text = heading ? `${heading.replace(/:\s*$/, '')}: ${step}` : step
+      heading = ''
+      steps.push(text)
+    }
+  }
+
+  if (steps.length === 1 && steps[0].length > 160) {
+    const sentences = splitSentences(steps[0])
+    if (sentences.length > 1) return sentences
+  }
+
+  return steps
 }
 
 export function debounce(fn, delay = 350) {

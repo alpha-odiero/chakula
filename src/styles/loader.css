@@ -1,7 +1,7 @@
 /* ============ Pikawise branded loader ============ */
-/* The real Pikawise logo sits plainly on the page — no ring, border or
-   shadow behind it — with four dots that jump up in a line, then come back
-   down in a line, on a 2.5s loop. */
+/* Wordmark-free on purpose: the app name and four dots that jump up in a
+   line, then come back down in a line, on a 2.5s loop. No logo or app icon
+   is shown while the app starts up. */
 
 .pw-loader {
   display: flex;
@@ -26,17 +26,6 @@
 .pw-loader--inline {
   flex-direction: row;
   gap: 10px;
-}
-
-.pw-loader-logo {
-  display: block;
-  width: auto;
-  height: 34px;
-  flex-shrink: 0;
-}
-
-.pw-loader--inline .pw-loader-logo {
-  height: 16px;
 }
 
 .pw-loader-name {
@@ -84,10 +73,6 @@
 
 /* Inside buttons, show just the animated dots in the button's text colour
    so the loader stays legible on filled (primary) buttons. */
-.button .pw-loader-logo {
-  display: none;
-}
-
 .button .pw-loader-dots span {
   background: currentColor;
 }
