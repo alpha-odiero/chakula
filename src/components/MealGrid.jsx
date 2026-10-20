@@ -44,12 +44,17 @@ function MealGrid({
     uniqueMeals.push(meal)
   }
 
+  // The first row is almost always in view on load, so its images get
+  // priority; everything below stays lazy until the user scrolls near it.
+  const EAGER_COUNT = 6
+
   return (
     <div className={`meal-grid ${className}`.trim()}>
-      {uniqueMeals.map((meal) => (
+      {uniqueMeals.map((meal, index) => (
         <MealCard
           key={meal.id ?? meal.idMeal}
           meal={meal}
+          eager={index < EAGER_COUNT}
           fallbackCategory={fallbackCategory}
           fallbackArea={fallbackArea}
         />

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import Icon from './Icon'
 import SaveButton from './SaveButton'
 
-function MealCard({ meal, fallbackCategory = null, fallbackArea = null }) {
+function MealCard({ meal, fallbackCategory = null, fallbackArea = null, eager = false }) {
   if (!meal) return null
   const id = meal.id ?? meal.idMeal
   const name = meal.name ?? meal.strMeal
@@ -18,10 +18,11 @@ function MealCard({ meal, fallbackCategory = null, fallbackArea = null }) {
             className="meal-card-img"
             src={image}
             alt={name}
-            loading="lazy"
+            loading={eager ? 'eager' : 'lazy'}
+            fetchpriority={eager ? 'high' : undefined}
             decoding="async"
             width="680"
-            height="480"
+            height="510"
           />
           {category && <span className="meal-card-category">{category}</span>}
         </div>

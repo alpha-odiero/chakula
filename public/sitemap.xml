@@ -31,19 +31,9 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://pikawise.vercel.app/about</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
     <loc>https://pikawise.vercel.app/developer</loc>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://pikawise.vercel.app/privacy</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
   <url>
     <loc>https://pikawise.vercel.app/terms</loc>

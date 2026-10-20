@@ -17,18 +17,30 @@ function LoadingSkeleton({ variant = 'meal' }) {
   if (variant === 'detail') {
     return (
       <div className="skeleton-detail" role="status" aria-label="Loading recipe">
-        <span className="skeleton-block skeleton-detail-hero" />
-        <div className="container">
-          <div className="recipe-layout">
-            <div className="skeleton-stack">
+        <div className="container meal-detail-layout">
+          <div className="meal-detail-hero">
+            <span className="skeleton-block skeleton-detail-hero" />
+            <div className="skeleton-stack skeleton-detail-intro">
               <span className="skeleton-block skeleton-block--title" />
               <span className="skeleton-block skeleton-block--line" />
               <span className="skeleton-block skeleton-block--line" />
             </div>
-            <div className="skeleton-stack">
-              <span className="skeleton-block skeleton-block--title" />
-              <span className="skeleton-block skeleton-block--line" />
-              <span className="skeleton-block skeleton-block--line" />
+          </div>
+          <div className="meal-detail-content">
+            <div className="skeleton skeleton-panel">
+              <div className="skeleton-stack">
+                <span className="skeleton-block skeleton-block--title" />
+                <span className="skeleton-block skeleton-block--line" />
+                <span className="skeleton-block skeleton-block--line" />
+                <span className="skeleton-block skeleton-block--line" />
+              </div>
+            </div>
+            <div className="skeleton skeleton-panel">
+              <div className="skeleton-stack">
+                <span className="skeleton-block skeleton-block--title" />
+                <span className="skeleton-block skeleton-block--line" />
+                <span className="skeleton-block skeleton-block--line" />
+              </div>
             </div>
           </div>
         </div>

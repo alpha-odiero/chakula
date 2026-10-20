@@ -11,8 +11,8 @@ const manifest = {
   start_url: '/',
   scope: '/',
   orientation: 'portrait-primary',
-  theme_color: '#198a43',
-  background_color: '#f7f8f5',
+  theme_color: '#ffffff',
+  background_color: '#ffffff',
   categories: ['food', 'lifestyle', 'utilities'],
   icons: [
     {

@@ -4,13 +4,14 @@ import Icon from './Icon'
 import logo from '../assets/LOGO.png'
 import MobileMenu from './MobileMenu'
 import NotificationCenter from './NotificationCenter'
+import GetAppButton from './GetAppButton'
 
 const desktopNavItems = [
   { to: '/', label: 'Home', end: true },
   { to: '/explore', label: 'Discover' },
   { to: '/categories', label: 'Recipes' },
   { to: '/#how-it-works', label: 'How it works' },
-  { to: '/about', label: 'About' }
+  { to: '/terms#about', label: 'About' }
 ]
 
 function WebHeader() {
@@ -58,9 +59,7 @@ function WebHeader() {
               <Icon name="search" size={20} />
             </Link>
             <NotificationCenter className="header-action" />
-            <Link to="/explore" className="header-cta">
-              Open Pikawise
-            </Link>
+            <GetAppButton className="header-cta" />
             <button
               type="button"
               className="menu-toggle"

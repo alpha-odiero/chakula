@@ -5,7 +5,7 @@ import ErrorState from '../../components/ErrorState'
 import EmptyState from '../../components/EmptyState'
 import CategoryCard from '../../components/CategoryCard'
 import { useHomeData } from '../../hooks/useHomeData'
-import heroCurry from '../../assets/food/hero-curry.jpg'
+import sundayRoast from '../../assets/food/sunday-roast.jpg'
 import sukuma from '../../assets/food/sukuma-wiki.jpg'
 import ingredients from '../../assets/food/breakfast.jpg'
 
@@ -77,8 +77,8 @@ function SiteHome() {
           <div className="site-hero-media">
             <div className="site-hero-photo site-hero-photo--main">
               <img
-                src={heroCurry}
-                alt="A freshly cooked curry served in a bowl"
+                src={sundayRoast}
+                alt="A hearty Sunday roast plated with vegetables"
                 width="720"
                 height="720"
                 decoding="async"

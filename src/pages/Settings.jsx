@@ -227,6 +227,7 @@ function Settings() {
               type="button"
               className={`toggle${preferences.reduceMotion ? ' toggle--on' : ''}`}
               role="switch"
+              aria-label="Reduce motion"
               aria-checked={preferences.reduceMotion}
               onClick={() => update({ reduceMotion: !preferences.reduceMotion })}
             >
@@ -445,15 +446,15 @@ function Settings() {
             Information
           </h2>
           <nav className="settings-links" aria-label="Information">
-            <Link to="/about" className="settings-link">
+            <Link to="/terms#about" className="settings-link">
               About Pikawise
               <Icon name="arrowRight" size={16} />
             </Link>
-            <Link to="/privacy" className="settings-link">
+            <Link to="/terms#privacy" className="settings-link">
               Privacy Policy
               <Icon name="arrowRight" size={16} />
             </Link>
-            <Link to="/privacy#cookies" className="settings-link">
+            <Link to="/terms#cookies" className="settings-link">
               Cookies
               <Icon name="arrowRight" size={16} />
             </Link>

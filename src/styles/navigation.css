@@ -143,6 +143,7 @@
 .header-cta {
   display: none;
   align-items: center;
+  gap: 8px;
   height: 42px;
   padding: 0 18px;
   margin-left: 4px;
@@ -285,7 +286,7 @@
 }
 
 .app-avatar:hover {
-  background: var(--soft-green-strong);
+  background: var(--soft-neutral-strong);
   color: var(--accent-dark);
 }
 
@@ -560,6 +561,29 @@
   flex-shrink: 0;
 }
 
+.mobile-menu-cta-wrap {
+  padding: 8px 8px 6px;
+}
+
+.mobile-menu-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 46px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 15px;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.mobile-menu-cta:hover {
+  background: var(--accent-hover);
+}
+
 .mobile-menu-footer {
   padding: 14px 20px;
   font-size: 12px;
@@ -641,9 +665,9 @@
 /* ============ Footer ============ */
 
 .site-footer {
-  background: var(--charcoal);
-  color: var(--on-dark-secondary);
-  border-top: 1px solid var(--on-dark-border);
+  background: var(--bg);
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
   margin-top: auto;
 }
 
@@ -655,20 +679,20 @@
   gap: 18px;
   padding-top: 34px;
   padding-bottom: 30px;
-  border-bottom: 1px solid var(--on-dark-border);
+  border-bottom: 1px solid var(--border);
 }
 
 .footer-downloads h2 {
   font-size: 19px;
   font-weight: 700;
-  color: var(--on-dark);
+  color: var(--text);
   letter-spacing: -0.02em;
 }
 
 .footer-downloads p {
   margin-top: 6px;
   font-size: 14px;
-  color: var(--on-dark-secondary);
+  color: var(--text-secondary);
   line-height: 1.6;
   max-width: 420px;
 }
@@ -694,10 +718,10 @@
   gap: 11px;
   min-height: 48px;
   padding: 8px 18px 8px 15px;
-  border: 1px solid rgba(15, 19, 16, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: var(--radius-md);
   background: #ffffff;
-  color: #10140f;
+  color: #000000;
   font-family: inherit;
   text-align: left;
   cursor: pointer;
@@ -708,7 +732,7 @@
 .store-btn:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
-  background: #f4f5f2;
+  background: #f8f8f8;
 }
 
 .store-btn:active {
@@ -737,7 +761,7 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #4a5347;
+  color: #525252;
 }
 
 .store-btn-name {
@@ -756,23 +780,23 @@
 
 @media (min-width: 768px) {
   .footer-inner {
-    grid-template-columns: 1.7fr 1fr 1fr 1fr;
+    grid-template-columns: 1.7fr 1fr 1fr;
     gap: 40px;
   }
 }
 
 .footer-brand .brand {
-  color: var(--on-dark);
+  color: var(--text);
 }
 
-.footer-brand .brand-logo {
+.theme-dark .footer-brand .brand-logo {
   filter: brightness(0) invert(1);
 }
 
 .footer-brand p {
   margin-top: 12px;
   font-size: 14px;
-  color: var(--on-dark-secondary);
+  color: var(--text-secondary);
   line-height: 1.6;
   max-width: 320px;
 }
@@ -781,90 +805,12 @@
   font-size: 17px;
 }
 
-.footer-install {
-  margin-top: 18px;
-}
-
-.footer-install-text {
-  font-size: 13px;
-  color: var(--on-dark-secondary);
-  line-height: 1.6;
-  max-width: 280px;
-  margin-bottom: 12px;
-}
-
-.footer-install-action {
-  position: relative;
-  display: inline-flex;
-}
-
-.footer-install-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Glows orange three times to draw the eye to the install button after a
-   "coming soon" store message has disappeared. */
-.footer-install-btn--flash {
-  animation: install-flash 0.7s ease-in-out 3;
-}
-
-@keyframes install-flash {
-  0%,
-  100% {
-    background-color: var(--accent);
-    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
-  }
-  50% {
-    background-color: #f97316;
-    box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.35), 0 0 22px 8px rgba(249, 115, 22, 0.6);
-  }
-}
-
-.install-nudge {
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  margin-left: 4px;
-  color: var(--on-dark);
-  transform: translateY(-50%) scaleX(-1);
-  animation: install-nudge-pulse 1.4s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes install-nudge-pulse {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .install-nudge {
-    animation: none;
-    opacity: 0.85;
-  }
-}
-
-.footer-install-done {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--on-dark);
-}
-
 .footer-col h2 {
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--on-dark-muted);
+  color: var(--text-muted);
   margin-bottom: 14px;
 }
 
@@ -878,19 +824,19 @@
   display: inline-flex;
   align-items: center;
   min-height: 36px;
-  color: var(--on-dark-secondary);
+  color: var(--text-secondary);
   font-size: 14px;
   transition: color var(--duration-fast) var(--ease-out);
 }
 
 .footer-col a:hover {
-  color: var(--on-dark);
+  color: var(--text);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
 .footer-bottom {
-  border-top: 1px solid var(--on-dark-border);
+  border-top: 1px solid var(--border);
   padding: 18px 0;
 }
 
@@ -901,17 +847,17 @@
   justify-content: center;
   gap: 8px 12px;
   font-size: 13px;
-  color: var(--on-dark-muted);
+  color: var(--text-muted);
 }
 
 .footer-bottom a {
-  color: var(--on-dark-secondary);
+  color: var(--text-secondary);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .footer-bottom a:hover {
-  color: var(--on-dark);
+  color: var(--text);
 }
 
 /* ---------- Footer on small screens ---------- */
@@ -974,16 +920,6 @@
   .footer-brand p {
     margin-top: 10px;
     font-size: 13px;
-    max-width: none;
-  }
-
-  .footer-install {
-    margin-top: 14px;
-  }
-
-  .footer-install-text {
-    font-size: 12px;
-    margin-bottom: 10px;
     max-width: none;
   }
 

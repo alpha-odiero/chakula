@@ -4,6 +4,7 @@ import LoadingSkeleton from '../components/LoadingSkeleton'
 import ErrorState from '../components/ErrorState'
 import Icon from '../components/Icon'
 import CookingMode from '../components/CookingMode'
+import ImageViewer from '../components/ImageViewer'
 import { useToast } from '../components/Toast'
 import { getMeal, getRandomMeal } from '../services/mealdb'
 import {
@@ -29,6 +30,7 @@ function MealDetails() {
   const [servings, setServings] = useState(1)
   const [checked, setChecked] = useState(() => new Set())
   const [cooking, setCooking] = useState(false)
+  const [viewerOpen, setViewerOpen] = useState(false)
 
   const load = useCallback(() => {
     if (!id) return
@@ -56,6 +58,7 @@ function MealDetails() {
     setServings(1)
     setChecked(new Set())
     setCooking(false)
+    setViewerOpen(false)
   }, [id])
 
   const meal = state.data
@@ -188,9 +191,15 @@ function MealDetails() {
         </div>
       </div>
 
-      <article className="meal-detail-hero">
-        <div className="container meal-detail-hero-inner">
-          <div className="meal-detail-media">
+      <div className="container meal-detail-layout">
+        <article className="meal-detail-hero">
+          <button
+            type="button"
+            className="meal-detail-media"
+            onClick={() => setViewerOpen(true)}
+            aria-label={`View full image of ${meal.name ?? meal.strMeal}`}
+            aria-haspopup="dialog"
+          >
             <img
               className="meal-detail-img"
               src={meal.image ?? meal.strMealThumb}
@@ -198,7 +207,12 @@ function MealDetails() {
               width="1280"
               height="960"
             />
-          </div>
+            <span className="meal-detail-zoom" aria-hidden="true">
+              <Icon name="zoom" size={14} />
+              Zoom
+            </span>
+          </button>
+
           <div className="meal-detail-intro">
             <p className="page-eyebrow">{meta || 'Recipe'}</p>
             <h1 className="meal-detail-title">{meal.name ?? meal.strMeal}</h1>
@@ -239,11 +253,10 @@ function MealDetails() {
               </button>
             </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <section className="container recipe-layout" aria-label="Recipe">
-        <div className="recipe-panel">
+        <section className="meal-detail-content" aria-label="Recipe">
+          <div className="recipe-panel">
           <div className="recipe-panel-head">
             <h2 className="recipe-panel-title">
               <Icon name="utensils" size={20} />
@@ -362,7 +375,16 @@ function MealDetails() {
             )}
           </div>
         </div>
-      </section>
+        </section>
+      </div>
+
+      {viewerOpen && (
+        <ImageViewer
+          src={meal.image ?? meal.strMealThumb}
+          alt={meal.name ?? meal.strMeal}
+          onClose={() => setViewerOpen(false)}
+        />
+      )}
 
       {cooking && (
         <CookingMode

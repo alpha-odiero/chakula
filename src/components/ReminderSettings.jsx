@@ -4,10 +4,11 @@ import { useReminders } from './ReminderProvider'
 import { useToast } from './Toast'
 import { MEAL_PERIODS, REMINDER_MODES, WEEKDAYS } from '../config/reminders'
 import { formatDateTime, formatTimeOfDay, getBrowserTimeZone } from '../utils/reminderSchedule'
+import { getIOSDevice } from '../utils/platform'
 import {
-  getNotificationPermission,
   isNotificationSupported,
-  requestNotificationPermission
+  requestNotificationPermission,
+  showOsNotification
 } from '../services/notifications'
 
 function SegmentedTime({ value, onChange, label }) {
@@ -28,6 +29,8 @@ function ReminderSettings() {
   const { reminders, update, nextReminder, permission, refresh } = useReminders()
   const toast = useToast()
   const [requesting, setRequesting] = useState(false)
+  const [testing, setTesting] = useState(false)
+  const iosDevice = getIOSDevice()
 
   const timeZone = reminders.timezone === 'auto' ? getBrowserTimeZone() : reminders.timezone
 
@@ -86,6 +89,29 @@ function ReminderSettings() {
     }
   }
 
+  const sendTestNotification = async () => {
+    if (permission !== 'granted') {
+      toast.notify('Enable notifications above first, then send a test.', { variant: 'info' })
+      return
+    }
+    setTesting(true)
+    const sent = await showOsNotification({
+      id: 'pikawise-test',
+      title: 'Pikawise test notification',
+      body: 'Notifications are working. Meal reminders will appear like this.',
+      tag: 'pikawise-test',
+      data: { url: '/' }
+    })
+    setTesting(false)
+    if (sent) {
+      toast.success('Test notification sent — check your notifications.')
+    } else {
+      toast.notify('Could not show a notification. Check that notifications are allowed for this site.', {
+        variant: 'error'
+      })
+    }
+  }
+
   const permissionLabel = {
     granted: 'Allowed',
     denied: 'Blocked in browser',
@@ -113,6 +139,7 @@ function ReminderSettings() {
           type="button"
           className={`toggle${reminders.enabled ? ' toggle--on' : ''}`}
           role="switch"
+          aria-label="Meal reminders"
           aria-checked={reminders.enabled}
           onClick={() => update({ enabled: !reminders.enabled })}
         >
@@ -126,15 +153,21 @@ function ReminderSettings() {
             <div>
               <p className="settings-label">Device notifications</p>
               <p className="settings-hint">
-                {getNotificationPermission() === 'granted'
+                {permission === 'granted'
                   ? 'Reminders appear as system notifications.'
-                  : 'Allow notifications so reminders reach you outside the app.'}
+                  : permission === 'denied'
+                    ? 'Notifications are blocked for this site — see below to re-enable them.'
+                    : permission === 'unsupported'
+                      ? 'This browser does not support notifications. Reminders still appear inside Pikawise.'
+                      : 'Allow notifications so reminders reach you outside the app.'}
               </p>
             </div>
-            {getNotificationPermission() === 'granted' ? (
+            {permission === 'granted' ? (
               <span className="reminder-status reminder-status--ok">
                 <Icon name="check" size={14} /> {permissionLabel}
               </span>
+            ) : permission === 'denied' ? (
+              <span className="reminder-status">{permissionLabel}</span>
             ) : (
               <button
                 type="button"
@@ -145,6 +178,43 @@ function ReminderSettings() {
                 {requesting ? 'Requesting…' : 'Enable'}
               </button>
             )}
+          </div>
+
+          {permission === 'denied' && (
+            <div className="permission-note" role="note">
+              <p className="permission-note-title">
+                <Icon name="bell" size={14} /> Notifications are blocked
+              </p>
+              <p className="settings-hint">
+                Allow notifications for this site in your browser settings (the lock or tune icon
+                next to the address bar), then reload the page.
+              </p>
+              {iosDevice && (
+                <p className="settings-hint">
+                  On iPhone and iPad, notifications only work from the installed app: open
+                  Pikawise from your Home Screen and allow notifications when asked.
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="settings-row">
+            <div>
+              <p className="settings-label">Test notification</p>
+              <p className="settings-hint">
+                {permission === 'granted'
+                  ? 'Send one now to check sound and delivery while Pikawise is open.'
+                  : 'Enable notifications above to send a test.'}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="button button--secondary"
+              onClick={sendTestNotification}
+              disabled={permission !== 'granted' || testing}
+            >
+              {testing ? 'Sending…' : 'Send test'}
+            </button>
           </div>
 
           {nextReminder && (
@@ -234,6 +304,7 @@ function ReminderSettings() {
               type="button"
               className={`toggle${reminders.quietHours.enabled ? ' toggle--on' : ''}`}
               role="switch"
+              aria-label="Quiet hours"
               aria-checked={reminders.quietHours.enabled}
               onClick={() =>
                 update({ quietHours: { ...reminders.quietHours, enabled: !reminders.quietHours.enabled } })
@@ -261,6 +332,14 @@ function ReminderSettings() {
 
           <p className="settings-hint reminder-tz">
             <Icon name="globe" size={13} /> Times use your device time zone ({timeZone}).
+          </p>
+
+          <p className="settings-hint reminder-limits">
+            Reminders are best effort and stay on this device. They run while Pikawise is open or
+            installed; browsers cannot wake a fully closed app without a push service.
+            {iosDevice
+              ? ' On iPhone and iPad, notifications only work from the Home Screen app and may stop after a while — reinstall it from Share → Add to Home Screen to restore them.'
+              : ''}
           </p>
 
           <div className="reminder-save">

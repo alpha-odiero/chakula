@@ -27,7 +27,7 @@ export function useTheme() {
         (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
       root.classList.remove('theme-light', 'theme-dark')
       root.classList.add(isDark ? 'theme-dark' : 'theme-light')
-      if (meta) meta.setAttribute('content', isDark ? '#0f1310' : '#198a43')
+      if (meta) meta.setAttribute('content', isDark ? '#0a0a0a' : '#ffffff')
     }
 
     apply()

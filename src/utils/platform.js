@@ -17,6 +17,41 @@ export function getIOSDevice() {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
 }
 
+export function getAndroidDevice() {
+  if (typeof navigator === 'undefined') return false
+  return /Android/i.test(navigator.userAgent)
+}
+
+// Platform-specific manual install instructions, used whenever the native
+// install prompt is unavailable or the user dismissed it, so the "Get app"
+// button always leads somewhere useful.
+export function getInstallGuide() {
+  if (getIOSDevice()) {
+    return {
+      platform: 'iPhone and iPad',
+      steps: ['Tap the Share button in Safari', 'Choose "Add to Home Screen"', 'Tap "Add"']
+    }
+  }
+  if (getAndroidDevice()) {
+    return {
+      platform: 'Android',
+      steps: [
+        'Open your browser menu (⋮)',
+        'Tap "Install app" or "Add to Home screen"',
+        'Confirm with "Install"'
+      ]
+    }
+  }
+  return {
+    platform: 'desktop',
+    steps: [
+      'Open your browser menu',
+      'Choose "Install Pikawise…" or "Install this site as an app"',
+      'Confirm the install'
+    ]
+  }
+}
+
 export function isMobileViewport() {
   return typeof window !== 'undefined' && window.innerWidth < 768
 }

@@ -202,6 +202,99 @@
   gap: 10px;
 }
 
+/* ---------- Install guide dialog ---------- */
+.install-guide .confirm-message {
+  margin-bottom: 14px;
+}
+
+.install-guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+  text-align: left;
+  counter-reset: install-step;
+}
+
+.install-guide-steps li {
+  position: relative;
+  counter-increment: install-step;
+  padding: 10px 12px 10px 46px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.install-guide-steps li::before {
+  content: counter(install-step);
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ---------- Full image viewer ---------- */
+.image-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.86);
+  animation: fadeIn 0.15s ease;
+}
+
+.image-viewer-inner {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  outline: none;
+}
+
+.image-viewer-img {
+  display: block;
+  width: 100%;
+  max-height: 86dvh;
+  object-fit: contain;
+  background: #000000;
+  border-radius: var(--radius-md);
+}
+
+.image-viewer-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.image-viewer-close:hover {
+  transform: scale(1.05);
+}
+
 /* ---------- Ingredient chips ---------- */
 .chips {
   display: flex;

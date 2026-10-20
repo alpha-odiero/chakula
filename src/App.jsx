@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import WebHeader from './components/WebHeader'
 import AppHeader from './components/AppHeader'
 import BottomNavigation from './components/BottomNavigation'
@@ -31,9 +31,7 @@ const MealPlans = lazy(() => import('./pages/MealPlans'))
 const ShoppingList = lazy(() => import('./pages/ShoppingListPage'))
 const Settings = lazy(() => import('./pages/Settings'))
 const Reminder = lazy(() => import('./pages/Reminder'))
-const About = lazy(() => import('./pages/About'))
 const Developer = lazy(() => import('./pages/Developer'))
-const Privacy = lazy(() => import('./pages/Privacy'))
 const Terms = lazy(() => import('./pages/Terms'))
 const Favorites = lazy(() => import('./pages/Favorites'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -119,9 +117,9 @@ function AppShell() {
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/reminder" element={<Reminder />} />
-              <Route path="/about" element={<About />} />
+              <Route path="/about" element={<Navigate to="/terms#about" replace />} />
+              <Route path="/privacy" element={<PrivacyRedirect />} />
               <Route path="/developer" element={<Developer />} />
-              <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
@@ -135,6 +133,13 @@ function AppShell() {
       </div>
     </PwaProvider>
   )
+}
+
+// /privacy moved into the consolidated /terms page; keep the old anchor working.
+function PrivacyRedirect() {
+  const location = useLocation()
+  const hash = location.hash === '#cookies' ? '#cookies' : '#privacy'
+  return <Navigate to={`/terms${hash}`} replace />
 }
 
 function App() {

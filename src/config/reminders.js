@@ -5,9 +5,9 @@
 // in, so enabling reminders is always an explicit choice.
 
 export const MEAL_PERIODS = [
-  { id: 'breakfast', label: 'Breakfast', icon: 'sun', defaultTime: '08:00' },
+  { id: 'breakfast', label: 'Breakfast', icon: 'sun', defaultTime: '07:00' },
   { id: 'morningSnack', label: 'Morning snack', icon: 'sparkles', defaultTime: '10:30' },
-  { id: 'lunch', label: 'Lunch', icon: 'utensils', defaultTime: '13:00' },
+  { id: 'lunch', label: 'Lunch', icon: 'utensils', defaultTime: '12:30' },
   { id: 'afternoonSnack', label: 'Afternoon snack', icon: 'sparkles', defaultTime: '16:00' },
   { id: 'dinner', label: 'Dinner', icon: 'cookingPot', defaultTime: '19:00' },
   { id: 'eveningSnack', label: 'Evening snack', icon: 'moon', defaultTime: '21:00' }

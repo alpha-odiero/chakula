@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import SearchBar from '../components/SearchBar'
 import MealGrid from '../components/MealGrid'
+import InfiniteMealGrid from '../components/InfiniteMealGrid'
 import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
 import Icon from '../components/Icon'
@@ -24,6 +25,8 @@ function Explore() {
   const [areas, setAreas] = useState({ data: [], loading: true, error: null })
   const [ingredients, setIngredients] = useState({ data: [], loading: true, error: null })
   const [meals, setMeals] = useState({ data: null, loading: true, error: null })
+  const [progress, setProgress] = useState(null)
+  const requestIdRef = useRef(0)
   const [searchParams, setSearchParams] = useSearchParams()
   const [ingredientSearch, setIngredientSearch] = useState('')
   const [filtersOpen, setFiltersOpen] = useState(false)
@@ -42,6 +45,8 @@ function Explore() {
   }, [searchParams])
 
   const loadMeals = useCallback((filter = activeFilter) => {
+    const requestId = ++requestIdRef.current
+    setProgress(null)
     setMeals((prev) => ({ ...prev, loading: true, error: null }))
     const request = filter.type === 'category'
       ? filterByCategory(filter.value)
@@ -52,9 +57,18 @@ function Explore() {
           : Promise.all([getRandomMeal(), getRandomMeal(), getRandomMeal(), getRandomMeal()])
               .then((mealsArr) => mealsArr.filter(Boolean))
     request
-      .then((data) => setMeals({ data, loading: false, error: null }))
-      .catch((error) => setMeals({ data: null, loading: false, error }))
+      .then((data) => {
+        // Drop stale responses when the filter changed mid-flight.
+        if (requestId !== requestIdRef.current) return
+        setMeals({ data, loading: false, error: null })
+      })
+      .catch((error) => {
+        if (requestId !== requestIdRef.current) return
+        setMeals({ data: null, loading: false, error })
+      })
   }, [activeFilter])
+
+  const reportProgress = useCallback((shown, total) => setProgress({ shown, total }), [])
 
   const dedupe = (items) => [...new Set(items)]
 
@@ -263,7 +277,9 @@ function Explore() {
                 )}
                 {!meals.loading && meals.data && (
                   <span className="results-count">
-                    {meals.data.length} {meals.data.length === 1 ? 'meal' : 'meals'}
+                    {activeFilter.value && progress && progress.total > 8
+                      ? `${progress.shown} of ${progress.total} meals`
+                      : `${meals.data.length} ${meals.data.length === 1 ? 'meal' : 'meals'}`}
                   </span>
                 )}
               </div>
@@ -275,11 +291,17 @@ function Explore() {
               ) : meals.error ? (
                 <ErrorState onRetry={() => loadMeals(activeFilter)} />
               ) : meals.data && meals.data.length > 0 ? (
-                <MealGrid
-                  meals={meals.data}
-                  fallbackCategory={activeFilter.type === 'category' ? activeFilter.value : null}
-                  fallbackArea={activeFilter.type === 'area' ? activeFilter.value : null}
-                />
+                activeFilter.value ? (
+                  <InfiniteMealGrid
+                    key={`${activeFilter.type}:${activeFilter.value}`}
+                    meals={meals.data}
+                    onProgress={reportProgress}
+                    fallbackCategory={activeFilter.type === 'category' ? activeFilter.value : null}
+                    fallbackArea={activeFilter.type === 'area' ? activeFilter.value : null}
+                  />
+                ) : (
+                  <MealGrid meals={meals.data} />
+                )
               ) : (
                 <EmptyState
                   title="No meals found"

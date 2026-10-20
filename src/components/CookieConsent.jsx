@@ -22,7 +22,7 @@ function CookieConsent() {
           <p>
             Pikawise keeps your favorites, preferences, meal plans and shopping list on this device
             only — no tracking or advertising cookies.{' '}
-            <Link to="/privacy#cookies">Learn more</Link>
+            <Link to="/terms#cookies">Learn more</Link>
           </p>
           {managing && (
             <div className="cookie-consent-details" id="cookie-consent-details">

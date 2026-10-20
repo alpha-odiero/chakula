@@ -30,16 +30,29 @@ export function useInstallPrompt() {
     }
   }, [])
 
-  const install = async () => {
-    if (!deferredPrompt) return false
+  // Reports exactly what happened with the native prompt so callers can react
+  // to a dismissed prompt instead of treating it as success.
+  const promptInstall = async () => {
+    if (!deferredPrompt) return { outcome: 'unavailable' }
     deferredPrompt.prompt()
+    let outcome = 'dismissed'
     try {
-      await deferredPrompt.userChoice
+      const choice = await deferredPrompt.userChoice
+      if (choice?.outcome === 'accepted') outcome = 'accepted'
+    } catch {
+      outcome = 'dismissed'
     } finally {
       setDeferredPrompt(null)
     }
-    return true
+    return { outcome }
   }
 
-  return { canInstall: Boolean(deferredPrompt), isInstalled, install, deferredPrompt }
+  // Legacy boolean API: true when a native prompt was shown (accepted or
+  // dismissed), false when installation is unavailable in this browser.
+  const install = async () => {
+    const { outcome } = await promptInstall()
+    return outcome !== 'unavailable'
+  }
+
+  return { canInstall: Boolean(deferredPrompt), isInstalled, install, promptInstall, deferredPrompt }
 }

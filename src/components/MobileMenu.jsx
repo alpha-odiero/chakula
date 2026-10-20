@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import Icon from './Icon'
 import logo from '../assets/LOGO.png'
+import GetAppButton from './GetAppButton'
 
 const menuItems = [
   { to: '/', label: 'Home', icon: 'home', end: true },
@@ -11,7 +12,7 @@ const menuItems = [
   { to: '/random', label: 'Random Meal', icon: 'random' },
   { to: '/meal-plans', label: 'Meal Plans', icon: 'calendar' },
   { to: '/shopping-list', label: 'Shopping List', icon: 'shoppingBag' },
-  { to: '/about', label: 'About', icon: 'info' },
+  { to: '/terms#about', label: 'About', icon: 'info' },
   { to: '/settings', label: 'Settings', icon: 'settings' }
 ]
 
@@ -69,6 +70,9 @@ function MobileMenu({ open, onClose }) {
             ))}
           </ul>
         </nav>
+        <div className="mobile-menu-cta-wrap">
+          <GetAppButton className="mobile-menu-cta" onNavigate={onClose} />
+        </div>
         <p className="mobile-menu-footer">Discover meals. Cook what you have.</p>
       </aside>
     </div>
