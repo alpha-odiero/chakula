@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import { APP_VERSION } from '../config/app'
+import { useSeo } from '../hooks/useSeo'
 
 const SECTIONS = [
   { id: 'about', label: 'About this app' },
@@ -12,6 +13,12 @@ const SECTIONS = [
 ]
 
 function Terms() {
+  useSeo({
+    title: 'About & policies — Pikawise',
+    description:
+      'How Pikawise works, terms of use, privacy, cookies, third-party recipe data and contact information.',
+    path: '/terms'
+  })
   return (
     <main className="static-page">
       <PageHeader

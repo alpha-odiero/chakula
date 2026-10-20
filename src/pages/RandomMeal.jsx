@@ -5,9 +5,15 @@ import ErrorState from '../components/ErrorState'
 import PikawiseLoader from '../components/PikawiseLoader'
 import { getRandomMeal } from '../services/mealdb'
 import { getMealTags } from '../utils/meal'
-import { APP_TITLE } from '../config/app'
+import { useSeo } from '../hooks/useSeo'
 
 function RandomMeal() {
+  useSeo({
+    title: 'Random recipe picker — Pikawise',
+    description:
+      "Don't know what to cook? Let Pikawise pick a random recipe with ingredients and clear cooking steps.",
+    path: '/random'
+  })
   const [state, setState] = useState({ data: null, loading: false, error: null })
   const navigate = useNavigate()
 
@@ -16,7 +22,6 @@ function RandomMeal() {
     try {
       const meal = await getRandomMeal()
       setState({ data: meal, loading: false, error: null })
-      if (meal) document.title = `${meal.name ?? meal.strMeal} — Pikawise`
     } catch (error) {
       setState({ data: null, loading: false, error })
     }

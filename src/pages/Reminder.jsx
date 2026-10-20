@@ -7,8 +7,15 @@ import { usePreferences } from '../components/PreferencesProvider'
 import { useReminders } from '../components/ReminderProvider'
 import { periodById } from '../config/reminders'
 import { fetchReminderSuggestions } from '../services/reminderContent'
+import { useSeo } from '../hooks/useSeo'
 
 function Reminder() {
+  useSeo({
+    title: 'Meal reminder — Pikawise',
+    description: 'Meal suggestions for your reminder.',
+    path: '/reminder',
+    robots: 'noindex,follow'
+  })
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const { preferences } = usePreferences()

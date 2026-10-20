@@ -8,6 +8,7 @@ import PikawiseLoader from '../components/PikawiseLoader'
 import { usePreferences } from '../components/PreferencesProvider'
 import { useToast } from '../components/Toast'
 import { useNetworkState } from '../hooks/useNetworkState'
+import { useSeo } from '../hooks/useSeo'
 import { generateMealPlan, COMMON_INGREDIENTS, normalizeIngredient, inferMealType, evaluateBalance, calculateIngredientMatch } from '../utils/recommendations'
 import { addMealPlan } from '../utils/storage'
 import { supportsWebShare, supportsClipboard } from '../utils/platform'
@@ -30,6 +31,12 @@ const TIME_OPTIONS = [
 const SLOT_LABELS = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
 
 function BalancedDiet() {
+  useSeo({
+    title: 'Meal planner & balanced diet — Pikawise',
+    description:
+      'Build a balanced meal plan from ingredients you have. Get breakfast, lunch, dinner and snack ideas with a shopping list.',
+    path: '/balanced-diet'
+  })
   const location = useLocation()
   const query = useMemo(() => new URLSearchParams(location.search), [location.search])
   const { preferences } = usePreferences()

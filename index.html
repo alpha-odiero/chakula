@@ -3,42 +3,93 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="Pikawise — discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with offline access." />
+    <meta name="description" content="Discover recipes, cook with ingredients you already have, and follow clear step-by-step instructions. Free, no account needed." />
     <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="application-name" content="Pikawise" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Pikawise" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Pikawise — Discover meals. Cook with what you have." />
-    <meta property="og:description" content="Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with Pikawise." />
-    <meta property="og:site_name" content="Pikawise" />
-    <meta property="og:url" content="https://pikawise.vercel.app" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Pikawise — Discover meals. Cook with what you have." />
-    <meta name="twitter:description" content="Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with Pikawise." />
-    <link rel="canonical" href="https://pikawise.vercel.app" />
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
     <meta name="google-site-verification" content="Qb5fvAevj_gqHvjdykTMA47MyFueviCSqU1SmmBWbGM" />
+    <link rel="canonical" href="https://pikawise.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pikawise" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Pikawise — Discover meals. Cook with what you have." />
+    <meta property="og:description" content="Discover recipes, cook with ingredients you already have, and follow clear step-by-step instructions. Free, no account needed." />
+    <meta property="og:url" content="https://pikawise.vercel.app/" />
+    <meta property="og:image" content="https://pikawise.vercel.app/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Pikawise — a plated Sunday roast with the Pikawise wordmark and tagline" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pikawise — Discover meals. Cook with what you have." />
+    <meta name="twitter:description" content="Discover recipes, cook with ingredients you already have, and follow clear step-by-step instructions. Free, no account needed." />
+    <meta name="twitter:image" content="https://pikawise.vercel.app/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Pikawise — a plated Sunday roast with the Pikawise wordmark and tagline" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-friendly site summary" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Pikawise",
-        "url": "https://pikawise.vercel.app",
-        "applicationCategory": "LifestyleApplication",
-        "operatingSystem": "Android, iOS, Windows, macOS",
-        "softwareVersion": "1.1",
-        "description": "Discover meals, explore recipes using ingredients you have, and follow clear cooking instructions with offline access.",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://pikawise.vercel.app/#website",
+            "url": "https://pikawise.vercel.app/",
+            "name": "Pikawise",
+            "description": "Discover recipes, cook with ingredients you already have, and follow clear step-by-step instructions.",
+            "inLanguage": "en",
+            "publisher": { "@id": "https://pikawise.vercel.app/#organization" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://pikawise.vercel.app/search?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://pikawise.vercel.app/#organization",
+            "name": "Pikawise",
+            "url": "https://pikawise.vercel.app/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://pikawise.vercel.app/icons/icon-512.png",
+              "width": 512,
+              "height": 512
+            },
+            "sameAs": ["https://github.com/alpha-odiero/chakula"]
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://pikawise.vercel.app/#app",
+            "name": "Pikawise",
+            "url": "https://pikawise.vercel.app/",
+            "applicationCategory": "LifestyleApplication",
+            "operatingSystem": "Any modern web browser; Android, iOS, Windows, macOS",
+            "browserRequirements": "Requires JavaScript",
+            "softwareVersion": "1.1",
+            "description": "Discover recipes, cook with ingredients you already have, and follow clear step-by-step instructions.",
+            "isPartOf": { "@id": "https://pikawise.vercel.app/#website" },
+            "publisher": { "@id": "https://pikawise.vercel.app/#organization" },
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            }
+          }
+        ]
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://www.themealdb.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.themealdb.com" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
@@ -201,6 +252,31 @@
         }, 8000)
       })()
     </script>
+    <noscript>
+      <style>
+        #app-splash {
+          display: none;
+        }
+      </style>
+      <main
+        style="max-width: 44rem; margin: 0 auto; padding: 40px 20px; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; line-height: 1.65; color: #111"
+      >
+        <h1>Pikawise — discover recipes and cook with what you have</h1>
+        <p>
+          Pikawise is a free recipe discovery and cooking companion. Browse hundreds of recipes,
+          see the ingredients you need, follow clear step-by-step instructions, and plan meals with
+          what is already in your kitchen.
+        </p>
+        <p>
+          <a href="/explore">Explore recipes</a> ·
+          <a href="/categories">Browse meal categories</a> ·
+          <a href="/balanced-diet">Build a meal plan</a> ·
+          <a href="/random">Try a random recipe</a> ·
+          <a href="/terms">About &amp; policies</a>
+        </p>
+        <p>Pikawise works best with JavaScript enabled in your browser.</p>
+      </main>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

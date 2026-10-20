@@ -2,5 +2,100 @@ User-agent: *
 Allow: /
 Disallow: /settings
 Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+# Search and AI assistants: Pikawise is free to read, quote and link to.
+User-agent: GPTBot
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+User-agent: Claude-User
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /settings
+Disallow: /favorites
+Disallow: /reminder
+Disallow: /search
+Disallow: /meal-plans
+Disallow: /shopping-list
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
 
 Sitemap: https://pikawise.vercel.app/sitemap.xml

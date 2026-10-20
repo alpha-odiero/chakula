@@ -3,9 +3,16 @@ import CategoryCard from '../components/CategoryCard'
 import LoadingSkeleton from '../components/LoadingSkeleton'
 import ErrorState from '../components/ErrorState'
 import PageHeader from '../components/PageHeader'
+import { useSeo } from '../hooks/useSeo'
 import { getCategories } from '../services/mealdb'
 
 function Categories() {
+  useSeo({
+    title: 'Meal categories — Pikawise',
+    description:
+      'Browse recipe categories including beef, chicken, seafood, vegetarian, vegan, desserts, breakfast and more.',
+    path: '/categories'
+  })
   const [state, setState] = useState({ data: null, loading: true, error: null })
 
   const load = useCallback(() => {

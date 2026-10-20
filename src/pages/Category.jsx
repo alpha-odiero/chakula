@@ -5,6 +5,8 @@ import InfiniteMealGrid from '../components/InfiniteMealGrid'
 import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
+import { useSeo } from '../hooks/useSeo'
+import { SITE_URL } from '../config/app'
 import { filterByCategory, getCategories } from '../services/mealdb'
 
 function slugify(name) {
@@ -44,6 +46,27 @@ function Category() {
   }, [load])
 
   const displayName = categoryName || slug
+
+  useSeo({
+    title: `${displayName} recipes — Pikawise`,
+    description: `Browse ${displayName.toLowerCase()} recipes with ingredients, cooking steps and meal ideas from Pikawise.`,
+    path: `/categories/${slug}`,
+    jsonLd:
+      state.data && state.data.length > 0
+        ? {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            name: `${displayName} recipes`,
+            numberOfItems: state.data.length,
+            itemListElement: state.data.slice(0, 30).map((meal, index) => ({
+              '@type': 'ListItem',
+              position: index + 1,
+              name: meal.name ?? meal.strMeal,
+              url: `${SITE_URL}/meal/${meal.id ?? meal.idMeal}`
+            }))
+          }
+        : null
+  })
 
   return (
     <main className="category-page">

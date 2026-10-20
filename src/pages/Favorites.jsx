@@ -5,8 +5,15 @@ import EmptyState from '../components/EmptyState'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Icon from '../components/Icon'
 import { getFavorites, clearFavorites } from '../utils/favorites'
+import { useSeo } from '../hooks/useSeo'
 
 function Favorites() {
+  useSeo({
+    title: 'Saved recipes — Pikawise',
+    description: 'Recipes you saved on this device.',
+    path: '/favorites',
+    robots: 'noindex,follow'
+  })
   const [favorites, setFavorites] = useState([])
   const [confirmOpen, setConfirmOpen] = useState(false)
 

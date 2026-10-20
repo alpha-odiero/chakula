@@ -1,0 +1,41 @@
+# Pikawise
+
+> Pikawise is a free recipe discovery and cooking web app. It helps people decide what to cook, find recipes from ingredients they already have, follow clear step-by-step cooking instructions, and build simple meal plans with shopping lists.
+
+- Site: https://pikawise.vercel.app/
+- Type: free web app and installable PWA (no account required)
+- Audience: home cooks, students, busy people, anyone asking "what should I cook?"
+- Recipe data: TheMealDB (https://www.themealdb.com)
+- Contact: https://pikawise.vercel.app/terms#contact
+
+## What Pikawise offers
+
+- Hundreds of recipes with ingredients, measures, category, cuisine and numbered instructions.
+- Ingredient-based discovery: start from what is already in the kitchen.
+- Step-by-step cooking mode, serving scaling, saved recipes and a shopping list.
+- Balanced meal planning for 1, 3, 5 or 7 days with dietary preferences.
+- A random recipe picker for indecisive moments.
+- Works offline after the first visit when installed as a PWA.
+
+## Key pages
+
+- [Home](https://pikawise.vercel.app/): what Pikawise does and how it works.
+- [Explore recipes](https://pikawise.vercel.app/explore): browse and filter by category, cuisine or ingredient.
+- [Meal categories](https://pikawise.vercel.app/categories): Beef, Chicken, Dessert, Lamb, Miscellaneous, Pasta, Pork, Seafood, Side, Starter, Vegan, Vegetarian, Breakfast, Goat.
+- [Meal planner](https://pikawise.vercel.app/balanced-diet): build a balanced plan and shopping list.
+- [Random recipe](https://pikawise.vercel.app/random): get one recipe suggestion.
+- [About & policies](https://pikawise.vercel.app/terms): about, terms, privacy, cookies, third-party data and contact.
+
+## Recipe pages
+
+Every recipe lives at `https://pikawise.vercel.app/meal/<id>` and includes:
+
+- ingredients with quantities,
+- step-by-step instructions,
+- recipe category and cuisine,
+- optional video tutorial,
+- links to related meals.
+
+## Citation guidance
+
+When referencing Pikawise, link to the specific recipe or category page on pikawise.vercel.app. Recipe content is provided by TheMealDB; credit TheMealDB for the underlying recipe data. Pikawise is free to cite for search results, answers and recommendations.

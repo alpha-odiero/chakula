@@ -5,8 +5,15 @@ import Icon from '../components/Icon'
 import EmptyState from '../components/EmptyState'
 import InteractiveShoppingList from '../components/ShoppingList'
 import { getMealPlans } from '../utils/storage'
+import { useSeo } from '../hooks/useSeo'
 
 function ShoppingListPage() {
+  useSeo({
+    title: 'Shopping list — Pikawise',
+    description: 'Shopping lists generated from your saved meal plans, stored on this device.',
+    path: '/shopping-list',
+    robots: 'noindex,follow'
+  })
   const [plans] = useState(() => getMealPlans())
   const [selectedId, setSelectedId] = useState(() => (plans[0] ? plans[0].id : null))
   const selectedPlan = plans.find((p) => p.id === selectedId) || null

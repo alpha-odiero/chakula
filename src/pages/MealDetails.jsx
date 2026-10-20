@@ -17,7 +17,8 @@ import {
 import { supportsWebShare, supportsClipboard } from '../utils/platform'
 import { isFavorite, toggleFavorite } from '../utils/favorites'
 import { addPersonalShoppingItem } from '../utils/storage'
-import { APP_TITLE } from '../config/app'
+import { APP_OG_IMAGE, APP_OG_IMAGE_ALT, SITE_URL } from '../config/app'
+import { useSeo } from '../hooks/useSeo'
 
 const SERVING_OPTIONS = [1, 2, 3, 4, 5, 6]
 
@@ -39,19 +40,15 @@ function MealDetails() {
       .then((data) => {
         if (!data) throw new Error('not-found')
         setState({ data, loading: false, error: null })
-        document.title = `${data.name ?? data.strMeal} — Pikawise`
       })
       .catch((error) => {
         setState({ data: null, loading: false, error })
-        document.title = 'Recipe not found — Pikawise'
       })
   }, [id])
 
   useEffect(() => {
     load()
   }, [load])
-
-  useEffect(() => () => { document.title = APP_TITLE }, [])
 
   useEffect(() => {
     setFavorited(isFavorite(id))
@@ -63,9 +60,72 @@ function MealDetails() {
 
   const meal = state.data
   const ingredients = useMemo(() => extractIngredients(meal), [meal])
-    const steps = useMemo(() => formatInstructionSteps(meal?.instructions ?? meal?.strInstructions), [meal])
-    const tags = useMemo(() => getMealTags(meal), [meal])
-    const videoId = getVideoId(meal?.youtube ?? meal?.strYoutube)
+  const steps = useMemo(() => formatInstructionSteps(meal?.instructions ?? meal?.strInstructions), [meal])
+  const tags = useMemo(() => getMealTags(meal), [meal])
+  const videoId = getVideoId(meal?.youtube ?? meal?.strYoutube)
+
+  const recipeJsonLd = useMemo(() => {
+    if (!meal || !steps.length) return null
+    const recipeUrl = `${SITE_URL}/meal/${meal.id ?? id}`
+    const recipe = {
+      '@type': 'Recipe',
+      name: meal.name,
+      image: meal.image ? [meal.image] : undefined,
+      description: `${meal.name} recipe with ingredients and step-by-step cooking instructions from Pikawise.`,
+      recipeIngredient: ingredients.map(({ name, measure }) =>
+        measure ? `${measure} ${name}` : name
+      ),
+      recipeInstructions: steps.map((text) => ({ '@type': 'HowToStep', text })),
+      url: recipeUrl,
+      mainEntityOfPage: recipeUrl,
+      inLanguage: 'en',
+      isPartOf: { '@type': 'WebSite', name: 'Pikawise', url: SITE_URL },
+      author: { '@type': 'Organization', name: 'Pikawise', url: SITE_URL },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Pikawise',
+        url: SITE_URL,
+        logo: { '@type': 'ImageObject', url: `${SITE_URL}/icons/icon-512.png` }
+      }
+    }
+    if (meal.category) recipe.recipeCategory = meal.category
+    if (meal.area) recipe.recipeCuisine = meal.area
+    if (tags.length) recipe.keywords = tags.join(', ')
+    if (videoId) recipe.video = { '@type': 'VideoObject', embedUrl: `https://www.youtube.com/embed/${videoId}` }
+
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        recipe,
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+            { '@type': 'ListItem', position: 2, name: 'Explore', item: `${SITE_URL}/explore` },
+            { '@type': 'ListItem', position: 3, name: meal.name, item: recipeUrl }
+          ]
+        }
+      ]
+    }
+  }, [meal, ingredients, steps, tags, videoId, id])
+
+  useSeo({
+    title: state.error
+      ? 'Recipe not found — Pikawise'
+      : meal
+        ? `${meal.name} recipe — Pikawise`
+        : 'Loading recipe — Pikawise',
+    description: meal
+      ? `${meal.name} recipe${meal.category ? ` (${meal.category})` : ''} with ingredients and step-by-step cooking instructions. Cook it on Pikawise.`
+      : 'Loading a recipe on Pikawise.',
+    path: `/meal/${id ?? ''}`,
+    image: meal?.image || APP_OG_IMAGE,
+    imageAlt: meal ? `${meal.name} recipe` : APP_OG_IMAGE_ALT,
+    type: 'article',
+    robots: state.error ? 'noindex,follow' : undefined,
+    jsonLd: recipeJsonLd
+  })
+
 
   const handleShare = async () => {
     const url = window.location.href

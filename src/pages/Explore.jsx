@@ -7,6 +7,7 @@ import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
 import Icon from '../components/Icon'
 import PageHeader from '../components/PageHeader'
+import { useSeo } from '../hooks/useSeo'
 import { getCategories, listAreas, listIngredients, filterByCategory, filterByArea, filterByIngredient, getRandomMeal } from '../services/mealdb'
 import {
   getPersonalShopping,
@@ -21,6 +22,12 @@ const POPULAR_CATEGORIES = ['Beef', 'Chicken', 'Seafood', 'Vegetarian', 'Pasta',
 const FILTER_LABELS = { category: 'Category', area: 'Cuisine', ingredient: 'Ingredient' }
 
 function Explore() {
+  useSeo({
+    title: 'Explore recipes — Pikawise',
+    description:
+      'Browse hundreds of recipes by category, cuisine, or ingredient. Find meal ideas and cook with what you already have.',
+    path: '/explore'
+  })
   const [categories, setCategories] = useState({ data: null, loading: true, error: null })
   const [areas, setAreas] = useState({ data: [], loading: true, error: null })
   const [ingredients, setIngredients] = useState({ data: [], loading: true, error: null })

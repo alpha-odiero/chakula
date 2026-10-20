@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sitemap": "node scripts/generate-sitemap.mjs",
+    "og-image": "node scripts/generate-og-image.mjs"
   },
   "dependencies": {
     "puppeteer-core": "^25.13.0",

@@ -16,6 +16,7 @@ import {
 } from '../utils/storage'
 import { getIOSDevice } from '../utils/platform'
 import { APP_VERSION } from '../config/app'
+import { useSeo } from '../hooks/useSeo'
 
 const DIET_OPTIONS = [
   { value: 'any', label: 'No preference' },
@@ -94,6 +95,12 @@ function TagField({ id, label, hint, values, onChange, placeholder }) {
 }
 
 function Settings() {
+  useSeo({
+    title: 'Settings — Pikawise',
+    description: 'Appearance, dietary preferences, reminders and data settings for Pikawise.',
+    path: '/settings',
+    robots: 'noindex,follow'
+  })
   const [theme, setTheme] = useTheme()
   const { preferences, update } = usePreferences()
   const { canInstall, isInstalled, install } = useInstallPrompt()

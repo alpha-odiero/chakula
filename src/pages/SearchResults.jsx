@@ -6,6 +6,7 @@ import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
 import Icon from '../components/Icon'
+import { useSeo } from '../hooks/useSeo'
 import { searchMeals } from '../services/mealdb'
 import { useDebouncedValue } from '../hooks/useDebounce'
 
@@ -49,9 +50,14 @@ function SearchResults() {
     return data
   }, [results.data, sort])
 
-  useEffect(() => {
-    if (query.trim()) document.title = `Search results for "${query}" — Pikawise`
-  }, [query])
+  useSeo({
+    title: query ? `Search results for "${query}" — Pikawise` : 'Search recipes — Pikawise',
+    description: query
+      ? `Recipes matching "${query}" on Pikawise.`
+      : 'Search recipes by meal name or ingredient on Pikawise.',
+    path: '/search',
+    robots: 'noindex,follow'
+  })
 
   return (
     <main className="search-page">

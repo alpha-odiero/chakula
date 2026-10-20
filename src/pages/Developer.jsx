@@ -1,6 +1,7 @@
 import PageHeader from '../components/PageHeader'
 import Icon from '../components/Icon'
 import { DEVELOPER } from '../config/developer'
+import { useSeo } from '../hooks/useSeo'
 
 const LINKS = [
   { key: 'portfolio', label: 'Portfolio', icon: 'briefcase' },
@@ -9,6 +10,12 @@ const LINKS = [
 ]
 
 function Developer() {
+  useSeo({
+    title: 'About the developer — Pikawise',
+    description:
+      'Pikawise is built by Alpha Odiero, a software engineer focused on useful, secure and scalable products.',
+    path: '/developer'
+  })
   const hasLinks = LINKS.some((link) => Boolean(DEVELOPER[link.key]))
 
   return (

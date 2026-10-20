@@ -8,8 +8,15 @@ import InteractiveShoppingList from '../components/ShoppingList'
 import { useToast } from '../components/Toast'
 import { getMealPlans, removeMealPlan, clearMealPlans } from '../utils/storage'
 import { supportsWebShare, supportsClipboard } from '../utils/platform'
+import { useSeo } from '../hooks/useSeo'
 
 function MealPlans() {
+  useSeo({
+    title: 'Your meal plans — Pikawise',
+    description: 'Meal plans saved on this device, with ingredients and shopping lists.',
+    path: '/meal-plans',
+    robots: 'noindex,follow'
+  })
   const [plans, setPlans] = useState(() => getMealPlans())
   const [expandedId, setExpandedId] = useState(null)
   const [confirmDelete, setConfirmDelete] = useState(null)
