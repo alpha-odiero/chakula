@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
+import { useTranslation } from '../i18n/LocaleContext'
 import Icon from '../components/Icon'
 import EmptyState from '../components/EmptyState'
 import ErrorState from '../components/ErrorState'
@@ -17,24 +18,36 @@ import { extractIngredients } from '../utils/meal'
 
 const DAY_OPTIONS = [1, 3, 5, 7]
 const DIET_OPTIONS = [
-  { value: 'any', label: 'No preference' },
-  { value: 'vegetarian', label: 'Vegetarian' },
-  { value: 'high-protein', label: 'High-protein' },
-  { value: 'lower-meat', label: 'Lower-meat' }
+  { value: 'any', label: 'balanced.dietAny' },
+  { value: 'vegetarian', label: 'balanced.dietVegetarian' },
+  { value: 'high-protein', label: 'balanced.dietHighProtein' },
+  { value: 'lower-meat', label: 'balanced.dietLowerMeat' }
 ]
 const TIME_OPTIONS = [
-  { value: 'any', label: 'Any' },
-  { value: 'quick', label: 'Under 30 minutes' },
-  { value: 'moderate', label: 'Under 60 minutes' },
-  { value: 'longer', label: 'Time is not a problem' }
+  { value: 'any', label: 'balanced.timeAny' },
+  { value: 'quick', label: 'balanced.timeQuick' },
+  { value: 'moderate', label: 'balanced.timeModerate' },
+  { value: 'longer', label: 'balanced.timeLonger' }
 ]
-const SLOT_LABELS = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
+const SLOT_KEYS = {
+  breakfast: 'config.slot.breakfast',
+  lunch: 'config.slot.lunch',
+  dinner: 'config.slot.dinner',
+  snack: 'config.slot.snack'
+}
+const BALANCE_NOTE_KEYS = {
+  'Balanced meal': 'balance.balanced',
+  'Add a protein source': 'balance.addProtein',
+  'Could use more vegetables': 'balance.moreVegetables',
+  'Consider a carbohydrate': 'balance.addCarbohydrate',
+  'Generally balanced': 'balance.generallyBalanced'
+}
 
 function BalancedDiet() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Meal planner & balanced diet — Pikawise',
-    description:
-      'Build a balanced meal plan from ingredients you have. Get breakfast, lunch, dinner and snack ideas with a shopping list.',
+    title: t('balanced.seoTitle'),
+    description: t('balanced.seoDescription'),
     path: '/balanced-diet'
   })
   const location = useLocation()
@@ -156,23 +169,23 @@ function BalancedDiet() {
 
     const nextPlan = { ...plan, meals: nextMeals, shopping: computeShopping(nextMeals, plan.ingredients) }
     setPlan(nextPlan)
-    showMessage('Meal swapped.')
+    showMessage(t('balanced.mealSwapped'))
   }
 
   const savePlan = () => {
     if (!plan) return
-    const saved = { ...plan, label: `${plan.days}-Day Meal Plan` }
+    const saved = { ...plan, label: t('common.dayMealPlan', { days: plan.days }) }
     delete saved._pool
     addMealPlan(saved)
-    showMessage('Meal plan saved.')
+    showMessage(t('balanced.planSaved'))
   }
 
   const sharePlan = async () => {
     if (!plan) return
-    const text = formatPlanText(plan)
+    const text = formatPlanText(plan, t)
     if (supportsWebShare()) {
       try {
-        await navigator.share({ title: `${plan.days}-Day Meal Plan`, text })
+        await navigator.share({ title: t('common.dayMealPlan', { days: plan.days }), text })
         return
       } catch {
         /* fall back to copy */
@@ -180,7 +193,7 @@ function BalancedDiet() {
     }
     const copied = await copyText(text)
     showMessage(
-      copied ? 'Meal plan copied!' : 'Could not copy the meal plan.',
+      copied ? t('balanced.planCopied') : t('balanced.copyFailed'),
       copied ? 'success' : 'error'
     )
   }
@@ -189,23 +202,22 @@ function BalancedDiet() {
 
   return (
     <main className="balanced-diet-page">
-      <PageHeader eyebrow="Balanced Diet" title="Eat Better, One Meal at a Time">
+      <PageHeader eyebrow={t('balanced.eyebrow')} title={t('balanced.title')}>
         <p className="page-subtitle">
-          Build a simple, balanced meal plan using the foods you already have.
+          {t('balanced.subtitle')}
         </p>
         <div className="balanced-hero">
           <div className="balanced-hero-actions">
             <a href="#build-plan" className="button button--primary button--large">
               <Icon name="sparkles" size={18} />
-              Build My Meal Plan
+              {t('balanced.buildPlanCta')}
             </a>
             <a href="#about-balanced" className="button button--secondary button--large">
-              Learn About Balanced Meals
+              {t('balanced.learnMoreCta')}
             </a>
           </div>
           <div className="balanced-info-box" id="about-balanced">
-            A balanced meal generally combines different food groups such as vegetables and fruits,
-            protein-rich foods, carbohydrates/starched, and healthy fats.
+            {t('balanced.infoBox')}
           </div>
         </div>
       </PageHeader>
@@ -214,7 +226,7 @@ function BalancedDiet() {
         {!isOnline && (
           <div className="empty-state empty-state--soft">
             <p className="empty-state-message">
-              You're offline. Saved plans are still available.
+              {t('balanced.offlineMessage')}
             </p>
           </div>
         )}
@@ -222,14 +234,14 @@ function BalancedDiet() {
         <div className="builder-layout">
           <div className="builder-ingredients-panel" id="what-do-you-have">
             <h2 className="builder-section-title">
-              <Icon name="shoppingBag" size={20} /> What food do you have?
+              <Icon name="shoppingBag" size={20} /> {t('balanced.whatDoYouHave')}
             </h2>
             <p className="panel-subtitle">
-              Add the ingredients available at home and Pikawise will look for meals you can make.
+              {t('balanced.ingredientsSubtitle')}
             </p>
 
             <div className="ingredient-input-row">
-              <label className="visually-hidden" htmlFor="ingredient-input">Add ingredient</label>
+              <label className="visually-hidden" htmlFor="ingredient-input">{t('balanced.addIngredientLabel')}</label>
               <input
                 id="ingredient-input"
                 className="ingredient-input"
@@ -242,7 +254,7 @@ function BalancedDiet() {
                     addIngredient(input)
                   }
                 }}
-                placeholder="Type an ingredient, e.g. chicken"
+                placeholder={t('balanced.ingredientPlaceholder')}
                 autoComplete="off"
               />
               <button
@@ -251,19 +263,19 @@ function BalancedDiet() {
                 onClick={() => addIngredient(input)}
                 disabled={!normalizeIngredient(input)}
               >
-                <Icon name="plus" size={18} /> Add
+                <Icon name="plus" size={18} /> {t('common.add')}
               </button>
             </div>
 
             {ingredients.length > 0 ? (
-              <div className="chips" aria-label="Your ingredients">
+              <div className="chips" aria-label={t('balanced.ingredientsAria')}>
                 {ingredients.map((ing, index) => (
                   <span key={`${ing}-${index}`} className="chip chip--removable">
                     {ing.charAt(0).toUpperCase() + ing.slice(1)}
                     <button
                       type="button"
                       className="chip-remove"
-                      aria-label={`Remove ${ing}`}
+                      aria-label={t('a11y.removeTag', { name: ing })}
                       onClick={() => removeIngredient(ing)}
                     >
                       <Icon name="close" size={14} />
@@ -273,17 +285,17 @@ function BalancedDiet() {
               </div>
             ) : (
               <EmptyState
-                title="No ingredients yet"
-                message="Type an ingredient above or pick a suggestion below to get started."
+                title={t('balanced.emptyTitle')}
+                message={t('balanced.emptyMessage')}
               />
             )}
 
             <div className="suggestions">
               <div className="suggestions-row">
-                <p className="suggestions-title">Quick picks</p>
+                <p className="suggestions-title">{t('balanced.quickPicks')}</p>
                 {ingredients.length > 0 && (
                   <button type="button" className="link-button" onClick={clearIngredients}>
-                    Clear all
+                    {t('common.clearAll')}
                   </button>
                 )}
               </div>
@@ -308,11 +320,11 @@ function BalancedDiet() {
           </div>
 
           <div className="builder-config">
-            <h2 className="builder-section-title">Meal plan preferences</h2>
+            <h2 className="builder-section-title">{t('balanced.preferences')}</h2>
 
             <div className="config-group">
-              <p className="config-label">Number of days</p>
-              <div className="config-chips" role="group" aria-label="Number of days">
+              <p className="config-label">{t('balanced.daysOption')}</p>
+              <div className="config-chips" role="group" aria-label={t('balanced.daysOption')}>
                 {DAY_OPTIONS.map((opt) => (
                   <button
                     type="button"
@@ -321,15 +333,15 @@ function BalancedDiet() {
                     aria-pressed={config.days === opt}
                     onClick={() => updateConfig('days', opt)}
                   >
-                    {opt} day{opt > 1 ? 's' : ''}
+                    {opt} {t('common.day', { count: opt })}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="config-group">
-              <p className="config-label">Meals per day</p>
-              <div className="config-chips" role="group" aria-label="Meals per day">
+              <p className="config-label">{t('balanced.mealsPerDayOption')}</p>
+              <div className="config-chips" role="group" aria-label={t('balanced.mealsPerDayOption')}>
                 {[2, 3, 4].map((opt) => (
                   <button
                     type="button"
@@ -338,15 +350,15 @@ function BalancedDiet() {
                     aria-pressed={config.mealsPerDay === opt}
                     onClick={() => updateConfig('mealsPerDay', opt)}
                   >
-                    {opt} meals
+                    {opt} {t('common.meal', { count: opt })}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="config-group">
-              <p className="config-label">Dietary preference</p>
-              <div className="config-chips" role="group" aria-label="Dietary preference">
+              <p className="config-label">{t('balanced.dietaryPreference')}</p>
+              <div className="config-chips" role="group" aria-label={t('balanced.dietaryPreference')}>
                 {DIET_OPTIONS.map((opt) => (
                   <button
                     type="button"
@@ -355,15 +367,15 @@ function BalancedDiet() {
                     aria-pressed={config.dietaryPreference === opt.value}
                     onClick={() => updateConfig('dietaryPreference', opt.value)}
                   >
-                    {opt.label}
+                    {t(opt.label)}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="config-group">
-              <p className="config-label">Cooking time</p>
-              <div className="config-chips" role="group" aria-label="Cooking time">
+              <p className="config-label">{t('balanced.cookingTime')}</p>
+              <div className="config-chips" role="group" aria-label={t('balanced.cookingTime')}>
                 {TIME_OPTIONS.map((opt) => (
                   <button
                     type="button"
@@ -372,7 +384,7 @@ function BalancedDiet() {
                     aria-pressed={config.cookingTime === opt.value}
                     onClick={() => updateConfig('cookingTime', opt.value)}
                   >
-                    {opt.label}
+                    {t(opt.label)}
                   </button>
                 ))}
               </div>
@@ -388,17 +400,17 @@ function BalancedDiet() {
                 {generating ? (
                   <>
                     <PikawiseLoader variant="inline" decorative />
-                    Creating your meal plan…
+                    {t('balanced.generating')}
                   </>
                 ) : (
                   <>
                     <Icon name="sparkles" size={18} />
-                    Generate My Meal Plan
+                    {t('balanced.generate')}
                   </>
                 )}
               </button>
               {ingredients.length === 0 && (
-                <p className="settings-hint">Add a few ingredients to get started.</p>
+                <p className="settings-hint">{t('balanced.addIngredientsHint')}</p>
               )}
             </div>
           </div>
@@ -407,14 +419,14 @@ function BalancedDiet() {
         {generationLoading && (
           <div className="plan-loading" role="status" aria-live="polite">
             <PikawiseLoader variant="inline" decorative />
-            <p>Matching your ingredients…</p>
-            <p className="settings-hint">Searching recipes and organizing meals.</p>
+            <p>{t('balanced.matching')}</p>
+            <p className="settings-hint">{t('balanced.searchingHint')}</p>
           </div>
         )}
 
         {generationError && !generating && (
           <ErrorState
-            message="We couldn't create your plan right now."
+            message={t('balanced.errorMessage')}
             onRetry={handleGenerate}
           />
         )}
@@ -423,8 +435,7 @@ function BalancedDiet() {
           <div className="plan-results" ref={resultRef}>
             <PlanResults plan={plan} onReplace={replaceMeal} onSave={savePlan} onShare={sharePlan} onReset={() => setPlan(null)} />
             <div className="balanced-info-box plan-note">
-              <strong>Note:</strong> Pikawise provides general meal-planning ideas and is not medical or
-              professional dietary advice. Individual nutritional needs vary.
+              <strong>{t('balanced.noteLabel')}</strong> {t('balanced.planNote')}
             </div>
           </div>
         )}
@@ -464,34 +475,36 @@ function BalancedDiet() {
 }
 
 function PlanResults({ plan, onReplace, onSave, onShare, onReset }) {
+  const { t } = useTranslation()
   return (
     <>
       <div className="plan-summary">
         <div>
-          <h2 className="plan-summary-title">Your {plan.days}-Day Meal Plan</h2>
+          <h2 className="plan-summary-title">{t('balanced.yourPlanTitle', { days: plan.days })}</h2>
           <p className="plan-summary-meta">
-            {plan.ingredients.length} ingredient{plan.ingredients.length === 1 ? '' : 's'} · {plan.mealsPerDay} meals per day
-            {plan.fromIngredients ? '' : ' · some meals use nearby alternatives'}
+            {plan.ingredients.length} {t('common.ingredient', { count: plan.ingredients.length })} ·{' '}
+            {t('balanced.mealsPerDaySummary', { count: plan.mealsPerDay })}
+            {plan.fromIngredients ? '' : ` · ${t('balanced.nearbyAlternatives')}`}
           </p>
         </div>
         <div className="plan-actions">
           <button type="button" className="button button--primary" onClick={onSave}>
-            <Icon name="check" size={18} /> Save Plan
+            <Icon name="check" size={18} /> {t('common.savePlan')}
           </button>
           <button type="button" className="button button--secondary" onClick={onShare}>
-            <Icon name="share" size={18} /> Share Plan
+            <Icon name="share" size={18} /> {t('common.sharePlan')}
           </button>
           <button type="button" className="button button--ghost" onClick={onReset}>
-            Start over
+            {t('common.startOver')}
           </button>
         </div>
       </div>
 
       {plan.meals.map((day) => (
-<section key={day.day} className="plan-day" aria-label={`Day ${day.day}`}>
+<section key={day.day} className="plan-day" aria-label={t('common.day', { n: day.day })}>
             <h3 className="plan-day-header">
-              <span>Day {day.day}</span>
-              <span className="plan-day-count">{day.meals.length} meals</span>
+              <span>{t('common.day', { n: day.day })}</span>
+              <span className="plan-day-count">{day.meals.length} {t('common.meal', { count: day.meals.length })}</span>
             </h3>
           <div className="plan-meals">
             {day.meals.map((slot, slotIndex) => (
@@ -511,10 +524,15 @@ function PlanResults({ plan, onReplace, onSave, onShare, onReset }) {
 }
 
 function PlanMeal({ slot, onReplace }) {
-  const canonicalSlot = SLOT_LABELS.find((s) => s.toLowerCase() === (slot.slot || slot.type).toLowerCase()) || slot.slot || slot.type
+  const { t } = useTranslation()
+  const rawSlot = slot.slot || slot.type
+  const slotKey = SLOT_KEYS[String(rawSlot || '').toLowerCase()]
+  const canonicalSlot = slotKey ? t(slotKey) : rawSlot
   const matched = (slot.matchedIngredients || []).slice(0, 3)
   const balanceNote = slot.balance?.note || ''
   const balanceGood = balanceNote === 'Balanced meal'
+  const balanceKey = BALANCE_NOTE_KEYS[balanceNote]
+  const balanceText = balanceKey ? t(balanceKey) : balanceNote
 
   return (
     <article className="plan-meal-slot">
@@ -532,25 +550,25 @@ function PlanMeal({ slot, onReplace }) {
           <Icon name="clock" size={14} />
           {canonicalSlot}
         </p>
-        <Link to={`/meal/${slot.meal.id ?? slot.meal.idMeal}`} className="plan-meal-name" aria-label={`View ${slot.meal.name ?? slot.meal.strMeal} recipe`}>
+        <Link to={`/meal/${slot.meal.id ?? slot.meal.idMeal}`} className="plan-meal-name" aria-label={t('balanced.viewRecipeAria', { name: slot.meal.name ?? slot.meal.strMeal })}>
           {slot.meal.name ?? slot.meal.strMeal}
         </Link>
         {matched.length > 0 && (
           <p className="plan-meal-match">
-            {slot.matchRatio > 0 ? `Strong ingredient match` : ''}
+            {slot.matchRatio > 0 ? t('balanced.strongMatch') : ''}
             {matched.length > 0 && <span> · {matched.map((m) => m.charAt(0).toUpperCase() + m.slice(1)).join(', ')}</span>}
           </p>
         )}
         <p className={`plan-meal-balance ${balanceGood ? 'plan-meal-balance--good' : 'plan-meal-balance--warn'}`}>
           <Icon name={balanceGood ? 'check' : 'info'} size={14} />
-          {balanceNote}
+          {balanceText}
         </p>
         <div className="plan-meal-actions">
           <Link to={`/meal/${slot.meal.id ?? slot.meal.idMeal}`} className="button button--ghost button--small">
-            View Recipe
+            {t('common.viewRecipe')}
           </Link>
           <button type="button" className="button button--ghost button--small" onClick={onReplace}>
-            <Icon name="refresh" size={14} /> Replace
+            <Icon name="refresh" size={14} /> {t('common.replace')}
           </button>
         </div>
       </div>
@@ -559,21 +577,22 @@ function PlanMeal({ slot, onReplace }) {
 }
 
 function ShoppingList({ plan }) {
+  const { t } = useTranslation()
   const shopping = plan.shopping || { required: [], have: [], need: [] }
   return (
     <div className="shopping-panel" id="shopping-list">
       <div className="shopping-panel-header">
         <h3 className="shopping-panel-title">
-          <Icon name="shoppingBag" size={20} /> Shopping List
+          <Icon name="shoppingBag" size={20} /> {t('balanced.shoppingList')}
         </h3>
         <Link to="/shopping-list" className="shopping-panel-link">
-          Open shopping list <Icon name="arrowRight" size={16} />
+          {t('balanced.openShoppingList')} <Icon name="arrowRight" size={16} />
         </Link>
       </div>
       <div className="shopping-groups">
         {shopping.have.length > 0 && (
           <div>
-            <p className="shopping-group-title">You already have</p>
+            <p className="shopping-group-title">{t('balanced.alreadyHave')}</p>
             <ul>
               {shopping.have.map((item) => (
                 <li key={item} className="shopping-item">
@@ -588,7 +607,7 @@ function ShoppingList({ plan }) {
         )}
         {shopping.need.length > 0 && (
           <div>
-            <p className="shopping-group-title">You may need</p>
+            <p className="shopping-group-title">{t('balanced.mayNeed')}</p>
             <ul>
               {shopping.need.map((item) => (
                 <li key={item} className="shopping-item">
@@ -628,12 +647,14 @@ async function copyText(text) {
   }
 }
 
-export function formatPlanText(plan) {
-  const lines = [`Your ${plan.days}-Day Meal Plan`]
+export function formatPlanText(plan, t) {
+  const lines = [t('balanced.yourPlanTitle', { days: plan.days })]
   plan.meals.forEach((day) => {
-    lines.push(`\nDay ${day.day}`)
+    lines.push(`\n${t('common.day', { n: day.day })}`)
     day.meals.forEach((slot) => {
-      lines.push(`${slot.slot}: ${slot.meal.name ?? slot.meal.strMeal}`)
+      const slotKey = SLOT_KEYS[String(slot.slot || '').toLowerCase()]
+      const slotLabel = slotKey ? t(slotKey) : slot.slot
+      lines.push(`${slotLabel}: ${slot.meal.name ?? slot.meal.strMeal}`)
     })
   })
   return lines.join('\n')

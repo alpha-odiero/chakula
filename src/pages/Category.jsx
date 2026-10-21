@@ -6,6 +6,7 @@ import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 import { SITE_URL } from '../config/app'
 import { filterByCategory, getCategories } from '../services/mealdb'
 
@@ -14,6 +15,7 @@ function slugify(name) {
 }
 
 function Category() {
+  const { t } = useTranslation()
   const { category: slug } = useParams()
   const [state, setState] = useState({ data: null, loading: true, error: null })
   const [categoryName, setCategoryName] = useState(null)
@@ -48,8 +50,8 @@ function Category() {
   const displayName = categoryName || slug
 
   useSeo({
-    title: `${displayName} recipes — Pikawise`,
-    description: `Browse ${displayName.toLowerCase()} recipes with ingredients, cooking steps and meal ideas from Pikawise.`,
+    title: t('category.seo.title', { category: displayName }),
+    description: t('category.seo.description', { category: displayName.toLowerCase() }),
     path: `/categories/${slug}`,
     jsonLd:
       state.data && state.data.length > 0
@@ -70,8 +72,8 @@ function Category() {
 
   return (
     <main className="category-page">
-      <PageHeader eyebrow="Category" title={displayName}>
-        <p>Meals in this category</p>
+      <PageHeader eyebrow={t('category.eyebrow')} title={displayName}>
+        <p>{t('category.mealsInCategory')}</p>
       </PageHeader>
       <section className="container">
         {state.loading && <MealGrid loading />}
@@ -81,11 +83,11 @@ function Category() {
         )}
         {!state.loading && !state.error && state.data && state.data.length === 0 && (
           <EmptyState
-            title="No meals in this category"
-            message="This category doesn't have any meals right now."
+            title={t('category.emptyTitle')}
+            message={t('category.emptyMessage')}
             action={
               <Link to="/categories" className="button button--primary">
-                Browse categories
+                {t('common.browseCategories')}
               </Link>
             }
           />

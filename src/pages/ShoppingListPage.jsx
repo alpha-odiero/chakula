@@ -6,11 +6,13 @@ import EmptyState from '../components/EmptyState'
 import InteractiveShoppingList from '../components/ShoppingList'
 import { getMealPlans } from '../utils/storage'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function ShoppingListPage() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Shopping list — Pikawise',
-    description: 'Shopping lists generated from your saved meal plans, stored on this device.',
+    title: t('shopping.seoTitle'),
+    description: t('shopping.seoDescription'),
     path: '/shopping-list',
     robots: 'noindex,follow'
   })
@@ -21,18 +23,13 @@ function ShoppingListPage() {
   if (plans.length === 0) {
     return (
       <main className="about-page">
-        <PageHeader eyebrow="Shopping List" title="Your Shopping Lists">
-          <p className="page-subtitle">
-            Build a balanced meal plan to see what you already have and what you might need.
-          </p>
+        <PageHeader eyebrow={t('shopping.eyebrow')} title={t('shopping.title')}>
+          <p className="page-subtitle">{t('shopping.emptySubtitle')}</p>
         </PageHeader>
         <section className="container">
-          <EmptyState
-            title="No shopping list yet"
-            message="Shopping lists come from saved meal plans. Build a plan first and your list will show up here."
-          >
+          <EmptyState title={t('shopping.emptyTitle')} message={t('shopping.emptyMessage')}>
             <Link to="/balanced-diet" className="button button--primary">
-              <Icon name="sparkles" size={18} /> Build a Meal Plan
+              <Icon name="sparkles" size={18} /> {t('common.buildMealPlan')}
             </Link>
           </EmptyState>
         </section>
@@ -42,14 +39,12 @@ function ShoppingListPage() {
 
   return (
     <main className="about-page">
-      <PageHeader eyebrow="Shopping List" title="Your Shopping Lists">
-        <p className="page-subtitle">
-          Everything you need for your meal plan, with check-offs saved on this device.
-        </p>
+      <PageHeader eyebrow={t('shopping.eyebrow')} title={t('shopping.title')}>
+        <p className="page-subtitle">{t('shopping.subtitle')}</p>
       </PageHeader>
       <section className="container">
-        <div className="plan-picker" aria-label="Choose a meal plan">
-          <label className="visually-hidden" htmlFor="shopping-plan-select">Meal plan</label>
+        <div className="plan-picker" aria-label={t('shopping.choosePlanAria')}>
+          <label className="visually-hidden" htmlFor="shopping-plan-select">{t('shopping.planLabel')}</label>
           <select
             id="shopping-plan-select"
             className="ingredient-input"
@@ -58,7 +53,7 @@ function ShoppingListPage() {
           >
             {plans.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.label || `${p.days}-Day Meal Plan`}
+                {p.label || t('common.dayMealPlan', { days: p.days })}
               </option>
             ))}
           </select>
@@ -66,7 +61,7 @@ function ShoppingListPage() {
         {selectedPlan ? (
           <InteractiveShoppingList key={selectedPlan.id} plan={selectedPlan} />
         ) : (
-          <EmptyState title="Plan not found" message="Pick a saved plan above." />
+          <EmptyState title={t('shopping.planNotFoundTitle')} message={t('shopping.planNotFoundMessage')} />
         )}
       </section>
     </main>

@@ -57,6 +57,7 @@ function Icon({ name, size = 24, className = '', label = null, strokeWidth = 2 }
   return (
     <svg
       className={`icon ${className}`.trim()}
+      data-icon={name}
       width={size}
       height={size}
       viewBox="0 0 24 24"

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Icon from './Icon'
 import { scaleMeasure } from '../utils/meal'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function CookingMode({ mealName, steps, ingredients = [], servings = 1, baseServings = 1, onClose }) {
+  const { t } = useTranslation()
   const [index, setIndex] = useState(0)
   const [showIngredients, setShowIngredients] = useState(false)
   const wakeLockRef = useRef(null)
@@ -84,16 +86,16 @@ function CookingMode({ mealName, steps, ingredients = [], servings = 1, baseServ
       className="cooking-mode"
       role="dialog"
       aria-modal="true"
-      aria-label={`Cooking mode: ${mealName}`}
+      aria-label={t('meal.cookingModeLabel', { name: mealName })}
     >
       <header className="cooking-mode-bar">
-        <button type="button" className="cooking-icon-button" onClick={onClose} aria-label="Exit cooking mode">
+        <button type="button" className="cooking-icon-button" onClick={onClose} aria-label={t('meal.exitCookingMode')}>
           <Icon name="close" size={20} />
         </button>
         <div className="cooking-mode-progress-text">
           <span className="cooking-mode-name">{mealName}</span>
           <span className="cooking-mode-step-label">
-            Step {index + 1} of {total}
+            {t('meal.stepOfTotal', { current: index + 1, total })}
           </span>
         </div>
         <button
@@ -101,7 +103,7 @@ function CookingMode({ mealName, steps, ingredients = [], servings = 1, baseServ
           className={`cooking-icon-button${showIngredients ? ' is-active' : ''}`}
           onClick={() => setShowIngredients((v) => !v)}
           aria-expanded={showIngredients}
-          aria-label={showIngredients ? 'Hide ingredients' : 'Show ingredients'}
+          aria-label={showIngredients ? t('meal.hideIngredients') : t('meal.showIngredients')}
         >
           <Icon name="utensils" size={20} />
         </button>
@@ -114,21 +116,20 @@ function CookingMode({ mealName, steps, ingredients = [], servings = 1, baseServ
       <div className="cooking-mode-body">
         {total === 0 ? (
           <p className="cooking-step-text">
-            This recipe doesn&apos;t include written steps. You can still cook it using the
-            ingredients list.
+            {t('meal.noSteps')}
           </p>
         ) : (
           <div className="cooking-step" key={index}>
-            <span className="cooking-step-number">Step {index + 1}</span>
+            <span className="cooking-step-number">{t('meal.stepNumber', { current: index + 1 })}</span>
             <p className="cooking-step-text">{steps[index]}</p>
           </div>
         )}
       </div>
 
       {showIngredients && (
-        <div className="cooking-ingredients" role="region" aria-label="Ingredients">
+        <div className="cooking-ingredients" role="region" aria-label={t('meal.ingredients')}>
           <div className="cooking-ingredients-head">
-            <h2>Ingredients for {servings} {servings === 1 ? 'serving' : 'servings'}</h2>
+            <h2>{t('meal.ingredientsFor', { count: servings })}</h2>
           </div>
           <ul>
             {scaledIngredients.map(({ ingredient, measure }) => (
@@ -149,7 +150,7 @@ function CookingMode({ mealName, steps, ingredients = [], servings = 1, baseServ
           disabled={isFirst}
         >
           <Icon name="chevronLeft" size={18} />
-          Previous
+          {t('meal.previous')}
         </button>
         <button
           type="button"
@@ -159,11 +160,11 @@ function CookingMode({ mealName, steps, ingredients = [], servings = 1, baseServ
           {isLast ? (
             <>
               <Icon name="check" size={18} />
-              Finish
+              {t('meal.finish')}
             </>
           ) : (
             <>
-              Next
+              {t('common.next')}
               <Icon name="arrowRight" size={18} />
             </>
           )}

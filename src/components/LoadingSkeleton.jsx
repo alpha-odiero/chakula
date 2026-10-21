@@ -1,4 +1,8 @@
+import { useTranslation } from '../i18n/LocaleContext'
+
 function LoadingSkeleton({ variant = 'meal' }) {
+  const { t } = useTranslation()
+
   const classes = {
     meal: 'skeleton-card',
     category: 'skeleton-category',
@@ -16,7 +20,7 @@ function LoadingSkeleton({ variant = 'meal' }) {
 
   if (variant === 'detail') {
     return (
-      <div className="skeleton-detail" role="status" aria-label="Loading recipe">
+      <div className="skeleton-detail" role="status" aria-label={t('loader.loadingRecipe')}>
         <div className="container meal-detail-layout">
           <div className="meal-detail-hero">
             <span className="skeleton-block skeleton-detail-hero" />

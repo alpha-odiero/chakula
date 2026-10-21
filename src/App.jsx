@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import LocaleProvider, { useTranslation } from './i18n/LocaleContext'
 import WebHeader from './components/WebHeader'
 import AppHeader from './components/AppHeader'
 import BottomNavigation from './components/BottomNavigation'
@@ -37,10 +38,12 @@ const Favorites = lazy(() => import('./pages/Favorites'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function PageFallback() {
-  return <PikawiseLoader variant="section" label="Loading page" delay={150} />
+  const { t } = useTranslation()
+  return <PikawiseLoader variant="section" label={t('common.loadingPage')} delay={150} />
 }
 
 function AppShell() {
+  const { t } = useTranslation()
   const isOnline = useNetworkState()
   const { isInstalled } = useInstallPrompt()
   const { preferences } = usePreferences()
@@ -88,11 +91,11 @@ function AppShell() {
 
   useEffect(() => {
     const handleInstalled = () => {
-      toast.success('Thanks for installing Pikawise!')
+      toast.success(t('common.pwaInstalledToast'))
     }
     window.addEventListener('appinstalled', handleInstalled)
     return () => window.removeEventListener('appinstalled', handleInstalled)
-  }, [toast])
+  }, [toast, t])
 
   useEffect(() => {
     const root = document.documentElement
@@ -158,13 +161,15 @@ function PrivacyRedirect() {
 
 function App() {
   return (
-    <PreferencesProvider>
-      <ToastProvider>
-        <ReminderProvider>
-          <AppShell />
-        </ReminderProvider>
-      </ToastProvider>
-    </PreferencesProvider>
+    <LocaleProvider>
+      <PreferencesProvider>
+        <ToastProvider>
+          <ReminderProvider>
+            <AppShell />
+          </ReminderProvider>
+        </ToastProvider>
+      </PreferencesProvider>
+    </LocaleProvider>
   )
 }
 

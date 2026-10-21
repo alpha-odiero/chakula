@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react'
+import { useTranslation } from '../i18n/LocaleContext'
 import Icon from './Icon'
 
-function ConfirmDialog({ open = true, title = 'Are you sure?', message = '', onConfirm, onCancel, confirmLabel = 'Confirm', cancelLabel = 'Cancel', danger = false }) {
+function ConfirmDialog({ open = true, title, message = '', onConfirm, onCancel, confirmLabel, cancelLabel, danger = false }) {
+  const { t } = useTranslation()
   const dialogRef = useRef(null)
 
   useEffect(() => {
@@ -20,6 +22,10 @@ function ConfirmDialog({ open = true, title = 'Are you sure?', message = '', onC
 
   if (!open) return null
 
+  const resolvedTitle = title === undefined ? t('app.confirmTitle') : title
+  const resolvedConfirmLabel = confirmLabel === undefined ? t('app.confirmAction') : confirmLabel
+  const resolvedCancelLabel = cancelLabel === undefined ? t('common.cancel') : cancelLabel
+
   return (
     <div className="confirm-overlay" role="presentation" onMouseDown={onCancel}>
       <div
@@ -35,11 +41,11 @@ function ConfirmDialog({ open = true, title = 'Are you sure?', message = '', onC
         <div className="confirm-icon" aria-hidden="true">
           <Icon name={danger ? 'trash' : 'info'} size={24} />
         </div>
-        <h3 className="confirm-title" id="confirm-title">{title}</h3>
+        <h3 className="confirm-title" id="confirm-title">{resolvedTitle}</h3>
         {message && <p className="confirm-message" id="confirm-message">{message}</p>}
         <div className="confirm-actions">
-          <button type="button" className="button button--ghost" onClick={onCancel}>{cancelLabel}</button>
-          <button type="button" className={`button ${danger ? 'button--danger' : 'button--primary'}`} onClick={onConfirm}>{confirmLabel}</button>
+          <button type="button" className="button button--ghost" onClick={onCancel}>{resolvedCancelLabel}</button>
+          <button type="button" className={`button ${danger ? 'button--danger' : 'button--primary'}`} onClick={onConfirm}>{resolvedConfirmLabel}</button>
         </div>
       </div>
     </div>

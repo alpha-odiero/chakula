@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/LocaleContext'
 import Icon from './Icon'
 import { useToast } from './Toast'
 import { isFavorite, toggleFavorite } from '../utils/favorites'
 
 function SaveButton({ meal, className = '' }) {
+  const { t } = useTranslation()
   const id = meal?.id ?? meal?.idMeal
   const [saved, setSaved] = useState(() => (id ? isFavorite(id) : false))
   const toast = useToast()
@@ -14,7 +16,7 @@ function SaveButton({ meal, className = '' }) {
 
   if (!id) return null
 
-  const name = meal.name ?? meal.strMeal ?? 'recipe'
+  const name = meal.name ?? meal.strMeal ?? t('app.recipeFallback')
 
   const handleClick = (event) => {
     event.preventDefault()
@@ -22,8 +24,8 @@ function SaveButton({ meal, className = '' }) {
     toggleFavorite(meal)
     const nowSaved = isFavorite(id)
     setSaved(nowSaved)
-    if (nowSaved) toast.success('Recipe saved.')
-    else toast.info('Removed from saved recipes.')
+    if (nowSaved) toast.success(t('app.recipeSaved'))
+    else toast.info(t('app.recipeRemoved'))
   }
 
   return (
@@ -31,7 +33,7 @@ function SaveButton({ meal, className = '' }) {
       type="button"
       className={`meal-save ${className}`.trim()}
       aria-pressed={saved}
-      aria-label={saved ? `Remove ${name} from saved recipes` : `Save ${name} to saved recipes`}
+      aria-label={saved ? t('app.removeFromSaved', { name }) : t('app.saveToSaved', { name })}
       onClick={handleClick}
     >
       <Icon name={saved ? 'heartFilled' : 'heart'} size={18} />

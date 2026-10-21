@@ -861,8 +861,8 @@
 }
 
 /* ---------- Footer on small screens ---------- */
-/* Keep the footer compact and tidy on phones: tighter spacing, a two-column
-   link grid, and the two store buttons always sitting side by side. */
+/* Phones get a single readable column for the link groups, 44px link targets,
+   and store buttons that only sit side by side when there is room for both. */
 @media (max-width: 767px) {
   .footer-downloads {
     padding-top: 26px;
@@ -881,15 +881,15 @@
 
   .store-buttons {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
     gap: 10px;
     width: 100%;
   }
 
   .store-btn {
     width: 100%;
-    min-height: 46px;
-    padding: 7px 12px;
+    min-height: 48px;
+    padding: 8px 12px;
     gap: 9px;
   }
 
@@ -907,14 +907,14 @@
   }
 
   .footer-inner {
-    grid-template-columns: 1fr 1fr;
-    gap: 22px 20px;
+    grid-template-columns: 1fr;
+    gap: 26px;
     padding-top: 26px;
     padding-bottom: 24px;
   }
 
   .footer-brand {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .footer-brand p {
@@ -925,12 +925,16 @@
 
   .footer-col h2 {
     font-size: 11px;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+  }
+
+  .footer-col ul {
+    gap: 0;
   }
 
   .footer-col a {
-    min-height: 30px;
-    font-size: 13px;
+    min-height: 44px;
+    font-size: 14px;
   }
 
   .footer-bottom {
@@ -939,5 +943,16 @@
 
   .footer-bottom-inner {
     font-size: 12px;
+  }
+}
+
+@media (min-width: 480px) and (max-width: 767px) {
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 26px 20px;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1;
   }
 }

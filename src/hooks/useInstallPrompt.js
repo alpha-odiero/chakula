@@ -1,58 +1,39 @@
-import { useEffect, useState } from 'react'
-import { isStandalone } from '../utils/platform'
+import { useCallback, useEffect, useState } from 'react'
+import {
+  subscribeToInstallState,
+  getInstallState,
+  promptInstall as sharedPromptInstall
+} from '../utils/installPrompt'
 
+// Thin React binding over the shared install-prompt store. Every consumer
+// sees the same event, so one component prompting the browser no longer
+// breaks the others.
 export function useInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState(null)
-  const [isInstalled, setIsInstalled] = useState(false)
+  const [state, setState] = useState(getInstallState)
 
   useEffect(() => {
-    const checkStandalone = () => setIsInstalled(isStandalone())
-
-    const handleBeforeInstallPrompt = (event) => {
-      event.preventDefault()
-      setDeferredPrompt(event)
-    }
-
-    const handleInstalled = () => {
-      setIsInstalled(true)
-      setDeferredPrompt(null)
-    }
-
-    checkStandalone()
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.addEventListener('appinstalled', handleInstalled)
-    window.addEventListener('resize', checkStandalone)
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      window.removeEventListener('appinstalled', handleInstalled)
-      window.removeEventListener('resize', checkStandalone)
-    }
+    const unsubscribe = subscribeToInstallState(() => setState(getInstallState()))
+    setState(getInstallState())
+    return unsubscribe
   }, [])
 
-  // Reports exactly what happened with the native prompt so callers can react
-  // to a dismissed prompt instead of treating it as success.
-  const promptInstall = async () => {
-    if (!deferredPrompt) return { outcome: 'unavailable' }
-    deferredPrompt.prompt()
-    let outcome = 'dismissed'
-    try {
-      const choice = await deferredPrompt.userChoice
-      if (choice?.outcome === 'accepted') outcome = 'accepted'
-    } catch {
-      outcome = 'dismissed'
-    } finally {
-      setDeferredPrompt(null)
-    }
-    return { outcome }
-  }
+  const promptInstall = useCallback(async () => {
+    const result = await sharedPromptInstall()
+    return result
+  }, [])
 
   // Legacy boolean API: true when a native prompt was shown (accepted or
   // dismissed), false when installation is unavailable in this browser.
-  const install = async () => {
-    const { outcome } = await promptInstall()
+  const install = useCallback(async () => {
+    const { outcome } = await sharedPromptInstall()
     return outcome !== 'unavailable'
-  }
+  }, [])
 
-  return { canInstall: Boolean(deferredPrompt), isInstalled, install, promptInstall, deferredPrompt }
+  return {
+    canInstall: state.canInstall,
+    isInstalled: state.isInstalled,
+    isPrompting: state.isPrompting,
+    install,
+    promptInstall
+  }
 }

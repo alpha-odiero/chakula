@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../i18n/LocaleContext'
 import Icon from './Icon'
 import { usePreferences } from './PreferencesProvider'
 
 const mealOptions = [2, 3, 4]
 const cookOptions = [
-  { value: 'quick', label: 'Quick', hint: 'Ideally under 30 minutes' },
-  { value: 'moderate', label: 'Moderate', hint: '30–60 minutes is fine' },
-  { value: 'longer', label: 'Longer meals are fine', hint: 'Time is not a problem' }
+  { value: 'quick', labelKey: 'onboarding.cookQuick', hintKey: 'onboarding.cookQuickHint' },
+  { value: 'moderate', labelKey: 'onboarding.cookModerate', hintKey: 'onboarding.cookModerateHint' },
+  { value: 'longer', labelKey: 'onboarding.cookLonger', hintKey: 'onboarding.cookLongerHint' }
 ]
 
 function Onboarding({ onClose }) {
+  const { t } = useTranslation()
   const { preferences, update } = usePreferences()
   const [step, setStep] = useState(0)
   const [mealsPerDay, setMealsPerDay] = useState(preferences?.mealsPerDay || 3)
@@ -47,7 +49,7 @@ function Onboarding({ onClose }) {
         className="onboarding"
         role="dialog"
         aria-modal="true"
-        aria-label="Welcome to Pikawise"
+        aria-label={t('onboarding.welcome', { app: t('common.appName') })}
         tabIndex="-1"
         ref={dialogRef}
       >
@@ -57,16 +59,14 @@ function Onboarding({ onClose }) {
 
         {step === 0 && (
           <>
-            <h2 className="onboarding-title">Welcome to Pikawise</h2>
-            <p className="onboarding-text">
-              Let's personalize your meal discovery experience. It only takes a moment.
-            </p>
+            <h2 className="onboarding-title">{t('onboarding.welcome', { app: t('common.appName') })}</h2>
+            <p className="onboarding-text">{t('onboarding.welcomeText')}</p>
             <div className="onboarding-actions">
               <button type="button" className="button button--primary" onClick={nextStep}>
-                Get Started
+                {t('onboarding.getStarted')}
               </button>
               <button type="button" className="button button--ghost" onClick={() => finish(true)}>
-                Skip
+                {t('onboarding.skip')}
               </button>
             </div>
           </>
@@ -74,8 +74,8 @@ function Onboarding({ onClose }) {
 
         {step === 1 && (
           <>
-            <h2 className="onboarding-title">How many meals do you usually plan per day?</h2>
-            <p className="onboarding-text">We'll use this as a default when building plans.</p>
+            <h2 className="onboarding-title">{t('onboarding.mealsTitle')}</h2>
+            <p className="onboarding-text">{t('onboarding.mealsText')}</p>
             <div className="onboarding-choices">
               {mealOptions.map((num) => (
                 <button
@@ -86,16 +86,16 @@ function Onboarding({ onClose }) {
                   onClick={() => setMealsPerDay(num)}
                 >
                   <span className="choice-value">{num}</span>
-                  <span className="choice-label">{num === 2 ? 'meals' : 'meals'}</span>
+                  <span className="choice-label">{t('onboarding.meals', { count: num })}</span>
                 </button>
               ))}
             </div>
             <div className="onboarding-actions">
               <button type="button" className="button button--primary" onClick={nextStep}>
-                Continue
+                {t('common.continue')}
               </button>
               <button type="button" className="button button--ghost" onClick={() => finish(true)}>
-                Skip
+                {t('onboarding.skip')}
               </button>
             </div>
           </>
@@ -103,8 +103,8 @@ function Onboarding({ onClose }) {
 
         {step === 2 && (
           <>
-            <h2 className="onboarding-title">How much time do you usually have to cook?</h2>
-            <p className="onboarding-text">Your preferences stay on this device only.</p>
+            <h2 className="onboarding-title">{t('onboarding.cookTitle')}</h2>
+            <p className="onboarding-text">{t('onboarding.cookText')}</p>
             <div className="onboarding-options">
               {cookOptions.map((option) => (
                 <button
@@ -114,17 +114,17 @@ function Onboarding({ onClose }) {
                   aria-pressed={cookingTime === option.value}
                   onClick={() => setCookingTime(option.value)}
                 >
-                  <span className="option-row-title">{option.label}</span>
-                  <span className="option-row-hint">{option.hint}</span>
+                  <span className="option-row-title">{t(option.labelKey)}</span>
+                  <span className="option-row-hint">{t(option.hintKey)}</span>
                 </button>
               ))}
             </div>
             <div className="onboarding-actions">
               <button type="button" className="button button--primary" onClick={() => finish()}>
-                Done
+                {t('common.done')}
               </button>
               <button type="button" className="button button--ghost" onClick={() => finish(true)}>
-                Skip
+                {t('onboarding.skip')}
               </button>
             </div>
           </>

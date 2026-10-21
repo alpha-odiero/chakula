@@ -1,8 +1,18 @@
 import { useEffect, useRef } from 'react'
+import { useTranslation } from '../i18n/LocaleContext'
 import Icon from './Icon'
 import { getInstallGuide } from '../utils/platform'
 
+// Translation keys for the platform-specific manual install steps returned by
+// getInstallGuide(). The original English strings stay as a fallback.
+const guideStepKeys = {
+  'iPhone and iPad': ['install.iosStep1', 'install.iosStep2', 'install.iosStep3'],
+  Android: ['install.androidStep1', 'install.androidStep2', 'install.androidStep3'],
+  desktop: ['install.desktopStep1', 'install.desktopStep2', 'install.desktopStep3']
+}
+
 function InstallGuide({ onClose, message }) {
+  const { t } = useTranslation()
   const dialogRef = useRef(null)
 
   useEffect(() => {
@@ -19,9 +29,12 @@ function InstallGuide({ onClose, message }) {
   }, [onClose])
 
   const guide = getInstallGuide()
+  const appName = t('common.appName')
+  const stepKeys = guideStepKeys[guide.platform]
+  const platform = guide.platform === 'desktop' ? t('install.platformDesktop') : guide.platform
   const text =
     message ||
-    `Pikawise is not in the app stores yet. On ${guide.platform}, install it from your browser in a few steps:`
+    t('install.guideMessage', { app: appName, platform })
 
   return (
     <div className="confirm-overlay" role="presentation" onMouseDown={onClose}>
@@ -39,19 +52,19 @@ function InstallGuide({ onClose, message }) {
           <Icon name="install" size={24} />
         </div>
         <h3 className="confirm-title" id="install-guide-title">
-          Get Pikawise
+          {t('install.guideTitle', { app: appName })}
         </h3>
         <p className="confirm-message" id="install-guide-message">
           {text}
         </p>
         <ol className="install-guide-steps">
-          {guide.steps.map((step) => (
-            <li key={step}>{step}</li>
+          {guide.steps.map((step, index) => (
+            <li key={step}>{stepKeys?.[index] ? t(stepKeys[index], { app: appName }) : step}</li>
           ))}
         </ol>
         <div className="confirm-actions">
           <button type="button" className="button button--primary" onClick={onClose}>
-            Got it
+            {t('install.gotIt')}
           </button>
         </div>
       </div>

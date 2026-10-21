@@ -6,12 +6,13 @@ import PikawiseLoader from '../components/PikawiseLoader'
 import { getRandomMeal } from '../services/mealdb'
 import { getMealTags } from '../utils/meal'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function RandomMeal() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Random recipe picker — Pikawise',
-    description:
-      "Don't know what to cook? Let Pikawise pick a random recipe with ingredients and clear cooking steps.",
+    title: t('random.seo.title'),
+    description: t('random.seo.description'),
     path: '/random'
   })
   const [state, setState] = useState({ data: null, loading: false, error: null })
@@ -39,21 +40,19 @@ function RandomMeal() {
             <div className="random-icon" aria-hidden="true">
               <Icon name="random" size={44} />
             </div>
-            <h1 className="page-title">Feeling hungry but don&apos;t know what to cook?</h1>
-            <p className="page-subtitle">
-              Let Pikawise pick a delicious meal for you at random.
-            </p>
+            <h1 className="page-title">{t('random.title')}</h1>
+            <p className="page-subtitle">{t('random.subtitle')}</p>
             <button type="button" className="button button--primary button--large" onClick={discover}>
               <Icon name="random" size={20} />
-              Discover a Meal
+              {t('random.discoverCta')}
             </button>
           </div>
         )}
 
         {state.loading && (
           <div className="random-loading">
-            <PikawiseLoader variant="inline" label="Choosing a meal for you" />
-            <p>Choosing a delicious meal for you…</p>
+            <PikawiseLoader variant="inline" label={t('random.loadingLabel')} />
+            <p>{t('random.loadingText')}</p>
           </div>
         )}
 
@@ -68,7 +67,7 @@ function RandomMeal() {
                 type="button"
                 className="random-result-image-button"
                 onClick={openRecipe}
-                aria-label={`Open ${state.data.name ?? state.data.strMeal} recipe`}
+                aria-label={t('random.openRecipe', { name: state.data.name ?? state.data.strMeal })}
               >
                 <img
                   src={state.data.image ?? state.data.strMealThumb}
@@ -86,7 +85,7 @@ function RandomMeal() {
               </p>
               <h1 className="random-result-title">{state.data.name ?? state.data.strMeal}</h1>
               {getMealTags(state.data).length > 0 && (
-                <ul className="meal-tags" aria-label="Tags">
+                <ul className="meal-tags" aria-label={t('a11y.tags')}>
                   {getMealTags(state.data).slice(0, 4).map((tag) => (
                     <li key={tag}>
                       <Link to={`/search?q=${encodeURIComponent(tag)}`} className="meal-tag">
@@ -98,12 +97,12 @@ function RandomMeal() {
               )}
               <div className="random-result-actions">
                 <button type="button" className="button button--primary" onClick={openRecipe}>
-                  View Recipe
+                  {t('common.viewRecipe')}
                   <Icon name="arrowRight" size={18} />
                 </button>
                 <button type="button" className="button button--secondary" onClick={discover}>
                   <Icon name="random" size={18} />
-                  Try Another
+                  {t('random.tryAnother')}
                 </button>
               </div>
             </div>

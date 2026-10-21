@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import Icon from '../components/Icon'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function NotFound() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Page not found — Pikawise',
-    description: 'The page you are looking for does not exist on Pikawise.',
+    title: t('notFound.seoTitle'),
+    description: t('notFound.seoDescription'),
     path: '/404',
     robots: 'noindex,follow'
   })
@@ -13,11 +15,11 @@ function NotFound() {
     <main className="not-found">
       <div className="container not-found-inner">
         <p className="not-found-code" aria-hidden="true">404</p>
-        <h1 className="page-title">Meal not found</h1>
-        <p className="page-subtitle">The page you're looking for doesn't exist.</p>
+        <h1 className="page-title">{t('notFound.title')}</h1>
+        <p className="page-subtitle">{t('notFound.subtitle')}</p>
         <Link to="/" className="button button--primary button--large">
           <Icon name="home" size={18} />
-          Back Home
+          {t('notFound.backHome')}
         </Link>
       </div>
     </main>

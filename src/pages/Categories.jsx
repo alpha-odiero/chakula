@@ -4,13 +4,14 @@ import LoadingSkeleton from '../components/LoadingSkeleton'
 import ErrorState from '../components/ErrorState'
 import PageHeader from '../components/PageHeader'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 import { getCategories } from '../services/mealdb'
 
 function Categories() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Meal categories — Pikawise',
-    description:
-      'Browse recipe categories including beef, chicken, seafood, vegetarian, vegan, desserts, breakfast and more.',
+    title: t('categories.seo.title'),
+    description: t('categories.seo.description'),
     path: '/categories'
   })
   const [state, setState] = useState({ data: null, loading: true, error: null })
@@ -26,7 +27,11 @@ function Categories() {
 
   return (
     <main className="categories-page">
-      <PageHeader eyebrow="Categories" title="Browse by category" subtitle="Pick a category to discover meals." />
+      <PageHeader
+        eyebrow={t('categories.eyebrow')}
+        title={t('categories.title')}
+        subtitle={t('categories.subtitle')}
+      />
       <section className="container categories-body">
         {state.loading && (
           <div className="category-grid category-grid--cards">

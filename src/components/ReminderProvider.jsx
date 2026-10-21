@@ -26,6 +26,7 @@ import {
   cancelPeriodicBackgroundSync
 } from '../utils/reminderSync'
 import { usePreferences } from './PreferencesProvider'
+import { useTranslation } from '../i18n/LocaleContext'
 
 const CHECK_INTERVAL_MS = 60 * 1000
 
@@ -44,6 +45,7 @@ export function useReminders() {
 
 function ReminderProvider({ children }) {
   const { preferences } = usePreferences()
+  const { t } = useTranslation()
   const [reminders, setReminders] = useState(getReminders)
   const [tick, setTick] = useState(0)
 
@@ -51,6 +53,8 @@ function ReminderProvider({ children }) {
   remindersRef.current = reminders
   const prefsRef = useRef(preferences)
   prefsRef.current = preferences
+  const translateRef = useRef(t)
+  translateRef.current = t
   const runningRef = useRef(false)
 
   const update = useCallback((partial) => {
@@ -89,19 +93,43 @@ function ReminderProvider({ children }) {
           const period = periodById(item.periodId) || { label: item.label }
           const payload = await buildReminderPayload(period, config, prefsRef.current)
           const id = `reminder-${item.key}`
+          // Store translation keys (not finished sentences) so the notification
+          // centre can render the reminder in whatever language is active.
+          const ideas = (payload.suggestions || []).map((meal) => meal.name).join(', ')
+          const modes = Array.isArray(config.modes) && config.modes.length ? config.modes : ['question']
+          const ask = modes.includes('question') || modes.includes('both')
+          const hasIdeas = ideas.length > 0
+          const titleKey = hasIdeas
+            ? ask
+              ? 'reminder.notifTitleTime'
+              : 'reminder.notifTitleIdeas'
+            : 'reminder.notifTitleQuestion'
+          const bodyKey = hasIdeas
+            ? ask
+              ? 'reminder.notifBodyIdeas'
+              : 'reminder.notifBodyTry'
+            : 'reminder.notifBodyTap'
+          const titleParams = {}
+          const bodyParams = hasIdeas ? { names: ideas } : {}
           addNotification({
             id,
             type: 'reminder',
-            title: payload.title,
-            body: payload.body,
+            titleKey,
+            titleParams,
+            bodyKey,
+            bodyParams,
             periodId: item.periodId,
             suggestions: payload.suggestions
           })
           if (isNotificationSupported() && getNotificationPermission() === 'granted') {
+            const translate = translateRef.current
+            const periodLabel = item.periodId
+              ? translate(`config.period.${item.periodId}`)
+              : translate('config.period.default')
             await showOsNotification({
               id,
-              title: payload.title,
-              body: payload.body,
+              title: translate(titleKey, { ...titleParams, label: periodLabel }),
+              body: translate(bodyKey, { ...bodyParams, label: periodLabel }),
               tag: `pikawise-${item.periodId}`,
               data: { url: `/reminder?period=${item.periodId}` }
             })

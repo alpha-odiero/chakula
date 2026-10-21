@@ -443,7 +443,7 @@ const explore = await page.evaluate(() => {
   }
 })
 check('discover grid gap >= 14px', parseFloat(explore.gap) >= 14, explore.gap)
-check('discover card min width >= 200px', explore.minWidth >= 200, `min=${explore.minWidth} max=${explore.maxWidth}`)
+check('discover card min width >= 180px (4 columns)', explore.minWidth >= 180, `min=${explore.minWidth} max=${explore.maxWidth}`)
 check('discover card widths consistent (max-min <= 8)', explore.maxWidth - explore.minWidth <= 8, `min=${explore.minWidth} max=${explore.maxWidth}`)
 check('discover images bounded by cards', explore.imgOverflow === 0, `overflowing=${explore.imgOverflow}`)
 check('unfiltered discover has no infinite sentinel', !(await page.$('.grid-sentinel')))

@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
+import { useTranslation } from '../i18n/LocaleContext'
 import Icon from './Icon'
 
 // Full-screen view of the original recipe image so the compact card on the
 // details page never hides any of the picture.
 function ImageViewer({ src, alt, onClose }) {
+  const { t } = useTranslation()
   const dialogRef = useRef(null)
 
   useEffect(() => {
@@ -27,12 +29,12 @@ function ImageViewer({ src, alt, onClose }) {
         className="image-viewer-inner"
         role="dialog"
         aria-modal="true"
-        aria-label={`${alt} — full image`}
+        aria-label={t('app.fullImage', { alt })}
         tabIndex="-1"
         ref={dialogRef}
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <button type="button" className="image-viewer-close" aria-label="Close image" onClick={onClose}>
+        <button type="button" className="image-viewer-close" aria-label={t('app.closeImage')} onClick={onClose}>
           <Icon name="close" size={20} />
         </button>
         <img className="image-viewer-img" src={src} alt={alt} />

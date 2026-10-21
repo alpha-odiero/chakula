@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 
 import { slugify as slugifyCategory } from '../services/meals'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function CategoryCard({ category }) {
+  const { t } = useTranslation()
   const str = category.name ?? category.strCategory
   const slug = str ? slugifyCategory(str) : ''
   const thumb = category.image ?? category.strCategoryThumb
@@ -27,7 +29,7 @@ function CategoryCard({ category }) {
           <p className="category-card-desc">{description}</p>
         )}
         <span className="category-card-cta">
-          Browse meals
+          {t('categories.browseMeals')}
           <svg className="category-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M5 12h14m-6-6 6 6-6 6" />
           </svg>

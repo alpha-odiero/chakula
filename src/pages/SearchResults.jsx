@@ -7,10 +7,12 @@ import EmptyState from '../components/EmptyState'
 import PageHeader from '../components/PageHeader'
 import Icon from '../components/Icon'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 import { searchMeals } from '../services/mealdb'
 import { useDebouncedValue } from '../hooks/useDebounce'
 
 function SearchResults() {
+  const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   const query = searchParams.get('q') || ''
@@ -51,21 +53,22 @@ function SearchResults() {
   }, [results.data, sort])
 
   useSeo({
-    title: query ? `Search results for "${query}" — Pikawise` : 'Search recipes — Pikawise',
-    description: query
-      ? `Recipes matching "${query}" on Pikawise.`
-      : 'Search recipes by meal name or ingredient on Pikawise.',
+    title: query ? t('search.seo.title', { query }) : t('search.seo.defaultTitle'),
+    description: query ? t('search.seo.description', { query }) : t('search.seo.defaultDescription'),
     path: '/search',
     robots: 'noindex,follow'
   })
 
   return (
     <main className="search-page">
-      <PageHeader eyebrow="Search" title={query ? `Search results for "${query}"` : 'Search meals'}>
+      <PageHeader
+        eyebrow={t('search.eyebrow')}
+        title={query ? t('search.title', { query }) : t('search.defaultTitle')}
+      >
         <div className="explore-search">
           <SearchBar
             defaultValue={query}
-            placeholder="Search meals, ingredients, cuisine…"
+            placeholder={t('common.searchPlaceholder')}
             onSearch={updateQuery}
           />
         </div>
@@ -76,26 +79,26 @@ function SearchResults() {
           <div className="results-head-info">
             {!results.loading && results.data && (
               <span className="results-count" role="status">
-                {results.data.length} {results.data.length === 1 ? 'meal found' : 'meals found'}
+                {t('search.resultCount', { count: results.data.length })}
               </span>
             )}
           </div>
           {results.data && results.data.length > 1 && (
             <label className="sort-control">
-              <span className="visually-hidden">Sort results</span>
+              <span className="visually-hidden">{t('search.sortLabel')}</span>
               <Icon name="chevronDown" size={16} />
-              <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort results">
-                <option value="relevance">Sort: Relevance</option>
-                <option value="name">Sort: Name (A–Z)</option>
-                <option value="category">Sort: Category</option>
+              <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label={t('search.sortLabel')}>
+                <option value="relevance">{t('search.sortRelevance')}</option>
+                <option value="name">{t('search.sortName')}</option>
+                <option value="category">{t('search.sortCategory')}</option>
               </select>
             </label>
           )}
         </div>
         {!query && (
           <EmptyState
-            title="Try a search"
-            message="Search for a meal name or ingredient, like chicken, rice, beef, pasta, or fish."
+            title={t('search.emptyTitle')}
+            message={t('search.emptyMessage')}
             icon={<Icon name="search" size={40} />}
           />
         )}
@@ -111,15 +114,15 @@ function SearchResults() {
         )}
         {query && !results.loading && !results.error && sortedData.length === 0 && (
           <EmptyState
-            title="No meals found"
-            message="Try another ingredient or meal name."
+            title={t('search.noMealsTitle')}
+            message={t('search.noMealsMessage')}
             action={
               <button
                 type="button"
                 className="button button--primary"
                 onClick={() => navigate('/explore')}
               >
-                Explore meals
+                {t('common.exploreMeals')}
               </button>
             }
           />

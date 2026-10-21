@@ -3,22 +3,29 @@ import LoadingSkeleton from './LoadingSkeleton'
 import EmptyState from './EmptyState'
 import ErrorState from './ErrorState'
 import { getErrorMessage } from '../hooks/useApi'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function MealGrid({
   meals,
   loading = false,
   error = null,
-  emptyTitle = 'No recipes found',
-  emptyMessage = 'Try a different search.',
+  emptyTitle = null,
+  emptyMessage = null,
   onRetry,
   fallbackCategory = null,
   fallbackArea = null,
   className = '',
   skeletonCount = 4
 }) {
+  const { t } = useTranslation()
+
   if (loading) {
     return (
-      <div className={`meal-grid ${className}`.trim()} role="status" aria-label="Loading recipes">
+      <div
+        className={`meal-grid ${className}`.trim()}
+        role="status"
+        aria-label={t('mealGrid.loadingRecipes')}
+      >
         {Array.from({ length: skeletonCount }).map((_, i) => (
           <LoadingSkeleton key={i} variant="meal" />
         ))}
@@ -31,7 +38,12 @@ function MealGrid({
   }
 
   if (!meals || meals.length === 0) {
-    return <EmptyState title={emptyTitle} message={emptyMessage} />
+    return (
+      <EmptyState
+        title={emptyTitle ?? t('mealGrid.emptyTitle')}
+        message={emptyMessage ?? t('mealGrid.emptyMessage')}
+      />
+    )
   }
 
   const uniqueMeals = []

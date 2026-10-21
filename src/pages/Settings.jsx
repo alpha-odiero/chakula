@@ -17,21 +17,23 @@ import {
 import { getIOSDevice } from '../utils/platform'
 import { APP_VERSION } from '../config/app'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 
 const DIET_OPTIONS = [
-  { value: 'any', label: 'No preference' },
-  { value: 'vegetarian', label: 'Vegetarian' },
-  { value: 'high-protein', label: 'High-protein' },
-  { value: 'lower-meat', label: 'Lower-meat' }
+  { value: 'any' },
+  { value: 'vegetarian' },
+  { value: 'high-protein' },
+  { value: 'lower-meat' }
 ]
 const TIME_OPTIONS = [
-  { value: 'any', label: 'Any' },
-  { value: 'quick', label: 'Under 30 minutes' },
-  { value: 'moderate', label: 'Under 60 minutes' },
-  { value: 'longer', label: 'Time is not a problem' }
+  { value: 'any' },
+  { value: 'quick' },
+  { value: 'moderate' },
+  { value: 'longer' }
 ]
 
 function TagField({ id, label, hint, values, onChange, placeholder }) {
+  const { t } = useTranslation()
   const [draft, setDraft] = useState('')
 
   const addFromDraft = () => {
@@ -67,7 +69,7 @@ function TagField({ id, label, hint, values, onChange, placeholder }) {
               <button
                 type="button"
                 className="chip-remove"
-                aria-label={`Remove ${value}`}
+                aria-label={t('a11y.removeTag', { name: value })}
                 onClick={() => onChange(values.filter((item) => item !== value))}
               >
                 <Icon name="close" size={13} />
@@ -87,7 +89,7 @@ function TagField({ id, label, hint, values, onChange, placeholder }) {
           onBlur={addFromDraft}
         />
         <button type="button" className="button button--secondary" onClick={addFromDraft}>
-          Add
+          {t('common.add')}
         </button>
       </div>
     </div>
@@ -95,9 +97,10 @@ function TagField({ id, label, hint, values, onChange, placeholder }) {
 }
 
 function Settings() {
+  const { t, locale, setLocale, locales } = useTranslation()
   useSeo({
-    title: 'Settings — Pikawise',
-    description: 'Appearance, dietary preferences, reminders and data settings for Pikawise.',
+    title: t('settings.seoTitle'),
+    description: t('settings.seoDescription'),
     path: '/settings',
     robots: 'noindex,follow'
   })
@@ -113,11 +116,19 @@ function Settings() {
 
   const showMessage = (text, variant = 'success') => toast.notify(text, { variant })
 
+  const handleLanguageChange = (event) => {
+    const next = event.target.value
+    if (!next) return
+    setLocale(next)
+    const meta = locales.find((l) => l.code === next)
+    if (meta) showMessage(t('settings.languageChanged', { language: meta.native }))
+  }
+
   const handleInstall = async () => {
     const ok = await install()
     if (!ok) {
       if (getIOSDevice() && !isInstalled) setIosGuide(true)
-      else showMessage('Installation is not available in this browser right now.', 'info')
+      else showMessage(t('settings.installUnavailableToast'), 'info')
     }
   }
 
@@ -125,7 +136,7 @@ function Settings() {
     clearMealPlans()
     clearShoppingChecks()
     setClearAllConfirm(false)
-    showMessage('Saved plans cleared.')
+    showMessage(t('settings.savedPlansClearedToast'))
   }
 
   const handleCheckForUpdates = async () => {
@@ -134,15 +145,15 @@ function Settings() {
       const registration = await navigator.serviceWorker?.getRegistration()
       if (!registration || !registration.update) {
         setUpdateState('error')
-        showMessage('Could not check for updates.', 'error')
+        showMessage(t('settings.updateCheckFailedToast'), 'error')
         return
       }
       await registration.update()
       setUpdateState('current')
-      showMessage('Pikawise is up to date.')
+      showMessage(t('settings.upToDateToast'))
     } catch {
       setUpdateState('error')
-      showMessage('Could not check for updates. You may be offline.', 'error')
+      showMessage(t('settings.updateCheckOfflineToast'), 'error')
     }
   }
 
@@ -151,19 +162,19 @@ function Settings() {
       const keys = await caches.keys()
       await Promise.all(keys.map((key) => caches.delete(key)))
       setClearCheckConfirm(false)
-      showMessage(`Cleared ${keys.length} cached file set${keys.length === 1 ? '' : 's'}.`)
+      showMessage(t('settings.cachedFilesCleared', { count: keys.length }))
     } catch {
       setClearCheckConfirm(false)
-      showMessage('Could not clear cached data.', 'error')
+      showMessage(t('settings.clearCacheFailedToast'), 'error')
     }
   }
 
   return (
     <main className="settings-page">
       <PageHeader
-        eyebrow="Settings"
-        title="Settings"
-        subtitle="Manage how Pikawise looks, plans your meals, and stores data on this device."
+        eyebrow={t('settings.eyebrow')}
+        title={t('settings.title')}
+        subtitle={t('settings.subtitle')}
       />
       <section className="container settings-body">
         <div className="settings-hero">
@@ -177,34 +188,64 @@ function Settings() {
           />
           <div className="settings-hero-info">
             <h2 className="settings-hero-name">Pikawise</h2>
-            <p className="settings-hero-tagline">Discover meals. Cook with what you have.</p>
+            <p className="settings-hero-tagline">{t('common.tagline')}</p>
             <span className="settings-hero-version">
               <Icon name="check" size={13} />
-              Version {APP_VERSION}
+              {t('settings.version', { version: APP_VERSION })}
             </span>
           </div>
         </div>
 
+        {/* ---- Language ---- */}
+        <div className="settings-group">
+          <h2 className="settings-group-title">
+            <span className="settings-group-icon">
+              <Icon name="globe" size={17} />
+            </span>
+            {t('settings.languageGroup')}
+          </h2>
+          <div className="settings-row settings-row--wrap">
+            <div>
+              <p className="settings-label">{t('settings.languageLabel')}</p>
+              <p className="settings-hint">{t('settings.languageHint')}</p>
+            </div>
+            <select
+              id="settings-language"
+              className="settings-select"
+              value={locale}
+              onChange={handleLanguageChange}
+              aria-label={t('settings.languageAria')}
+            >
+              {locales.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.native}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* ---- Appearance ---- */}
         <div className="settings-group">
           <h2 className="settings-group-title">
             <span className="settings-group-icon">
               <Icon name="sliders" size={17} />
             </span>
-            Appearance
+            {t('settings.appearanceGroup')}
           </h2>
           <div className="settings-row">
             <div>
-              <p className="settings-label">Theme</p>
-              <p className="settings-hint">Follow your device or pick a look.</p>
+              <p className="settings-label">{t('settings.themeLabel')}</p>
+              <p className="settings-hint">{t('settings.themeHint')}</p>
             </div>
-            <div className="segmented" role="group" aria-label="Theme">
+            <div className="segmented" role="group" aria-label={t('settings.themeLabel')}>
               <button
                 type="button"
                 className={theme === 'light' ? 'segmented-btn segmented-btn--active' : 'segmented-btn'}
                 aria-pressed={theme === 'light'}
                 onClick={() => setTheme('light')}
               >
-                <Icon name="sun" size={15} /> Light
+                <Icon name="sun" size={15} /> {t('settings.themeLight')}
               </button>
               <button
                 type="button"
@@ -212,7 +253,7 @@ function Settings() {
                 aria-pressed={theme === 'dark'}
                 onClick={() => setTheme('dark')}
               >
-                <Icon name="moon" size={15} /> Dark
+                <Icon name="moon" size={15} /> {t('settings.themeDark')}
               </button>
               <button
                 type="button"
@@ -220,21 +261,21 @@ function Settings() {
                 aria-pressed={theme === 'system'}
                 onClick={() => setTheme('system')}
               >
-                System
+                {t('settings.themeSystem')}
               </button>
             </div>
           </div>
 
           <div className="settings-row">
             <div>
-              <p className="settings-label">Reduce motion</p>
-              <p className="settings-hint">Turn off decorative animations and transitions.</p>
+              <p className="settings-label">{t('settings.reduceMotionLabel')}</p>
+              <p className="settings-hint">{t('settings.reduceMotionHint')}</p>
             </div>
             <button
               type="button"
               className={`toggle${preferences.reduceMotion ? ' toggle--on' : ''}`}
               role="switch"
-              aria-label="Reduce motion"
+              aria-label={t('settings.reduceMotionLabel')}
               aria-checked={preferences.reduceMotion}
               onClick={() => update({ reduceMotion: !preferences.reduceMotion })}
             >
@@ -248,14 +289,14 @@ function Settings() {
             <span className="settings-group-icon">
               <Icon name="leaf" size={17} />
             </span>
-            Meal preferences
+            {t('settings.preferencesGroup')}
           </h2>
           <div className="settings-row">
             <div>
-              <p className="settings-label">Planned meals per day</p>
-              <p className="settings-hint">Pikawise pre-fills your meal plan with this many meals.</p>
+              <p className="settings-label">{t('settings.mealsPerDayLabel')}</p>
+              <p className="settings-hint">{t('settings.mealsPerDayHint')}</p>
             </div>
-            <div className="segmented" role="group" aria-label="Meals per day">
+            <div className="segmented" role="group" aria-label={t('settings.mealsPerDayAria')}>
               {[2, 3, 4].map((opt) => (
                 <button
                   type="button"
@@ -271,7 +312,7 @@ function Settings() {
           </div>
 
           <div className="settings-field">
-            <p className="settings-label">Dietary preference</p>
+            <p className="settings-label">{t('settings.dietLabel')}</p>
             <div className="settings-chip-row">
               {DIET_OPTIONS.map((opt) => (
                 <button
@@ -281,14 +322,14 @@ function Settings() {
                   aria-pressed={preferences.dietaryPreference === opt.value}
                   onClick={() => update({ dietaryPreference: opt.value })}
                 >
-                  {opt.label}
+                  {t(`settings.diet.${opt.value}`)}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="settings-field">
-            <p className="settings-label">Cooking time</p>
+            <p className="settings-label">{t('settings.cookingTimeLabel')}</p>
             <div className="settings-chip-row">
               {TIME_OPTIONS.map((opt) => (
                 <button
@@ -298,7 +339,7 @@ function Settings() {
                   aria-pressed={preferences.cookingTime === opt.value}
                   onClick={() => update({ cookingTime: opt.value })}
                 >
-                  {opt.label}
+                  {t(`settings.time.${opt.value}`)}
                 </button>
               ))}
             </div>
@@ -306,44 +347,42 @@ function Settings() {
 
           <TagField
             id="settings-allergies"
-            label="Allergies"
-            hint="Ingredient ideas containing these are hidden from reminders."
+            label={t('settings.allergiesLabel')}
+            hint={t('settings.allergiesHint')}
             values={preferences.allergies || []}
             onChange={(allergies) => update({ allergies })}
-            placeholder="e.g. peanuts, shellfish"
+            placeholder={t('settings.allergiesPlaceholder')}
           />
 
           <TagField
             id="settings-excluded"
-            label="Ingredients to avoid"
-            hint="Reminder suggestions skip these ingredients."
+            label={t('settings.excludedLabel')}
+            hint={t('settings.excludedHint')}
             values={preferences.excludedIngredients || []}
             onChange={(excludedIngredients) => update({ excludedIngredients })}
-            placeholder="e.g. mushrooms"
+            placeholder={t('settings.excludedPlaceholder')}
           />
 
           <TagField
             id="settings-cuisines"
-            label="Preferred cuisines"
-            hint="Reminders lean toward these cuisines when possible."
+            label={t('settings.cuisinesLabel')}
+            hint={t('settings.cuisinesHint')}
             values={preferences.preferredCuisines || []}
             onChange={(preferredCuisines) => update({ preferredCuisines })}
-            placeholder="e.g. Italian, Thai"
+            placeholder={t('settings.cuisinesPlaceholder')}
           />
 
           <div className="settings-row">
             <div>
-              <p className="settings-label">Reset meal preferences</p>
-              <p className="settings-hint">
-                Return meals, diet, cooking time, and motion settings to defaults.
-              </p>
+              <p className="settings-label">{t('settings.resetPrefsLabel')}</p>
+              <p className="settings-hint">{t('settings.resetPrefsHint')}</p>
             </div>
             <button
               type="button"
               className="button button--secondary"
               onClick={() => setReducedPrefsConfirm(true)}
             >
-              Reset
+              {t('common.reset')}
             </button>
           </div>
         </div>
@@ -355,13 +394,13 @@ function Settings() {
             <span className="settings-group-icon">
               <Icon name="database" size={17} />
             </span>
-            My Stuff
+            {t('settings.myStuffGroup')}
           </h2>
           <div className="settings-row">
             <div>
-              <p className="settings-label">Clear saved plans &amp; check-offs</p>
+              <p className="settings-label">{t('settings.clearPlansLabel')}</p>
               <p className="settings-hint">
-                {getMealPlans().length} meal plan{getMealPlans().length === 1 ? '' : 's'} saved.
+                {t('settings.clearPlansHint', { count: getMealPlans().length })}
               </p>
             </div>
             <button
@@ -369,32 +408,28 @@ function Settings() {
               className="button button--danger"
               onClick={() => setClearAllConfirm(true)}
             >
-              Clear
+              {t('common.clear')}
             </button>
           </div>
 
           <div className="settings-row">
             <div>
-              <p className="settings-label">Clear cached data</p>
-              <p className="settings-hint">
-                Removes cached recipe responses. App stays usable offline.
-              </p>
+              <p className="settings-label">{t('settings.clearCacheLabel')}</p>
+              <p className="settings-hint">{t('settings.clearCacheHint')}</p>
             </div>
             <button
               type="button"
               className="button button--secondary"
               onClick={() => setClearCheckConfirm(true)}
             >
-              Clear
+              {t('common.clear')}
             </button>
           </div>
 
           <div className="settings-row">
             <div>
-              <p className="settings-label">Check for updates</p>
-              <p className="settings-hint">
-                Checks the installed app for newer updates.
-              </p>
+              <p className="settings-label">{t('settings.checkUpdatesLabel')}</p>
+              <p className="settings-hint">{t('settings.checkUpdatesHint')}</p>
             </div>
             <button
               type="button"
@@ -402,7 +437,7 @@ function Settings() {
               onClick={handleCheckForUpdates}
               disabled={updateState === 'checking'}
             >
-              {updateState === 'checking' ? 'Checking…' : 'Check'}
+              {updateState === 'checking' ? t('settings.checkUpdatesChecking') : t('settings.checkUpdatesCheck')}
             </button>
           </div>
         </div>
@@ -412,15 +447,13 @@ function Settings() {
             <span className="settings-group-icon">
               <Icon name="install" size={17} />
             </span>
-            Application
+            {t('settings.applicationGroup')}
           </h2>
           <div className="settings-row">
             <div>
-              <p className="settings-label">Install Pikawise</p>
+              <p className="settings-label">{t('settings.installLabel')}</p>
               <p className="settings-hint">
-                {isInstalled
-                  ? 'Pikawise is installed on this device.'
-                  : 'Install Pikawise to open it like a native app.'}
+                {isInstalled ? t('settings.installHintInstalled') : t('settings.installHint')}
               </p>
             </div>
             <button
@@ -429,17 +462,17 @@ function Settings() {
               onClick={handleInstall}
               disabled={isInstalled && !canInstall}
             >
-              {isInstalled ? 'Installed' : 'Install'}
+              {isInstalled ? t('settings.installed') : t('settings.install')}
             </button>
           </div>
 
           {iosGuide && (
             <div className="settings-guide" role="note">
-              <h3>To install Pikawise on iOS:</h3>
+              <h3>{t('settings.iosGuideTitle')}</h3>
               <ol>
-                <li>Tap the Share button</li>
-                <li>Select “Add to Home Screen”</li>
-                <li>Tap Add</li>
+                <li>{t('settings.iosGuideStep1')}</li>
+                <li>{t('settings.iosGuideStep2')}</li>
+                <li>{t('settings.iosGuideStep3')}</li>
               </ol>
             </div>
           )}
@@ -450,23 +483,23 @@ function Settings() {
             <span className="settings-group-icon">
               <Icon name="info" size={17} />
             </span>
-            Information
+            {t('settings.informationGroup')}
           </h2>
-          <nav className="settings-links" aria-label="Information">
+          <nav className="settings-links" aria-label={t('settings.informationGroup')}>
             <Link to="/terms#about" className="settings-link">
-              About Pikawise
+              {t('settings.linkAbout')}
               <Icon name="arrowRight" size={16} />
             </Link>
             <Link to="/terms#privacy" className="settings-link">
-              Privacy Policy
+              {t('settings.linkPrivacy')}
               <Icon name="arrowRight" size={16} />
             </Link>
             <Link to="/terms#cookies" className="settings-link">
-              Cookies
+              {t('settings.linkCookies')}
               <Icon name="arrowRight" size={16} />
             </Link>
             <Link to="/terms" className="settings-link">
-              Terms
+              {t('settings.linkTerms')}
               <Icon name="arrowRight" size={16} />
             </Link>
           </nav>
@@ -475,9 +508,9 @@ function Settings() {
 
       {clearAllConfirm && (
         <ConfirmDialog
-          title="Clear saved plans?"
-          message="All saved meal plans and their shopping check-offs on this device will be removed."
-          confirmLabel="Clear all"
+          title={t('settings.confirmClearPlansTitle')}
+          message={t('settings.confirmClearPlansMessage')}
+          confirmLabel={t('common.clearAll')}
           onConfirm={handleClearData}
           onCancel={() => setClearAllConfirm(false)}
         />
@@ -485,9 +518,9 @@ function Settings() {
 
       {clearCheckConfirm && (
         <ConfirmDialog
-          title="Clear cached data?"
-          message="Recipe responses cached for offline use will be removed. The app stays usable."
-          confirmLabel="Clear cache"
+          title={t('settings.confirmClearCacheTitle')}
+          message={t('settings.confirmClearCacheMessage')}
+          confirmLabel={t('settings.confirmClearCacheConfirm')}
           onConfirm={handleClearCachedData}
           onCancel={() => setClearCheckConfirm(false)}
         />
@@ -495,13 +528,13 @@ function Settings() {
 
       {reducedPrefsConfirm && (
         <ConfirmDialog
-          title="Reset preferences?"
-          message="Your meal preferences and onboarding choices will be reset."
-          confirmLabel="Reset"
+          title={t('settings.confirmResetTitle')}
+          message={t('settings.confirmResetMessage')}
+          confirmLabel={t('common.reset')}
           onConfirm={() => {
             update({ mealsPerDay: 3, cookingTime: 'any', dietaryPreference: 'any', reduceMotion: false })
             setReducedPrefsConfirm(false)
-            showMessage('Preferences reset.')
+            showMessage(t('settings.preferencesResetToast'))
           }}
           onCancel={() => setReducedPrefsConfirm(false)}
         />

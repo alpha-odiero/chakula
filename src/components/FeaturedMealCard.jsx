@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import Icon from './Icon'
+import { useTranslation } from '../i18n/LocaleContext'
 
-function FeaturedMealCard({ meal, eyebrow = "TODAY'S INSPIRATION" }) {
+function FeaturedMealCard({ meal, eyebrow = null }) {
+  const { t } = useTranslation()
   if (!meal) return null
 
   const id = meal.id ?? meal.idMeal
@@ -14,13 +16,15 @@ function FeaturedMealCard({ meal, eyebrow = "TODAY'S INSPIRATION" }) {
   return (
     <article className="featured-card">
       <div className="featured-card-body">
-        <p className="featured-card-eyebrow">{eyebrow}</p>
+        <p className="featured-card-eyebrow">{eyebrow ?? t('mealCard.featured.eyebrow')}</p>
         <h2 className="featured-card-title">{name}</h2>
         <p className="featured-card-text">
-          {meta ? `${meta} — ready when you are.` : 'A fresh idea to cook today.'}
+          {meta
+            ? t('mealCard.featured.readyText', { meta })
+            : t('mealCard.featured.fallbackText')}
         </p>
         <Link to={`/meal/${id}`} className="button button--primary featured-card-cta">
-          View recipe
+          {t('common.viewRecipe')}
           <Icon name="arrowRight" size={17} />
         </Link>
       </div>

@@ -9,11 +9,28 @@ import { useToast } from '../components/Toast'
 import { getMealPlans, removeMealPlan, clearMealPlans } from '../utils/storage'
 import { supportsWebShare, supportsClipboard } from '../utils/platform'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
+
+// Slot names come from a shared planner config, so they are resolved at the
+// render site instead of being baked into the plan data.
+const SLOT_KEYS = {
+  breakfast: 'config.slot.breakfast',
+  lunch: 'config.slot.lunch',
+  dinner: 'config.slot.dinner',
+  snack: 'config.slot.snack'
+}
+
+function slotLabel(slot, t) {
+  const raw = slot?.slot || slot?.type || ''
+  const key = SLOT_KEYS[String(raw).toLowerCase()]
+  return key ? t(key) : raw
+}
 
 function MealPlans() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Your meal plans — Pikawise',
-    description: 'Meal plans saved on this device, with ingredients and shopping lists.',
+    title: t('plans.seoTitle'),
+    description: t('plans.seoDescription'),
     path: '/meal-plans',
     robots: 'noindex,follow'
   })
@@ -30,21 +47,21 @@ function MealPlans() {
     setPlans(next)
     setConfirmDelete(null)
     if (expandedId === id) setExpandedId(null)
-    showMessage('Plan deleted.')
+    showMessage(t('plans.deletedToast'))
   }
 
   const handleClearAll = () => {
     setPlans(clearMealPlans())
     setConfirmDeleteAll(false)
     setExpandedId(null)
-    showMessage('All plans cleared.')
+    showMessage(t('plans.clearedToast'))
   }
 
   const copyPlan = async (plan) => {
-    const text = formatPlanText(plan)
+    const text = formatPlanText(plan, t)
     if (supportsWebShare()) {
       try {
-        await navigator.share({ title: plan.label || 'Meal Plan', text })
+        await navigator.share({ title: plan.label || t('plans.defaultTitle'), text })
         return
       } catch {
         /* fall back to copy */
@@ -53,7 +70,7 @@ function MealPlans() {
     if (supportsClipboard()) {
       try {
         await navigator.clipboard.writeText(text)
-        showMessage('Plan copied!')
+        showMessage(t('plans.copiedToast'))
         return
       } catch {
         /* fall through */
@@ -66,36 +83,31 @@ function MealPlans() {
       textArea.select()
       document.execCommand('copy')
       document.body.removeChild(textArea)
-      showMessage('Plan copied!')
+      showMessage(t('plans.copiedToast'))
     } catch {
-      showMessage('Could not copy the plan.', 'error')
+      showMessage(t('plans.copyFailedToast'), 'error')
     }
   }
 
   return (
     <main className="about-page">
-      <PageHeader eyebrow="Meal Plans" title="Your Saved Plans">
-        <p className="page-subtitle">
-          Saved plans are stored on this device. Open a plan to see its meals and shopping list.
-        </p>
+      <PageHeader eyebrow={t('plans.eyebrow')} title={t('plans.title')}>
+        <p className="page-subtitle">{t('plans.subtitle')}</p>
       </PageHeader>
 
       <section className="container">
         {plans.length === 0 ? (
-          <EmptyState
-            title="No saved plans yet"
-            message="Build a balanced meal plan and save it — it'll stay here until you need it."
-          >
+          <EmptyState title={t('plans.emptyTitle')} message={t('plans.emptyMessage')}>
             <Link to="/balanced-diet" className="button button--primary">
-              <Icon name="sparkles" size={18} /> Build a Meal Plan
+              <Icon name="sparkles" size={18} /> {t('common.buildMealPlan')}
             </Link>
           </EmptyState>
         ) : (
           <>
             <div className="plan-toolbar">
-              <p className="plan-count">{plans.length} saved plan{plans.length === 1 ? '' : 's'}</p>
+              <p className="plan-count">{t('plans.savedCount', { count: plans.length })}</p>
               <button type="button" className="button button--ghost button--small" onClick={() => setConfirmDeleteAll(true)}>
-                Clear all
+                {t('common.clearAll')}
               </button>
             </div>
 
@@ -112,17 +124,18 @@ function MealPlans() {
                     >
                       <span className="saved-plan-index">{String(index + 1).padStart(2, '0')}</span>
                       <span className="saved-plan-heading">
-                        <strong>{plan.label || `${plan.days}-Day Meal Plan`}</strong>
+                        <strong>{plan.label || t('common.dayMealPlan', { days: plan.days })}</strong>
                         <span>
-                          {plan.days} day{plan.days > 1 ? 's' : ''} · {plan.mealsPerDay} meals/day ·{' '}
-                          {plan.ingredients.length} ingredient{plan.ingredients.length === 1 ? '' : 's'}
+                          {plan.days} {t('common.day', { count: plan.days })} ·{' '}
+                          {t('plans.summary.mealsPerDay', { count: plan.mealsPerDay })} ·{' '}
+                          {plan.ingredients.length} {t('common.ingredient', { count: plan.ingredients.length })}
                         </span>
                       </span>
                       <span className="plan-actions">
                         <button
                           type="button"
                           className="icon-button"
-                          aria-label="Copy this plan"
+                          aria-label={t('plans.copyPlanAria')}
                           onClick={(e) => {
                             e.stopPropagation()
                             copyPlan(plan)
@@ -133,7 +146,7 @@ function MealPlans() {
                         <button
                           type="button"
                           className="icon-button"
-                          aria-label="Delete this plan"
+                          aria-label={t('plans.deletePlanAria')}
                           onClick={(e) => {
                             e.stopPropagation()
                             setConfirmDelete(plan.id)
@@ -149,7 +162,7 @@ function MealPlans() {
                       <div className="saved-plan-detail">
                         {plan.meals.map((day) => (
                           <div key={day.day} className="saved-plan-day">
-                            <h4>Day {day.day}</h4>
+                            <h4>{t('common.day', { n: day.day })}</h4>
                             <ul className="saved-plan-meals">
                               {day.meals.map((slot) => (
                                 <li key={(slot.meal.id ?? slot.meal.idMeal) + slot.slot}>
@@ -162,7 +175,7 @@ function MealPlans() {
                                     height="48"
                                   />
                                   <span>
-                                    <strong>{slot.slot}</strong>
+                                    <strong>{slotLabel(slot, t)}</strong>
                                     <Link to={`/meal/${slot.meal.id ?? slot.meal.idMeal}`}>{slot.meal.name ?? slot.meal.strMeal}</Link>
                                   </span>
                                 </li>
@@ -183,9 +196,9 @@ function MealPlans() {
 
       {confirmDelete && (
         <ConfirmDialog
-          title="Delete this meal plan?"
-          message="You won't be able to undo this."
-          confirmLabel="Delete plan"
+          title={t('plans.deleteTitle')}
+          message={t('plans.deleteMessage')}
+          confirmLabel={t('plans.deleteConfirm')}
           onConfirm={() => handleDelete(confirmDelete)}
           onCancel={() => setConfirmDelete(null)}
         />
@@ -193,9 +206,9 @@ function MealPlans() {
 
       {confirmDeleteAll && (
         <ConfirmDialog
-          title="Clear all saved plans?"
-          message="All saved meal plans on this device will be removed."
-          confirmLabel="Clear all"
+          title={t('plans.clearAllTitle')}
+          message={t('plans.clearAllMessage')}
+          confirmLabel={t('common.clearAll')}
           onConfirm={handleClearAll}
           onCancel={() => setConfirmDeleteAll(false)}
         />
@@ -204,12 +217,12 @@ function MealPlans() {
   )
 }
 
-function formatPlanText(plan) {
-  const lines = [plan.label || `Your ${plan.days}-Day Meal Plan`]
+function formatPlanText(plan, t) {
+  const lines = [plan.label || t('plans.yourPlanTitle', { days: plan.days })]
   plan.meals.forEach((day) => {
-    lines.push(`\nDay ${day.day}`)
+    lines.push(`\n${t('common.day', { n: day.day })}`)
     day.meals.forEach((slot) => {
-      lines.push(`${slot.slot}: ${slot.meal.name ?? slot.meal.strMeal}`)
+      lines.push(`${slotLabel(slot, t)}: ${slot.meal.name ?? slot.meal.strMeal}`)
     })
   })
   return lines.join('\n')

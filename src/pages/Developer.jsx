@@ -2,25 +2,45 @@ import PageHeader from '../components/PageHeader'
 import Icon from '../components/Icon'
 import { DEVELOPER } from '../config/developer'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 
 const LINKS = [
-  { key: 'portfolio', label: 'Portfolio', icon: 'briefcase' },
+  { key: 'portfolio', label: 'Portfolio', labelKey: 'developer.links.portfolio', icon: 'briefcase' },
   { key: 'github', label: 'GitHub', icon: 'leaf' },
   { key: 'linkedin', label: 'LinkedIn', icon: 'user' }
 ]
 
+// The bio and the "why" copy live in src/config/developer.js. They are mapped
+// to dictionary keys here so the page can be translated without touching the
+// config; anything unknown falls back to the original English text.
+const COPY_KEYS = {
+  [DEVELOPER.bio]: 'developer.bio',
+  [DEVELOPER.why]: 'developer.why'
+}
+
+const INTEREST_KEYS = {
+  'Full-Stack Development': 'developer.interest.fullStack',
+  'Backend Engineering': 'developer.interest.backend',
+  'AI Automation': 'developer.interest.ai',
+  'DevOps': 'developer.interest.devops',
+  'Cybersecurity': 'developer.interest.cybersecurity',
+  'Digital Product Design': 'developer.interest.productDesign'
+}
+
 function Developer() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'About the developer — Pikawise',
-    description:
-      'Pikawise is built by Alpha Odiero, a software engineer focused on useful, secure and scalable products.',
+    title: t('developer.seoTitle'),
+    description: t('developer.seoDescription'),
     path: '/developer'
   })
   const hasLinks = LINKS.some((link) => Boolean(DEVELOPER[link.key]))
+  const bioKey = COPY_KEYS[DEVELOPER.bio]
+  const whyKey = COPY_KEYS[DEVELOPER.why]
 
   return (
     <main className="developer-page">
-      <PageHeader eyebrow="Developer" title="Built by Alpha Odiero">
+      <PageHeader eyebrow={t('developer.eyebrow')} title={t('developer.title')}>
         <p className="page-subtitle">{DEVELOPER.tagline}</p>
       </PageHeader>
 
@@ -37,33 +57,36 @@ function Developer() {
 
         <div className="developer-section">
           <h2 className="settings-group-title">
-            <Icon name="info" size={20} /> About
+            <Icon name="info" size={20} /> {t('developer.about')}
           </h2>
-          <p className="developer-text">{DEVELOPER.bio}</p>
+          <p className="developer-text">{bioKey ? t(bioKey) : DEVELOPER.bio}</p>
         </div>
 
         <div className="developer-section">
           <h2 className="settings-group-title">
-            <Icon name="sparkles" size={20} /> Why Pikawise
+            <Icon name="sparkles" size={20} /> {t('developer.whyTitle')}
           </h2>
-          <p className="developer-text">{DEVELOPER.why}</p>
+          <p className="developer-text">{whyKey ? t(whyKey) : DEVELOPER.why}</p>
         </div>
 
         <div className="developer-section">
           <h2 className="settings-group-title">
-            <Icon name="bolt" size={20} /> Interests
+            <Icon name="bolt" size={20} /> {t('developer.interests')}
           </h2>
           <ul className="developer-interests">
-            {DEVELOPER.interests.map((interest) => (
-              <li key={interest} className="chip">{interest}</li>
-            ))}
+            {DEVELOPER.interests.map((interest) => {
+              const interestKey = INTEREST_KEYS[interest]
+              return (
+                <li key={interest} className="chip">{interestKey ? t(interestKey) : interest}</li>
+              )
+            })}
           </ul>
         </div>
 
         {hasLinks && (
           <div className="developer-section">
             <h2 className="settings-group-title">
-              <Icon name="link" size={20} /> Connect
+              <Icon name="link" size={20} /> {t('developer.connect')}
             </h2>
             <div className="developer-links">
               {LINKS.filter((link) => Boolean(DEVELOPER[link.key])).map((link) => (
@@ -75,7 +98,7 @@ function Developer() {
                   rel="noopener noreferrer"
                 >
                   <Icon name={link.icon} size={16} />
-                  {link.label}
+                  {link.labelKey ? t(link.labelKey) : link.label}
                 </a>
               ))}
             </div>
@@ -83,11 +106,7 @@ function Developer() {
         )}
 
         <div className="developer-note">
-          <p>
-            Pikawise is a free, offline-capable progressive web app. Ideas, recipe suggestions, and
-            the meal plan generator are provided for general use and are not professional dietary
-            advice.
-          </p>
+          <p>{t('developer.note')}</p>
         </div>
       </section>
     </main>

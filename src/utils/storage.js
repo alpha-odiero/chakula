@@ -13,7 +13,8 @@ const KEYS = {
   notifications: `${PREFIX}notifications`,
   notificationsAck: `${PREFIX}notifications_ack`,
   reminders: `${PREFIX}reminders`,
-  reminderLog: `${PREFIX}reminder_log`
+  reminderLog: `${PREFIX}reminder_log`,
+  locale: `${PREFIX}locale`
 }
 
 export const DEFAULT_PREFERENCES = {
@@ -73,6 +74,20 @@ export function getTheme() {
 
 export function saveTheme(theme) {
   write(KEYS.theme, theme)
+}
+
+/* ---------- Locale ---------- */
+
+// The interface language. Stored independently of the preference object so
+// switching language never touches dietary/motion/meal settings.
+export function getLocale() {
+  const value = read(KEYS.locale, null)
+  return typeof value === 'string' ? value : null
+}
+
+export function saveLocale(locale) {
+  if (!locale) return
+  write(KEYS.locale, locale)
 }
 
 /* ---------- Install prompt ---------- */

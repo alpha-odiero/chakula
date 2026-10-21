@@ -8,11 +8,13 @@ import { useReminders } from '../components/ReminderProvider'
 import { periodById } from '../config/reminders'
 import { fetchReminderSuggestions } from '../services/reminderContent'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function Reminder() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Meal reminder — Pikawise',
-    description: 'Meal suggestions for your reminder.',
+    title: t('reminder.seoTitle'),
+    description: t('reminder.seoDescription'),
     path: '/reminder',
     robots: 'noindex,follow'
   })
@@ -23,7 +25,7 @@ function Reminder() {
 
   const periodId = params.get('period') || ''
   const period = periodById(periodId)
-  const label = period?.label || 'your meal'
+  const label = period ? t(`config.period.${period.id}`) : t('config.period.default')
 
   const [meals, setMeals] = useState([])
   const [loading, setLoading] = useState(true)
@@ -59,33 +61,33 @@ function Reminder() {
   return (
     <main className="reminder-page">
       <PageHeader
-        eyebrow={period ? `${label} reminder` : 'Meal reminder'}
-        title={`What are you having for ${label.toLowerCase()}?`}
-        subtitle="Pick an idea, log your meal, or shuffle for something new."
+        eyebrow={period ? t('reminder.eyebrowPeriod', { label }) : t('reminder.eyebrow')}
+        title={t('reminder.title', { label })}
+        subtitle={t('reminder.subtitle')}
       />
       <section className="container reminder-body">
         <div className="reminder-actions">
           <button type="button" className="button button--primary" onClick={() => navigate('/random')}>
-            <Icon name="sparkles" size={16} /> Surprise me
+            <Icon name="sparkles" size={16} /> {t('common.surpriseMe')}
           </button>
           <Link to="/explore" className="button button--secondary">
-            <Icon name="globe" size={16} /> Browse ideas
+            <Icon name="globe" size={16} /> {t('reminder.browseIdeas')}
           </Link>
           <button type="button" className="button button--ghost" onClick={loadSuggestions}>
-            <Icon name="refresh" size={16} /> New ideas
+            <Icon name="refresh" size={16} /> {t('reminder.newIdeas')}
           </button>
         </div>
 
         <h2 className="reminder-section-title">
-          <Icon name="utensils" size={16} /> Ideas for {label.toLowerCase()}
+          <Icon name="utensils" size={16} /> {t('reminder.ideasFor', { label })}
         </h2>
         <MealGrid
           meals={meals}
           loading={loading}
           error={error}
           onRetry={loadSuggestions}
-          emptyTitle="No ideas right now"
-          emptyMessage="You may be offline. Try again or browse all recipes."
+          emptyTitle={t('reminder.emptyTitle')}
+          emptyMessage={t('reminder.emptyMessage')}
         />
       </section>
     </main>

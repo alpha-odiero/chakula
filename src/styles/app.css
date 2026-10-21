@@ -123,3 +123,71 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ============ Right-to-Left (RTL) Support (Arabic) ============ */
+
+[dir='rtl'] {
+  text-align: start;
+}
+
+/* Mirror directional icons only; non-directional icons and food photography stay untouched */
+[dir='rtl'] svg.icon[data-icon='arrowRight'],
+[dir='rtl'] svg.icon[data-icon='chevronLeft'],
+[dir='rtl'] svg.icon[data-icon='arrowUpRight'] {
+  transform: scaleX(-1);
+}
+
+/* Form controls & inputs */
+[dir='rtl'] input,
+[dir='rtl'] select,
+[dir='rtl'] textarea {
+  text-align: start;
+}
+
+/* Mobile drawer slide-in from the left in RTL */
+[dir='rtl'] .mobile-menu {
+  right: auto;
+  left: 0;
+  animation: slideInLeft 0.26s var(--ease-out);
+}
+
+/* Header notification panel */
+[dir='rtl'] .notif-panel {
+  right: auto;
+  left: 0;
+}
+
+/* Search bar and suggestions */
+[dir='rtl'] .search-bar {
+  padding-inline-start: 14px;
+  padding-inline-end: 6px;
+}
+
+[dir='rtl'] .search-bar--large {
+  padding-inline-start: 16px;
+}
+
+[dir='rtl'] .search-suggest-arrow {
+  margin-left: 0;
+  margin-inline-start: auto;
+}
+
+/* Meal cards badges and save button */
+[dir='rtl'] .meal-card-category {
+  left: auto;
+  right: 10px;
+}
+
+[dir='rtl'] .meal-save {
+  right: auto;
+  left: 8px;
+}
+
+/* Toast notifications on desktop */
+@media (min-width: 768px) {
+  [dir='rtl'] .toast-stack {
+    right: auto;
+    left: 24px;
+    align-items: flex-start;
+  }
+}

@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from '../i18n/LocaleContext'
 import { APP_NAME } from '../config/app'
 
 function PikawiseLoader({
   variant = 'section',
-  label = 'Loading',
+  label,
   showName,
   delay = 0,
   decorative = false,
   className = ''
 }) {
+  const { t } = useTranslation()
   const [shown, setShown] = useState(delay <= 0)
 
   useEffect(() => {
@@ -25,9 +27,10 @@ function PikawiseLoader({
 
   const withName = showName ?? variant !== 'inline'
   const classes = `pw-loader pw-loader--${variant}${className ? ` ${className}` : ''}`
+  const resolvedLabel = label === undefined ? t('a11y.loading') : label
   const statusProps = decorative
     ? { 'aria-hidden': 'true' }
-    : { role: 'status', 'aria-live': 'polite', 'aria-label': label }
+    : { role: 'status', 'aria-live': 'polite', 'aria-label': resolvedLabel }
 
   return (
     <div className={classes} {...statusProps}>

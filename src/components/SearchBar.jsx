@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Icon from './Icon'
 import { searchMeals } from '../services/mealdb'
 import { useDebouncedValue } from '../hooks/useDebounce'
+import { useTranslation } from '../i18n/LocaleContext'
 
 const MIN_QUERY_LENGTH = 2
 const MAX_SUGGESTIONS = 6
@@ -13,12 +14,13 @@ const suggestionCache = new Map()
 
 function SearchBar({
   defaultValue = '',
-  placeholder = 'Find recipes, meals or ingredients…',
+  placeholder = null,
   size = 'normal',
   onSearch = null,
   filterTo = null,
-  filterLabel = 'Open filters'
+  filterLabel = null
 }) {
+  const { t } = useTranslation()
   const [value, setValue] = useState(defaultValue)
   const [suggestions, setSuggestions] = useState([])
   const [phase, setPhase] = useState('idle') // idle | loading | ready | empty | error
@@ -190,7 +192,7 @@ function SearchBar({
       className={`search-bar search-bar--${size}`}
       onSubmit={handleSubmit}
       role="search"
-      aria-label="Search recipes"
+      aria-label={t('search.recipesLabel')}
       onBlur={handleBlur}
     >
       <span className="search-icon" aria-hidden="true">
@@ -202,8 +204,8 @@ function SearchBar({
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        aria-label="Search recipes, meals or ingredients"
+        placeholder={placeholder ?? t('common.searchPlaceholder')}
+        aria-label={t('search.inputLabel')}
         enterKeyHint="search"
         role="combobox"
         aria-expanded={showPanel}
@@ -215,10 +217,10 @@ function SearchBar({
         autoComplete="off"
       />
       <button type="submit" className="search-button">
-        Search
+        {t('common.search')}
       </button>
       {filterTo && (
-        <Link to={filterTo} className="search-filter" aria-label={filterLabel}>
+        <Link to={filterTo} className="search-filter" aria-label={filterLabel ?? t('search.openFilters')}>
           <Icon name="sliders" size={18} />
         </Link>
       )}
@@ -228,27 +230,26 @@ function SearchBar({
           {phase === 'loading' && (
             <p className="search-suggest-status" role="status">
               <span className="search-suggest-spinner" aria-hidden="true" />
-              Searching for “{trimmed}”…
+              {t('search.searchingFor', { query: trimmed })}
             </p>
           )}
 
           {phase === 'error' && (
             <div className="search-suggest-status" role="status">
-              <span>We couldn’t reach recipes right now.</span>
+              <span>{t('search.unreachable')}</span>
               <button
                 type="button"
                 className="link-button"
                 onClick={() => setRetryToken((token) => token + 1)}
               >
-                Try again
+                {t('common.retry')}
               </button>
             </div>
           )}
 
           {phase === 'empty' && (
             <p className="search-suggest-status" role="status">
-              We couldn’t find an exact match for “{trimmed}”. Try a different meal name or
-              ingredient.
+              {t('search.noExactMatch', { query: trimmed })}
             </p>
           )}
 
@@ -257,7 +258,7 @@ function SearchBar({
               className="search-suggest-list"
               id={`${baseId}-listbox`}
               role="listbox"
-              aria-label="Meal suggestions"
+              aria-label={t('search.suggestionsLabel')}
             >
               {suggestions.map((meal, index) => (
                 <li
@@ -283,7 +284,8 @@ function SearchBar({
                   <span className="search-suggest-text">
                     <span className="search-suggest-name">{meal.name}</span>
                     <span className="search-suggest-meta">
-                      {[meal.category, meal.area].filter(Boolean).join(' · ') || 'Recipe'}
+                      {[meal.category, meal.area].filter(Boolean).join(' · ') ||
+                        t('search.recipeLabel')}
                     </span>
                   </span>
                   <Icon name="arrowRight" size={16} className="search-suggest-arrow" />
@@ -304,7 +306,9 @@ function SearchBar({
                   <Icon name="search" size={16} />
                 </span>
                 <span className="search-suggest-text">
-                  <span className="search-suggest-name">See all results for “{trimmed}”</span>
+                  <span className="search-suggest-name">
+                    {t('search.seeAllResults', { query: trimmed })}
+                  </span>
                 </span>
                 <Icon name="arrowRight" size={16} className="search-suggest-arrow" />
               </li>

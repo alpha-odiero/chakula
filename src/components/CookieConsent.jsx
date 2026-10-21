@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from '../i18n/LocaleContext'
 import Icon from './Icon'
 import { hasValidCookieConsent, saveCookieConsent } from '../utils/storage'
 
 function CookieConsent() {
+  const { t } = useTranslation()
   const [consented, setConsented] = useState(() => hasValidCookieConsent())
   const [managing, setManaging] = useState(false)
 
@@ -15,24 +17,22 @@ function CookieConsent() {
   }
 
   return (
-    <aside className="cookie-consent" role="region" aria-label="Cookie notice">
+    <aside className="cookie-consent" role="region" aria-label={t('cookie.noticeLabel')}>
       <div className="cookie-consent-inner">
         <Icon name="info" size={18} className="cookie-consent-icon" />
         <div className="cookie-consent-text">
           <p>
-            Pikawise keeps your favorites, preferences, meal plans and shopping list on this device
-            only — no tracking or advertising cookies.{' '}
-            <Link to="/terms#cookies">Learn more</Link>
+            {t('cookie.notice', { app: t('common.appName') })}{' '}
+            <Link to="/terms#cookies">{t('cookie.learnMore')}</Link>
           </p>
           {managing && (
             <div className="cookie-consent-details" id="cookie-consent-details">
               <p>
-                <strong>Essential storage only:</strong> theme, saved recipes, meal plans, shopping
-                list and this consent choice. Nothing is shared with third parties.
+                <strong>{t('cookie.essentialLabel')}</strong> {t('cookie.essentialDetail')}
               </p>
               <p>
-                You can review or clear this data at any time in{' '}
-                <Link to="/settings">Settings</Link>.
+                {t('cookie.manageIntro')}{' '}
+                <Link to="/settings">{t('common.settings')}</Link>.
               </p>
             </div>
           )}
@@ -43,14 +43,14 @@ function CookieConsent() {
             className="button button--primary"
             onClick={() => choose('accepted')}
           >
-            Accept
+            {t('common.accept')}
           </button>
           <button
             type="button"
             className="button button--secondary"
             onClick={() => choose('essential')}
           >
-            Essential only
+            {t('cookie.essentialOnly')}
           </button>
           <button
             type="button"
@@ -59,7 +59,7 @@ function CookieConsent() {
             aria-controls="cookie-consent-details"
             onClick={() => setManaging((value) => !value)}
           >
-            {managing ? 'Hide details' : 'Manage preferences'}
+            {managing ? t('cookie.hideDetails') : t('cookie.managePreferences')}
           </button>
         </div>
       </div>

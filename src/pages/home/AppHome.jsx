@@ -9,8 +9,10 @@ import EmptyState from '../../components/EmptyState'
 import ErrorState from '../../components/ErrorState'
 import Icon from '../../components/Icon'
 import { useHomeData } from '../../hooks/useHomeData'
+import { useTranslation } from '../../i18n/LocaleContext'
 
 function AppHome() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const {
     featured,
@@ -26,14 +28,14 @@ function AppHome() {
 
   return (
     <main className="app-home">
-      <h1 className="visually-hidden">Pikawise — discover meals and cook with what you have</h1>
+      <h1 className="visually-hidden">{t('home.appTitle')}</h1>
       <section className="app-home-top">
         <div className="container">
           <SearchBar
             size="large"
-            placeholder="Find recipes, meals or ingredients…"
+            placeholder={t('home.searchPlaceholder')}
             filterTo="/explore"
-            filterLabel="Filter recipes"
+            filterLabel={t('home.filterRecipes')}
             onSearch={(q) => navigate(`/search?q=${encodeURIComponent(q)}`)}
           />
 
@@ -57,7 +59,7 @@ function AppHome() {
         </div>
       </section>
 
-      <RecipeSection title="Recommended for you" actionTo="/explore">
+      <RecipeSection title={t('home.recommended.title')} actionTo="/explore">
         {loading ? (
           <MealGrid loading skeletonCount={4} />
         ) : error ? (
@@ -66,11 +68,11 @@ function AppHome() {
           <MealGrid meals={recommended} fallbackCategory={category} />
         ) : (
           <EmptyState
-            title="Nothing to show yet"
-            message="We couldn't load recipe ideas right now. Try again or browse all recipes."
+            title={t('home.recommended.emptyTitle')}
+            message={t('home.recommended.emptyMessage')}
             action={
               <button type="button" className="button button--primary" onClick={reload}>
-                Retry
+                {t('common.retryShort')}
               </button>
             }
           />
@@ -78,23 +80,27 @@ function AppHome() {
       </RecipeSection>
 
       {areas.length > 0 && (
-        <RecipeSection title="Explore cuisines" actionTo="/explore" actionLabel="Browse all">
+        <RecipeSection
+          title={t('home.cuisines.title')}
+          actionTo="/explore"
+          actionLabel={t('home.browseAll')}
+        >
           <CuisineChips areas={areas} />
         </RecipeSection>
       )}
 
       {saved.length > 0 && (
-        <RecipeSection title="Saved for later" actionTo="/favorites">
+        <RecipeSection title={t('home.saved.title')} actionTo="/favorites">
           <MealGrid meals={saved} className="meal-grid--rail" skeletonCount={4} />
         </RecipeSection>
       )}
 
-      <RecipeSection title="More ways to cook" actionTo={null}>
+      <RecipeSection title={t('home.actions.title')} actionTo={null}>
         <div className="home-actions-grid">
           <button type="button" className="home-action-tile" onClick={() => navigate('/random')}>
             <Icon name="random" size={20} />
-            <strong>Surprise me</strong>
-            <span>A random recipe to cook</span>
+            <strong>{t('common.surpriseMe')}</strong>
+            <span>{t('home.actions.randomText')}</span>
           </button>
           <button
             type="button"
@@ -102,18 +108,18 @@ function AppHome() {
             onClick={() => navigate('/balanced-diet?focus=ingredients')}
           >
             <Icon name="leaf" size={20} />
-            <strong>Plan a balanced day</strong>
-            <span>Build meals from your food</span>
+            <strong>{t('home.actions.balancedTitle')}</strong>
+            <span>{t('home.actions.balancedText')}</span>
           </button>
           <button type="button" className="home-action-tile" onClick={() => navigate('/meal-plans')}>
             <Icon name="calendar" size={20} />
-            <strong>Saved meal plans</strong>
-            <span>Pick up where you left off</span>
+            <strong>{t('home.actions.plansTitle')}</strong>
+            <span>{t('home.actions.plansText')}</span>
           </button>
           <button type="button" className="home-action-tile" onClick={() => navigate('/shopping-list')}>
             <Icon name="list" size={20} />
-            <strong>Shopping list</strong>
-            <span>What you still need to buy</span>
+            <strong>{t('home.actions.shoppingTitle')}</strong>
+            <span>{t('home.actions.shoppingText')}</span>
           </button>
         </div>
       </RecipeSection>

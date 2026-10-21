@@ -5,6 +5,7 @@ import ErrorState from '../../components/ErrorState'
 import EmptyState from '../../components/EmptyState'
 import CategoryCard from '../../components/CategoryCard'
 import { useHomeData } from '../../hooks/useHomeData'
+import { useTranslation } from '../../i18n/LocaleContext'
 import sundayRoast from '../../assets/food/sunday-roast.jpg'
 import sukuma from '../../assets/food/sukuma-wiki.jpg'
 import ingredients from '../../assets/food/breakfast.jpg'
@@ -12,22 +13,23 @@ import ingredients from '../../assets/food/breakfast.jpg'
 const STEPS = [
   {
     icon: 'search',
-    title: 'Discover a meal',
-    text: 'Search by name or ingredient, browse categories, or see what the community is cooking.'
+    title: 'home.steps.discover.title',
+    text: 'home.steps.discover.text'
   },
   {
     icon: 'check',
-    title: 'Check the ingredients',
-    text: 'See exactly what you need, scale the servings, and tick off what you already have.'
+    title: 'home.steps.ingredients.title',
+    text: 'home.steps.ingredients.text'
   },
   {
     icon: 'cookingPot',
-    title: 'Follow the cooking instructions',
-    text: 'Follow clear, numbered steps in a distraction-free cooking mode built for the kitchen.'
+    title: 'home.steps.instructions.title',
+    text: 'home.steps.instructions.text'
   }
 ]
 
 function SiteHome() {
+  const { t } = useTranslation()
   const { featured, recommended, category, categories, loading, error, reload } = useHomeData()
 
   const featuredName = featured?.name ?? featured?.strMeal
@@ -42,34 +44,31 @@ function SiteHome() {
           <div className="site-hero-copy">
             <p className="site-hero-eyebrow">
               <Icon name="cookingPot" size={15} />
-              Your everyday cooking companion
+              {t('home.hero.eyebrow')}
             </p>
             <h1 className="site-hero-title">
-              Discover what to cook.
-              <span className="site-hero-accent"> Learn how to make it.</span>
+              {t('home.hero.title')}
+              <span className="site-hero-accent"> {t('home.hero.titleAccent')}</span>
             </h1>
-            <p className="site-hero-lead">
-              Find inspiring meals, explore recipes using ingredients you already have, and follow
-              clear cooking instructions from preparation to the final plate.
-            </p>
+            <p className="site-hero-lead">{t('home.hero.lead')}</p>
             <div className="site-hero-actions">
               <Link to="/explore" className="button button--primary button--large">
-                Explore recipes
+                {t('home.hero.exploreCta')}
                 <Icon name="arrowRight" size={18} />
               </Link>
               <Link to="/#how-it-works" className="button button--secondary button--large">
-                How it works
+                {t('home.hero.howItWorks')}
               </Link>
             </div>
             <ul className="site-hero-benefits">
               <li>
-                <Icon name="check" size={15} /> Discover new meals
+                <Icon name="check" size={15} /> {t('home.hero.benefitDiscover')}
               </li>
               <li>
-                <Icon name="check" size={15} /> Cook with what you have
+                <Icon name="check" size={15} /> {t('home.hero.benefitCook')}
               </li>
               <li>
-                <Icon name="check" size={15} /> Follow step-by-step recipes
+                <Icon name="check" size={15} /> {t('home.hero.benefitSteps')}
               </li>
             </ul>
           </div>
@@ -78,7 +77,7 @@ function SiteHome() {
             <div className="site-hero-photo site-hero-photo--main">
               <img
                 src={sundayRoast}
-                alt="A hearty Sunday roast plated with vegetables"
+                alt={t('home.hero.imageAlt')}
                 width="720"
                 height="720"
                 decoding="async"
@@ -87,7 +86,7 @@ function SiteHome() {
             <div className="site-hero-photo site-hero-photo--accent">
               <img
                 src={sukuma}
-                alt="A colourful plate of greens and vegetables"
+                alt={t('home.hero.accentImageAlt')}
                 width="360"
                 height="360"
                 loading="lazy"
@@ -96,11 +95,11 @@ function SiteHome() {
             </div>
             {featuredName && (
               <div className="site-hero-panel">
-                <p className="site-hero-panel-eyebrow">Today&apos;s idea</p>
+                <p className="site-hero-panel-eyebrow">{t('home.hero.todayIdea')}</p>
                 <p className="site-hero-panel-title">{featuredName}</p>
                 {featuredMeta && <p className="site-hero-panel-meta">{featuredMeta}</p>}
                 <Link to={`/meal/${featured.id ?? featured.idMeal}`} className="site-hero-panel-link">
-                  View recipe
+                  {t('common.viewRecipe')}
                   <Icon name="arrowRight" size={15} />
                 </Link>
               </div>
@@ -112,13 +111,11 @@ function SiteHome() {
       <section className="section site-section" aria-labelledby="site-discover">
         <div className="container">
           <div className="site-section-head">
-            <p className="site-eyebrow">Meal discovery</p>
+            <p className="site-eyebrow">{t('home.discover.eyebrow')}</p>
             <h2 id="site-discover" className="site-section-title">
-              Find your next favorite meal
+              {t('home.discover.title')}
             </h2>
-            <p className="site-section-lead">
-              Explore recipes and discover dishes for every kind of day.
-            </p>
+            <p className="site-section-lead">{t('home.discover.lead')}</p>
           </div>
 
           {loading ? (
@@ -147,7 +144,7 @@ function SiteHome() {
           <div className="site-ingredients-media">
             <img
               src={ingredients}
-              alt="Fresh ingredients laid out on a table"
+              alt={t('home.ingredients.imageAlt')}
               width="640"
               height="520"
               loading="lazy"
@@ -155,16 +152,13 @@ function SiteHome() {
             />
           </div>
           <div className="site-ingredients-copy">
-            <p className="site-eyebrow">Cook with what you have</p>
+            <p className="site-eyebrow">{t('home.ingredients.eyebrow')}</p>
             <h2 id="site-ingredients" className="site-section-title">
-              Make something delicious with what you have
+              {t('home.ingredients.title')}
             </h2>
-            <p className="site-section-lead">
-              Tell Pikawise which ingredients are already in your kitchen and we will suggest meals
-              you can actually make today — with a shopping list for anything you are missing.
-            </p>
+            <p className="site-section-lead">{t('home.ingredients.lead')}</p>
             <Link to="/balanced-diet?focus=ingredients" className="button button--primary button--large">
-              Find recipes
+              {t('home.ingredients.cta')}
               <Icon name="arrowRight" size={18} />
             </Link>
           </div>
@@ -174,9 +168,9 @@ function SiteHome() {
       <section className="section site-section" id="how-it-works" aria-labelledby="site-how">
         <div className="container">
           <div className="site-section-head site-section-head--center">
-            <p className="site-eyebrow">How Pikawise works</p>
+            <p className="site-eyebrow">{t('home.how.eyebrow')}</p>
             <h2 id="site-how" className="site-section-title">
-              From &ldquo;what&rsquo;s for dinner?&rdquo; to the first bite
+              {t('home.how.title')}
             </h2>
           </div>
           <ol className="site-steps">
@@ -185,9 +179,9 @@ function SiteHome() {
                 <span className="site-step-icon" aria-hidden="true">
                   <Icon name={step.icon} size={20} />
                 </span>
-                <span className="site-step-index">Step {index + 1}</span>
-                <h3 className="site-step-title">{step.title}</h3>
-                <p className="site-step-text">{step.text}</p>
+                <span className="site-step-index">{t('home.stepLabel', { n: index + 1 })}</span>
+                <h3 className="site-step-title">{t(step.title)}</h3>
+                <p className="site-step-text">{t(step.text)}</p>
               </li>
             ))}
           </ol>
@@ -197,13 +191,11 @@ function SiteHome() {
       <section className="section site-section" aria-labelledby="site-featured">
         <div className="container">
           <div className="site-section-head">
-            <p className="site-eyebrow">Featured recipes</p>
+            <p className="site-eyebrow">{t('home.featured.eyebrow')}</p>
             <h2 id="site-featured" className="site-section-title">
-              Straight from the kitchen
+              {t('home.featured.title')}
             </h2>
-            <p className="site-section-lead">
-              A hand-picked selection of recipes to cook this week.
-            </p>
+            <p className="site-section-lead">{t('home.featured.lead')}</p>
           </div>
 
           {loading ? (
@@ -214,11 +206,11 @@ function SiteHome() {
             <MealGrid meals={recommended.slice(0, 4)} fallbackCategory={category} />
           ) : (
             <EmptyState
-              title="Recipes are on the way"
-              message="We couldn't load recipes right now. Please try again."
+              title={t('home.featured.emptyTitle')}
+              message={t('home.featured.emptyMessage')}
               action={
                 <button type="button" className="button button--primary" onClick={reload}>
-                  Retry
+                  {t('common.retryShort')}
                 </button>
               }
             />
@@ -229,19 +221,17 @@ function SiteHome() {
       <section className="site-cta">
         <div className="container site-cta-inner">
           <div>
-            <h2 className="site-cta-title">Your next great meal starts here.</h2>
-            <p className="site-cta-text">
-              Find inspiration, explore recipes, and make cooking feel easier.
-            </p>
+            <h2 className="site-cta-title">{t('home.cta.title')}</h2>
+            <p className="site-cta-text">{t('home.cta.text')}</p>
           </div>
           <div className="site-cta-actions">
             <Link to="/explore" className="button button--primary button--large">
-              Start exploring
+              {t('home.cta.start')}
               <Icon name="arrowRight" size={18} />
             </Link>
             <Link to="/random" className="button button--secondary button--large">
               <Icon name="random" size={18} />
-              Surprise me
+              {t('common.surpriseMe')}
             </Link>
           </div>
         </div>

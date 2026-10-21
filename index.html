@@ -107,6 +107,39 @@
         } catch (e) {
           document.documentElement.classList.add('theme-light')
         }
+        // Apply the saved interface language before React mounts so the very
+        // first paint already has the right lang/dir (Arabic starts RTL).
+        try {
+          var RTL = { ar: 1 }
+          var LOCALE_ATTR = {
+            en: 'en',
+            sw: 'sw',
+            fr: 'fr',
+            es: 'es',
+            ar: 'ar',
+            pt: 'pt',
+            hi: 'hi',
+            'zh-CN': 'zh-CN'
+          }
+          var rawLocale = localStorage.getItem('chakula_locale')
+          var locale = rawLocale ? JSON.parse(rawLocale) : null;
+          if (!locale && typeof navigator !== 'undefined') {
+            var cand = ((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
+            if (cand === 'zh' || cand.indexOf('zh-cn') === 0 || cand.indexOf('zh-hans') === 0) locale = 'zh-CN';
+            else {
+              var supp = ['sw', 'fr', 'es', 'ar', 'pt', 'hi', 'en'];
+              for (var i = 0; i < supp.length; i++) {
+                if (cand === supp[i] || cand.indexOf(supp[i] + '-') === 0) { locale = supp[i]; break; }
+              }
+            }
+          }
+          if (typeof locale === 'string' && LOCALE_ATTR[locale]) {
+            document.documentElement.lang = LOCALE_ATTR[locale]
+            document.documentElement.dir = RTL[locale] ? 'rtl' : 'ltr'
+          }
+        } catch (e) {
+          /* keep the document defaults */
+        }
       })()
     </script>
     <style>
@@ -243,6 +276,27 @@
       ;(function () {
         var splash = document.getElementById('app-splash')
         if (!splash) return
+        // Localised loading label: set before React boots so screen readers
+        // announce the splash in the user's language.
+        try {
+          var LOADING_LABEL = {
+            en: 'Pikawise is loading',
+            sw: 'Pikawise inapakia',
+            fr: 'Pikawise se charge',
+            es: 'Pikawise se está cargando',
+            ar: 'جارٍ تحميل Pikawise',
+            pt: 'Pikawise está carregando',
+            hi: 'Pikawise लोड हो रहा है',
+            'zh-CN': 'Pikawise 正在加载'
+          }
+          var rawLocale = localStorage.getItem('chakula_locale')
+          var locale = rawLocale ? JSON.parse(rawLocale) : null
+          if (typeof locale === 'string' && LOADING_LABEL[locale]) {
+            splash.setAttribute('aria-label', LOADING_LABEL[locale])
+          }
+        } catch (e) {
+          /* keep the default label */
+        }
         window.setTimeout(function () {
           if (!splash.isConnected || splash.classList.contains('pw-splash--hidden')) return
           splash.classList.add('pw-splash--hidden')

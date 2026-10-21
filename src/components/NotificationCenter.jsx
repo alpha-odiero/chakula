@@ -4,20 +4,36 @@ import { useNavigate } from 'react-router-dom'
 import Icon from './Icon'
 import { usePwa } from './PwaProvider'
 import { getNotifications, markAllNotificationsRead, dismissNotification } from '../utils/storage'
+import { useTranslation } from '../i18n/LocaleContext'
 
-function formatTime(timestamp) {
+function formatTime(timestamp, t) {
   const diff = Date.now() - (timestamp || Date.now())
   const minutes = Math.round(diff / 60000)
-  if (minutes < 1) return 'Just now'
-  if (minutes < 60) return `${minutes} min ago`
+  if (minutes < 1) return t('notifications.justNow')
+  if (minutes < 60) return t('notifications.minutesAgo', { count: minutes })
   const hours = Math.round(minutes / 60)
-  if (hours < 24) return `${hours} hr ago`
+  if (hours < 24) return t('notifications.hoursAgo', { count: hours })
   const days = Math.round(hours / 24)
-  if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`
+  if (days < 7) return t('notifications.daysAgo', { count: days })
   return new Date(timestamp).toLocaleDateString()
 }
 
+// Notifications are stored with translation keys so a notification created in
+// one language still renders correctly after the user switches language.
+// Older entries keep their plain title/body and are shown as they are.
+function notificationText(item, t) {
+  const periodLabel = item.periodId ? t(`config.period.${item.periodId}`) : t('config.period.default')
+  const title = item.titleKey
+    ? t(item.titleKey, { ...(item.titleParams || {}), label: periodLabel })
+    : item.title
+  const body = item.bodyKey
+    ? t(item.bodyKey, { ...(item.bodyParams || {}), label: periodLabel })
+    : item.body
+  return { title, body }
+}
+
 function NotificationCenter({ className = '' }) {
+  const { t } = useTranslation()
   const { updateAvailable, update } = usePwa()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -79,7 +95,11 @@ function NotificationCenter({ className = '' }) {
       <button
         type="button"
         className={`notif-button ${className}`.trim()}
-        aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
+        aria-label={
+          unread > 0
+            ? t('notifications.ariaUnread', { count: unread })
+            : t('notifications.ariaButton')
+        }
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={toggle}
@@ -93,13 +113,13 @@ function NotificationCenter({ className = '' }) {
       </button>
 
       {open && (
-        <div className="notif-panel" role="dialog" aria-label="Notifications">
+        <div className="notif-panel" role="dialog" aria-label={t('notifications.title')}>
           <div className="notif-panel-head">
-            <h2>Notifications</h2>
+            <h2>{t('notifications.title')}</h2>
             <button
               type="button"
               className="notif-close"
-              aria-label="Close notifications"
+              aria-label={t('notifications.closeAria')}
               onClick={() => setOpen(false)}
             >
               <Icon name="close" size={18} />
@@ -107,45 +127,48 @@ function NotificationCenter({ className = '' }) {
           </div>
 
           {items.length === 0 ? (
-            <p className="notif-empty">You&apos;re all caught up.</p>
+            <p className="notif-empty">{t('notifications.empty')}</p>
           ) : (
             <ul className="notif-list">
-              {items.map((item) => (
-                <li key={item.id} className={`notif-item${item.read ? ' notif-item--read' : ''}`}>
-                  <span className="notif-item-mark" aria-hidden="true" />
-                  <div className="notif-item-main">
-                    <p className="notif-item-title">{item.title}</p>
-                    {item.body && <p className="notif-item-body">{item.body}</p>}
-                    <p className="notif-item-time">{formatTime(item.timestamp)}</p>
-                    {item.type === 'update' && (
-                      <button
-                        type="button"
-                        className="button button--primary notif-item-action"
-                        onClick={handleUpdate}
-                      >
-                        Update now
-                      </button>
-                    )}
-                    {item.type === 'reminder' && (
-                      <button
-                        type="button"
-                        className="button button--primary notif-item-action"
-                        onClick={() => handleReminder(item)}
-                      >
-                        Pick a meal
-                      </button>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    className="notif-item-dismiss"
-                    aria-label={`Dismiss ${item.title}`}
-                    onClick={() => handleDismiss(item.id)}
-                  >
-                    <Icon name="close" size={14} />
-                  </button>
-                </li>
-              ))}
+              {items.map((item) => {
+                const { title, body } = notificationText(item, t)
+                return (
+                  <li key={item.id} className={`notif-item${item.read ? ' notif-item--read' : ''}`}>
+                    <span className="notif-item-mark" aria-hidden="true" />
+                    <div className="notif-item-main">
+                      <p className="notif-item-title">{title}</p>
+                      {body && <p className="notif-item-body">{body}</p>}
+                      <p className="notif-item-time">{formatTime(item.timestamp, t)}</p>
+                      {item.type === 'update' && (
+                        <button
+                          type="button"
+                          className="button button--primary notif-item-action"
+                          onClick={handleUpdate}
+                        >
+                          {t('notifications.updateNow')}
+                        </button>
+                      )}
+                      {item.type === 'reminder' && (
+                        <button
+                          type="button"
+                          className="button button--primary notif-item-action"
+                          onClick={() => handleReminder(item)}
+                        >
+                          {t('notifications.pickMeal')}
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      className="notif-item-dismiss"
+                      aria-label={t('notifications.dismissAria', { title })}
+                      onClick={() => handleDismiss(item.id)}
+                    >
+                      <Icon name="close" size={14} />
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
           )}
         </div>

@@ -6,11 +6,13 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import Icon from '../components/Icon'
 import { getFavorites, clearFavorites } from '../utils/favorites'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function Favorites() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Saved recipes — Pikawise',
-    description: 'Recipes you saved on this device.',
+    title: t('favorites.seoTitle'),
+    description: t('favorites.seoDescription'),
     path: '/favorites',
     robots: 'noindex,follow'
   })
@@ -33,12 +35,10 @@ function Favorites() {
         <div className="container page-header-inner">
           <p className="page-eyebrow">
             <Icon name="heart" size={14} />
-            Your collection
+            {t('favorites.eyebrow')}
           </p>
-          <h1 className="page-title">Favorites</h1>
-          <p className="page-subtitle">
-            Recipes you've saved for later. They stay on this device, even offline.
-          </p>
+          <h1 className="page-title">{t('favorites.title')}</h1>
+          <p className="page-subtitle">{t('favorites.subtitle')}</p>
         </div>
       </header>
 
@@ -48,24 +48,24 @@ function Favorites() {
             <>
               <div className="results-head">
                 <div>
-                  <h2 className="results-head-title">{favorites.length} saved {favorites.length === 1 ? 'meal' : 'meals'}</h2>
-                  <p className="results-count">Tap a card to open the recipe.</p>
+                  <h2 className="results-head-title">{t('favorites.savedCount', { count: favorites.length })}</h2>
+                  <p className="results-count">{t('favorites.tapCard')}</p>
                 </div>
                 <button type="button" className="button button--ghost button--small" onClick={() => setConfirmOpen(true)}>
                   <Icon name="trash" size={16} />
-                  Clear all
+                  {t('common.clearAll')}
                 </button>
               </div>
               <MealGrid meals={favorites} />
             </>
           ) : (
             <EmptyState
-              title="No favorites yet"
-              message="Save meals you love and they'll appear here, ready even when you're offline."
+              title={t('favorites.emptyTitle')}
+              message={t('favorites.emptyMessage')}
               icon={<Icon name="heart" size={28} />}
               action={
                 <Link to="/explore" className="button button--primary button--small">
-                  Explore meals
+                  {t('common.exploreMeals')}
                   <Icon name="arrowRight" size={16} />
                 </Link>
               }
@@ -76,10 +76,10 @@ function Favorites() {
 
       <ConfirmDialog
         open={confirmOpen}
-        title="Clear all favorites?"
-        message="This will remove every saved meal from your favorites. You can always save them again later."
-        confirmLabel="Clear all"
-        cancelLabel="Keep them"
+        title={t('favorites.clearTitle')}
+        message={t('favorites.clearMessage')}
+        confirmLabel={t('common.clearAll')}
+        cancelLabel={t('favorites.keepThem')}
         danger
         onConfirm={handleClear}
         onCancel={() => setConfirmOpen(false)}

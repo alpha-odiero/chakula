@@ -19,12 +19,14 @@ import { isFavorite, toggleFavorite } from '../utils/favorites'
 import { addPersonalShoppingItem } from '../utils/storage'
 import { APP_OG_IMAGE, APP_OG_IMAGE_ALT, SITE_URL } from '../config/app'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 
 const SERVING_OPTIONS = [1, 2, 3, 4, 5, 6]
 
 function MealDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [state, setState] = useState({ data: null, loading: true, error: null })
   const toast = useToast()
   const [favorited, setFavorited] = useState(() => isFavorite(id))
@@ -111,16 +113,19 @@ function MealDetails() {
 
   useSeo({
     title: state.error
-      ? 'Recipe not found — Pikawise'
+      ? t('meal.seoNotFoundTitle')
       : meal
-        ? `${meal.name} recipe — Pikawise`
-        : 'Loading recipe — Pikawise',
+        ? t('meal.seoTitle', { name: meal.name })
+        : t('meal.seoLoadingTitle'),
     description: meal
-      ? `${meal.name} recipe${meal.category ? ` (${meal.category})` : ''} with ingredients and step-by-step cooking instructions. Cook it on Pikawise.`
-      : 'Loading a recipe on Pikawise.',
+      ? t('meal.seoDescription', {
+          name: meal.name,
+          category: meal.category ? ` (${meal.category})` : ''
+        })
+      : t('meal.seoLoadingDescription'),
     path: `/meal/${id ?? ''}`,
     image: meal?.image || APP_OG_IMAGE,
-    imageAlt: meal ? `${meal.name} recipe` : APP_OG_IMAGE_ALT,
+    imageAlt: meal ? t('meal.seoImageAlt', { name: meal.name }) : APP_OG_IMAGE_ALT,
     type: 'article',
     robots: state.error ? 'noindex,follow' : undefined,
     jsonLd: recipeJsonLd
@@ -129,11 +134,11 @@ function MealDetails() {
 
   const handleShare = async () => {
     const url = window.location.href
-    const title = meal?.name ?? meal?.strMeal ?? 'Pikawise meal'
+    const title = meal?.name ?? meal?.strMeal ?? t('meal.shareFallbackTitle')
 
     if (supportsWebShare()) {
       try {
-        await navigator.share({ title, text: `Check out ${title} on Pikawise`, url })
+        await navigator.share({ title, text: t('meal.shareText', { name: title }), url })
         return
       } catch (error) {
         if (error && error.name === 'AbortError') return
@@ -156,10 +161,10 @@ function MealDetails() {
       document.execCommand('copy')
       document.body.removeChild(textArea)
     } catch {
-      toast.error('Could not copy the recipe link.')
+      toast.error(t('meal.copyLinkFailed'))
       return
     }
-    toast.success('Recipe link copied.')
+    toast.success(t('meal.copyLinkSuccess'))
   }
 
   const handleAnother = async () => {
@@ -176,8 +181,8 @@ function MealDetails() {
     toggleFavorite(meal)
     const nowSaved = isFavorite(id)
     setFavorited(nowSaved)
-    if (nowSaved) toast.success('Recipe saved.')
-    else toast.info('Removed from saved recipes.')
+    if (nowSaved) toast.success(t('meal.savedRecipe'))
+    else toast.info(t('meal.removedFromSaved'))
   }
 
   const toggleIngredient = (name) => {
@@ -193,7 +198,7 @@ function MealDetails() {
     ingredients
       .filter((item) => !checked.has(item.name))
       .forEach((item) => addPersonalShoppingItem(item.name))
-    toast.success('Added to your shopping list.')
+    toast.success(t('meal.addedToShoppingList'))
   }
 
   if (state.loading) {
@@ -207,9 +212,9 @@ function MealDetails() {
         {isNotFound ? (
           <div className="empty-state">
             <h1 className="empty-state-title">404</h1>
-            <h2 className="meal-not-found-sub">Recipe not found</h2>
-            <p className="empty-state-message">The recipe you are looking for doesn&apos;t exist.</p>
-            <Link to="/explore" className="button button--primary">Browse recipes</Link>
+            <h2 className="meal-not-found-sub">{t('meal.notFoundTitle')}</h2>
+            <p className="empty-state-message">{t('meal.notFoundMessage')}</p>
+            <Link to="/explore" className="button button--primary">{t('meal.browseRecipes')}</Link>
           </div>
         ) : (
           <ErrorState onRetry={load} />
@@ -225,7 +230,7 @@ function MealDetails() {
     <main className="meal-detail">
       <div className="meal-detail-bar">
         <div className="container meal-detail-bar-inner">
-          <button type="button" className="meal-detail-bar-button" onClick={() => navigate(-1)} aria-label="Go back">
+          <button type="button" className="meal-detail-bar-button" onClick={() => navigate(-1)} aria-label={t('a11y.goBack')}>
             <Icon name="chevronLeft" size={20} />
           </button>
           <p className="meal-detail-bar-title">{meal.name ?? meal.strMeal}</p>
@@ -235,7 +240,7 @@ function MealDetails() {
               className="meal-detail-bar-button"
               onClick={handleFavorite}
               aria-pressed={favorited}
-              aria-label={favorited ? 'Remove from saved' : 'Save recipe'}
+              aria-label={favorited ? t('meal.removeFromSaved') : t('meal.saveRecipe')}
             >
               <Icon name={favorited ? 'heartFilled' : 'heart'} size={19} />
             </button>
@@ -243,7 +248,7 @@ function MealDetails() {
               type="button"
               className="meal-detail-bar-button"
               onClick={handleShare}
-              aria-label="Share recipe"
+              aria-label={t('meal.shareRecipe')}
             >
               <Icon name="share" size={19} />
             </button>
@@ -257,7 +262,7 @@ function MealDetails() {
             type="button"
             className="meal-detail-media"
             onClick={() => setViewerOpen(true)}
-            aria-label={`View full image of ${meal.name ?? meal.strMeal}`}
+            aria-label={t('meal.viewFullImage', { name: meal.name ?? meal.strMeal })}
             aria-haspopup="dialog"
           >
             <img
@@ -269,16 +274,16 @@ function MealDetails() {
             />
             <span className="meal-detail-zoom" aria-hidden="true">
               <Icon name="zoom" size={14} />
-              Zoom
+              {t('meal.zoom')}
             </span>
           </button>
 
           <div className="meal-detail-intro">
-            <p className="page-eyebrow">{meta || 'Recipe'}</p>
+            <p className="page-eyebrow">{meta || t('meal.recipe')}</p>
             <h1 className="meal-detail-title">{meal.name ?? meal.strMeal}</h1>
 
             {tags.length > 0 && (
-              <ul className="meal-tags" aria-label="Tags">
+              <ul className="meal-tags" aria-label={t('a11y.tags')}>
                 {tags.map((tag) => (
                   <li key={tag}>
                     <Link to={`/search?q=${encodeURIComponent(tag)}`} className="meal-tag">
@@ -296,7 +301,7 @@ function MealDetails() {
                 onClick={() => setCooking(true)}
               >
                 <Icon name="play" size={18} />
-                Start cooking
+                {t('meal.startCooking')}
               </button>
               <button
                 type="button"
@@ -305,26 +310,26 @@ function MealDetails() {
                 aria-pressed={favorited}
               >
                 <Icon name={favorited ? 'heartFilled' : 'heart'} size={18} />
-                {favorited ? 'Saved' : 'Save'}
+                {favorited ? t('common.saved') : t('common.save')}
               </button>
               <button type="button" className="button button--ghost button--large" onClick={handleAnother}>
                 <Icon name="random" size={18} />
-                Surprise me
+                {t('common.surpriseMe')}
               </button>
             </div>
           </div>
         </article>
 
-        <section className="meal-detail-content" aria-label="Recipe">
+        <section className="meal-detail-content" aria-label={t('meal.recipe')}>
           <div className="recipe-panel">
           <div className="recipe-panel-head">
             <h2 className="recipe-panel-title">
               <Icon name="utensils" size={20} />
-              Ingredients
+              {t('meal.ingredients')}
             </h2>
             {ingredients.length > 0 && (
               <span className="recipe-panel-count">
-                {readyCount}/{ingredients.length} ready
+                {t('meal.readyCount', { ready: readyCount, total: ingredients.length })}
               </span>
             )}
           </div>
@@ -333,9 +338,9 @@ function MealDetails() {
             <div className="servings-control">
               <span className="servings-label">
                 <Icon name="servings" size={16} />
-                Servings
+                {t('meal.servings')}
               </span>
-              <div className="servings-options" role="group" aria-label="Number of servings">
+              <div className="servings-options" role="group" aria-label={t('meal.numberOfServings')}>
                 {SERVING_OPTIONS.map((option) => (
                   <button
                     type="button"
@@ -375,13 +380,13 @@ function MealDetails() {
           </ul>
 
           <p className="recipe-panel-note">
-            Tick what you already have. Amounts start from the recipe&apos;s listed quantities.
+            {t('meal.ingredientNote')}
           </p>
 
           {ingredients.length > 0 && (
             <button type="button" className="button button--secondary button--block" onClick={handleAddMissing}>
               <Icon name="shoppingBag" size={18} />
-              Add missing to shopping list
+              {t('meal.addMissingToShoppingList')}
             </button>
           )}
         </div>
@@ -390,10 +395,10 @@ function MealDetails() {
           <div className="recipe-panel-head">
             <h2 className="recipe-panel-title">
               <Icon name="list" size={20} />
-              Instructions
+              {t('meal.instructions')}
             </h2>
             {steps.length > 0 && (
-              <span className="recipe-panel-count">{steps.length} steps</span>
+              <span className="recipe-panel-count">{t('meal.steps', { count: steps.length })}</span>
             )}
           </div>
 
@@ -408,7 +413,7 @@ function MealDetails() {
             </ol>
           ) : (
             <p className="recipe-panel-note">
-              This recipe doesn&apos;t include written instructions.
+              {t('meal.noInstructions')}
             </p>
           )}
 
@@ -419,7 +424,7 @@ function MealDetails() {
               onClick={() => setCooking(true)}
             >
               <Icon name="play" size={18} />
-              Start cooking
+              {t('meal.startCooking')}
             </button>
 
             {videoId && (
@@ -430,7 +435,7 @@ function MealDetails() {
                 className="button button--secondary button--block"
               >
                 <Icon name="video" size={18} />
-                Watch tutorial
+                {t('meal.watchTutorial')}
               </a>
             )}
           </div>

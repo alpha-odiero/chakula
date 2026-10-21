@@ -10,6 +10,7 @@ import {
   requestNotificationPermission,
   showOsNotification
 } from '../services/notifications'
+import { useTranslation } from '../i18n/LocaleContext'
 
 function SegmentedTime({ value, onChange, label }) {
   return (
@@ -26,6 +27,7 @@ function SegmentedTime({ value, onChange, label }) {
 }
 
 function ReminderSettings() {
+  const { t } = useTranslation()
   const { reminders, update, nextReminder, permission, refresh } = useReminders()
   const toast = useToast()
   const [requesting, setRequesting] = useState(false)
@@ -46,7 +48,7 @@ function ReminderSettings() {
       ? reminders.days.filter((value) => value !== day)
       : [...reminders.days, day]
     if (!days.length) {
-      toast.notify('Keep at least one day selected.', { variant: 'info' })
+      toast.notify(t('reminder.settings.keepDay'), { variant: 'info' })
       return
     }
     update({ days })
@@ -61,7 +63,7 @@ function ReminderSettings() {
       ? reminders.modes.filter((mode) => mode !== value)
       : [...reminders.modes, value]
     if (!modes.length) {
-      toast.notify('Keep at least one reminder style selected.', { variant: 'info' })
+      toast.notify(t('reminder.settings.keepMode'), { variant: 'info' })
       return
     }
     update({ modes })
@@ -70,12 +72,12 @@ function ReminderSettings() {
   const saveChanges = () => {
     update({})
     refresh()
-    toast.success('Reminder settings saved.')
+    toast.success(t('reminder.settings.savedToast'))
   }
 
   const enableNotifications = async () => {
     if (!isNotificationSupported()) {
-      toast.notify('This browser does not support notifications.', { variant: 'error' })
+      toast.notify(t('reminder.settings.unsupportedToast'), { variant: 'error' })
       return
     }
     setRequesting(true)
@@ -83,41 +85,41 @@ function ReminderSettings() {
     setRequesting(false)
     refresh()
     if (result === 'granted') {
-      toast.notify('Notifications enabled. Reminders will appear on your device.', { variant: 'success' })
+      toast.notify(t('reminder.settings.enabledToast'), { variant: 'success' })
     } else if (result === 'denied') {
-      toast.notify('Notifications are blocked. Enable them in your browser settings.', { variant: 'error' })
+      toast.notify(t('reminder.settings.blockedToast'), { variant: 'error' })
     }
   }
 
   const sendTestNotification = async () => {
     if (permission !== 'granted') {
-      toast.notify('Enable notifications above first, then send a test.', { variant: 'info' })
+      toast.notify(t('reminder.settings.enableFirstToast'), { variant: 'info' })
       return
     }
     setTesting(true)
     const sent = await showOsNotification({
       id: 'pikawise-test',
-      title: 'Pikawise test notification',
-      body: 'Notifications are working. Meal reminders will appear like this.',
+      title: t('reminder.settings.testNotificationTitle'),
+      body: t('reminder.settings.testNotificationBody'),
       tag: 'pikawise-test',
       data: { url: '/' }
     })
     setTesting(false)
     if (sent) {
-      toast.success('Test notification sent — check your notifications.')
+      toast.success(t('reminder.settings.testSentToast'))
     } else {
-      toast.notify('Could not show a notification. Check that notifications are allowed for this site.', {
+      toast.notify(t('reminder.settings.testFailedToast'), {
         variant: 'error'
       })
     }
   }
 
   const permissionLabel = {
-    granted: 'Allowed',
-    denied: 'Blocked in browser',
-    default: 'Not enabled yet',
-    unsupported: 'Not supported'
-  }[permission] || 'Unknown'
+    granted: t('reminder.settings.permissionAllowed'),
+    denied: t('reminder.settings.permissionDenied'),
+    default: t('reminder.settings.permissionDefault'),
+    unsupported: t('reminder.settings.permissionUnsupported')
+  }[permission] || t('reminder.settings.permissionUnknown')
 
   return (
     <div className="settings-group">
@@ -125,21 +127,19 @@ function ReminderSettings() {
         <span className="settings-group-icon">
           <Icon name="bell" size={17} />
         </span>
-        Meal reminders
+        {t('reminder.settings.groupTitle')}
       </h2>
 
       <div className="settings-row">
         <div>
-          <p className="settings-label">Meal reminders</p>
-          <p className="settings-hint">
-            Gently remind you when it is time to decide what to eat.
-          </p>
+          <p className="settings-label">{t('reminder.settings.label')}</p>
+          <p className="settings-hint">{t('reminder.settings.hint')}</p>
         </div>
         <button
           type="button"
           className={`toggle${reminders.enabled ? ' toggle--on' : ''}`}
           role="switch"
-          aria-label="Meal reminders"
+          aria-label={t('reminder.settings.label')}
           aria-checked={reminders.enabled}
           onClick={() => update({ enabled: !reminders.enabled })}
         >
@@ -151,15 +151,15 @@ function ReminderSettings() {
         <>
           <div className="settings-row">
             <div>
-              <p className="settings-label">Device notifications</p>
+              <p className="settings-label">{t('reminder.settings.notificationsLabel')}</p>
               <p className="settings-hint">
                 {permission === 'granted'
-                  ? 'Reminders appear as system notifications.'
+                  ? t('reminder.settings.notifGranted')
                   : permission === 'denied'
-                    ? 'Notifications are blocked for this site — see below to re-enable them.'
+                    ? t('reminder.settings.notifDenied')
                     : permission === 'unsupported'
-                      ? 'This browser does not support notifications. Reminders still appear inside Pikawise.'
-                      : 'Allow notifications so reminders reach you outside the app.'}
+                      ? t('reminder.settings.notifUnsupported')
+                      : t('reminder.settings.notifDefault')}
               </p>
             </div>
             {permission === 'granted' ? (
@@ -175,7 +175,7 @@ function ReminderSettings() {
                 onClick={enableNotifications}
                 disabled={requesting || !isNotificationSupported()}
               >
-                {requesting ? 'Requesting…' : 'Enable'}
+                {requesting ? t('reminder.settings.requesting') : t('reminder.settings.enable')}
               </button>
             )}
           </div>
@@ -183,28 +183,22 @@ function ReminderSettings() {
           {permission === 'denied' && (
             <div className="permission-note" role="note">
               <p className="permission-note-title">
-                <Icon name="bell" size={14} /> Notifications are blocked
+                <Icon name="bell" size={14} /> {t('reminder.settings.blockedTitle')}
               </p>
-              <p className="settings-hint">
-                Allow notifications for this site in your browser settings (the lock or tune icon
-                next to the address bar), then reload the page.
-              </p>
+              <p className="settings-hint">{t('reminder.settings.blockedHint')}</p>
               {iosDevice && (
-                <p className="settings-hint">
-                  On iPhone and iPad, notifications only work from the installed app: open
-                  Pikawise from your Home Screen and allow notifications when asked.
-                </p>
+                <p className="settings-hint">{t('reminder.settings.blockedIosHint')}</p>
               )}
             </div>
           )}
 
           <div className="settings-row">
             <div>
-              <p className="settings-label">Test notification</p>
+              <p className="settings-label">{t('reminder.settings.testLabel')}</p>
               <p className="settings-hint">
                 {permission === 'granted'
-                  ? 'Send one now to check sound and delivery while Pikawise is open.'
-                  : 'Enable notifications above to send a test.'}
+                  ? t('reminder.settings.testGrantedHint')
+                  : t('reminder.settings.testHint')}
               </p>
             </div>
             <button
@@ -213,21 +207,22 @@ function ReminderSettings() {
               onClick={sendTestNotification}
               disabled={permission !== 'granted' || testing}
             >
-              {testing ? 'Sending…' : 'Send test'}
+              {testing ? t('reminder.settings.sending') : t('reminder.settings.sendTest')}
             </button>
           </div>
 
           {nextReminder && (
             <p className="reminder-next">
-              <Icon name="bell" size={14} /> Next reminder: {formatDateTime(nextReminder.at)}
+              <Icon name="bell" size={14} /> {t('reminder.settings.nextReminder', { time: formatDateTime(nextReminder.at) })}
             </p>
           )}
 
           <div className="settings-field">
-            <p className="settings-label">Meals to remind you about</p>
+            <p className="settings-label">{t('reminder.settings.mealsLabel')}</p>
             <ul className="reminder-meals">
               {MEAL_PERIODS.map((period) => {
                 const meal = reminders.meals[period.id]
+                const periodLabel = t(`config.period.${period.id}`)
                 return (
                   <li key={period.id} className="reminder-meal">
                     <label className="reminder-meal-toggle">
@@ -237,14 +232,14 @@ function ReminderSettings() {
                         onChange={(event) => updateMeal(period.id, { enabled: event.target.checked })}
                       />
                       <span className="reminder-meal-name">
-                        <Icon name={period.icon} size={15} /> {period.label}
+                        <Icon name={period.icon} size={15} /> {periodLabel}
                       </span>
                     </label>
                     <input
                       type="time"
                       value={meal.time}
                       onChange={(event) => updateMeal(period.id, { time: event.target.value })}
-                      aria-label={`${period.label} time`}
+                      aria-label={t('reminder.settings.mealTimeAria', { label: periodLabel })}
                       disabled={!meal.enabled}
                     />
                   </li>
@@ -254,8 +249,8 @@ function ReminderSettings() {
           </div>
 
           <div className="settings-field">
-            <p className="settings-label">Reminder style</p>
-            <p className="settings-hint">Pick one or more — you can mix them.</p>
+            <p className="settings-label">{t('reminder.settings.styleLabel')}</p>
+            <p className="settings-hint">{t('reminder.settings.styleHint')}</p>
             <ul className="reminder-meals">
               {REMINDER_MODES.map((mode) => (
                 <li key={mode.value} className="reminder-meal">
@@ -266,8 +261,8 @@ function ReminderSettings() {
                       onChange={() => toggleMode(mode.value)}
                     />
                     <span className="reminder-style-text">
-                      <span className="reminder-meal-name">{mode.label}</span>
-                      <span className="reminder-style-hint">{mode.hint}</span>
+                      <span className="reminder-meal-name">{t(`config.mode.${mode.value}`)}</span>
+                      <span className="reminder-style-hint">{t(`config.modeHint.${mode.value}`)}</span>
                     </span>
                   </label>
                 </li>
@@ -276,7 +271,7 @@ function ReminderSettings() {
           </div>
 
           <div className="settings-field">
-            <p className="settings-label">Days</p>
+            <p className="settings-label">{t('reminder.settings.daysLabel')}</p>
             <div className="settings-chip-row">
               {WEEKDAYS.map((day) => (
                 <button
@@ -286,7 +281,7 @@ function ReminderSettings() {
                   aria-pressed={reminders.days.includes(day.value)}
                   onClick={() => toggleDay(day.value)}
                 >
-                  {day.label}
+                  {t(`config.weekday.${day.value}`)}
                 </button>
               ))}
             </div>
@@ -294,17 +289,19 @@ function ReminderSettings() {
 
           <div className="settings-row">
             <div>
-              <p className="settings-label">Quiet hours</p>
+              <p className="settings-label">{t('reminder.settings.quietLabel')}</p>
               <p className="settings-hint">
-                No reminders between {formatTimeOfDay(reminders.quietHours.start)} and{' '}
-                {formatTimeOfDay(reminders.quietHours.end)}.
+                {t('reminder.settings.quietHint', {
+                  start: formatTimeOfDay(reminders.quietHours.start),
+                  end: formatTimeOfDay(reminders.quietHours.end)
+                })}
               </p>
             </div>
             <button
               type="button"
               className={`toggle${reminders.quietHours.enabled ? ' toggle--on' : ''}`}
               role="switch"
-              aria-label="Quiet hours"
+              aria-label={t('reminder.settings.quietLabel')}
               aria-checked={reminders.quietHours.enabled}
               onClick={() =>
                 update({ quietHours: { ...reminders.quietHours, enabled: !reminders.quietHours.enabled } })
@@ -317,13 +314,13 @@ function ReminderSettings() {
           {reminders.quietHours.enabled && (
             <div className="reminder-quiet-times">
               <SegmentedTime
-                label="Quiet hours start"
+                label={t('reminder.settings.quietStart')}
                 value={reminders.quietHours.start}
                 onChange={(time) => update({ quietHours: { ...reminders.quietHours, start: time } })}
               />
-              <span>to</span>
+              <span>{t('reminder.settings.to')}</span>
               <SegmentedTime
-                label="Quiet hours end"
+                label={t('reminder.settings.quietEnd')}
                 value={reminders.quietHours.end}
                 onChange={(time) => update({ quietHours: { ...reminders.quietHours, end: time } })}
               />
@@ -331,20 +328,17 @@ function ReminderSettings() {
           )}
 
           <p className="settings-hint reminder-tz">
-            <Icon name="globe" size={13} /> Times use your device time zone ({timeZone}).
+            <Icon name="globe" size={13} /> {t('reminder.settings.timezone', { timezone: timeZone })}
           </p>
 
           <p className="settings-hint reminder-limits">
-            Reminders are best effort and stay on this device. They run while Pikawise is open or
-            installed; browsers cannot wake a fully closed app without a push service.
-            {iosDevice
-              ? ' On iPhone and iPad, notifications only work from the Home Screen app and may stop after a while — reinstall it from Share → Add to Home Screen to restore them.'
-              : ''}
+            {t('reminder.settings.limits')}
+            {iosDevice ? ` ${t('reminder.settings.limitsIos')}` : ''}
           </p>
 
           <div className="reminder-save">
             <button type="button" className="button button--primary" onClick={saveChanges}>
-              Save changes
+              {t('reminder.settings.save')}
             </button>
           </div>
         </>

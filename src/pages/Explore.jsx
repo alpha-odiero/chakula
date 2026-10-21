@@ -8,6 +8,7 @@ import EmptyState from '../components/EmptyState'
 import Icon from '../components/Icon'
 import PageHeader from '../components/PageHeader'
 import { useSeo } from '../hooks/useSeo'
+import { useTranslation } from '../i18n/LocaleContext'
 import { getCategories, listAreas, listIngredients, filterByCategory, filterByArea, filterByIngredient, getRandomMeal } from '../services/mealdb'
 import {
   getPersonalShopping,
@@ -19,13 +20,18 @@ import {
 
 const POPULAR_CATEGORIES = ['Beef', 'Chicken', 'Seafood', 'Vegetarian', 'Pasta', 'Dessert']
 
-const FILTER_LABELS = { category: 'Category', area: 'Cuisine', ingredient: 'Ingredient' }
+// Translation keys for the filter kinds; the values come from the API.
+const FILTER_LABELS = {
+  category: 'explore.filter.category',
+  area: 'explore.filter.area',
+  ingredient: 'explore.filter.ingredient'
+}
 
 function Explore() {
+  const { t } = useTranslation()
   useSeo({
-    title: 'Explore recipes — Pikawise',
-    description:
-      'Browse hundreds of recipes by category, cuisine, or ingredient. Find meal ideas and cook with what you already have.',
+    title: t('explore.seo.title'),
+    description: t('explore.seo.description'),
     path: '/explore'
   })
   const [categories, setCategories] = useState({ data: null, loading: true, error: null })
@@ -149,21 +155,22 @@ function Explore() {
 
   const collectedCount = shopping.filter((item) => item.checked).length
 
-  const filterLabel = activeFilter.value || 'all meals'
+  const filterLabel = activeFilter.value || t('explore.allMeals')
+  const filterTypeLabel = FILTER_LABELS[activeFilter.type]
+    ? t(FILTER_LABELS[activeFilter.type])
+    : activeFilter.type
 
   return (
     <main className="explore">
-      <PageHeader eyebrow="Explore" title="Discover meals">
-        <p className="page-subtitle">
-          Search by name or browse by category, cuisine, and ingredient to find something delicious.
-        </p>
+      <PageHeader eyebrow={t('explore.eyebrow')} title={t('explore.title')}>
+        <p className="page-subtitle">{t('explore.subtitle')}</p>
         <div className="explore-search">
-          <SearchBar placeholder="Search by name or ingredient…" />
+          <SearchBar placeholder={t('explore.searchPlaceholder')} />
         </div>
       </PageHeader>
 
-      <section className="container explore-browse" aria-label="Popular categories">
-        <p className="browse-label">Popular categories</p>
+      <section className="container explore-browse" aria-label={t('explore.popularCategories')}>
+        <p className="browse-label">{t('explore.popularCategories')}</p>
         <div className="browse-chips">
           {POPULAR_CATEGORIES.map((cat) => (
             <Link key={cat} to={`/explore?category=${encodeURIComponent(cat)}`} className="chip chip--browse">
@@ -182,7 +189,7 @@ function Explore() {
           onClick={() => setFiltersOpen((v) => !v)}
         >
           <Icon name="settings" size={18} />
-          Filters
+          {t('explore.filtersButton')}
           {activeFilter.value && <span className="filter-badge">{filterLabel}</span>}
         </button>
 
@@ -190,21 +197,23 @@ function Explore() {
           <aside
             id="explore-filters"
             className={`explore-filters ${filtersOpen ? 'explore-filters--open' : ''}`}
-            aria-label="Meal filters"
+            aria-label={t('explore.filtersPanelLabel')}
           >
             <div className="filters-header">
-              <h2>Filters</h2>
+              <h2>{t('explore.filtersTitle')}</h2>
               {activeFilter.value && (
                 <button type="button" className="link-button" onClick={clearAll}>
-                  Clear all
+                  {t('common.clearAll')}
                 </button>
               )}
             </div>
 
             <fieldset className="filter-group" disabled={categories.loading}>
-              <legend>Category</legend>
-              {categories.error && <p className="filter-note">Couldn't load categories.</p>}
-              {categories.loading && <p className="filter-note">Loading…</p>}
+              <legend>{t('explore.filter.category')}</legend>
+              {categories.error && (
+                <p className="filter-note">{t('explore.loadCategoriesError')}</p>
+              )}
+              {categories.loading && <p className="filter-note">{t('common.loading')}</p>}
               <div className="filter-options">
                 {categories.data?.map((c) => (
                   <label key={c.name ?? c.strCategory} className="filter-option">
@@ -221,8 +230,8 @@ function Explore() {
             </fieldset>
 
             <fieldset className="filter-group" disabled={areas.loading}>
-              <legend>Cuisine / Area</legend>
-              {areas.error && <p className="filter-note">Couldn't load cuisines.</p>}
+              <legend>{t('explore.filter.cuisineArea')}</legend>
+              {areas.error && <p className="filter-note">{t('explore.loadCuisinesError')}</p>}
               <div className="filter-options">
                 {areas.data.map((area) => (
                   <label key={area} className="filter-option">
@@ -239,15 +248,17 @@ function Explore() {
             </fieldset>
 
             <fieldset className="filter-group" disabled={ingredients.loading}>
-              <legend>Ingredient</legend>
-              {ingredients.error && <p className="filter-note">Couldn't load ingredients.</p>}
+              <legend>{t('explore.filter.ingredient')}</legend>
+              {ingredients.error && (
+                <p className="filter-note">{t('explore.loadIngredientsError')}</p>
+              )}
               <input
                 type="search"
                 className="filter-ingredient-search"
-                placeholder="Search ingredients…"
+                placeholder={t('explore.searchIngredientsPlaceholder')}
                 value={ingredientSearch}
                 onChange={(e) => setIngredientSearch(e.target.value)}
-                aria-label="Search ingredients"
+                aria-label={t('explore.searchIngredientsLabel')}
               />
               <div className="filter-options filter-options--ingredients">
                 {filteredIngredients.slice(0, 60).map((ing) => (
@@ -267,16 +278,20 @@ function Explore() {
 
           <div className="explore-results">
             <div className="results-head" role="status" aria-live="polite">
-              <h2>{activeFilter.value ? `${activeFilter.value} meals` : 'Meals'}</h2>
+              <h2>
+                {activeFilter.value
+                  ? t('explore.filteredMealsHeading', { filter: activeFilter.value })
+                  : t('explore.mealsHeading')}
+              </h2>
               <div className="results-head-meta">
                 {activeFilter.value && (
                   <button
                     type="button"
                     className="chip chip--active chip--removable"
                     onClick={clearAll}
-                    aria-label={`Remove ${activeFilter.value} filter`}
+                    aria-label={t('explore.removeFilter', { filter: activeFilter.value })}
                   >
-                    <span>{`${FILTER_LABELS[activeFilter.type] || activeFilter.type}: ${activeFilter.value}`}</span>
+                    <span>{`${filterTypeLabel}: ${activeFilter.value}`}</span>
                     <span className="chip-remove">
                       <Icon name="close" size={13} />
                     </span>
@@ -285,8 +300,8 @@ function Explore() {
                 {!meals.loading && meals.data && (
                   <span className="results-count">
                     {activeFilter.value && progress && progress.total > 8
-                      ? `${progress.shown} of ${progress.total} meals`
-                      : `${meals.data.length} ${meals.data.length === 1 ? 'meal' : 'meals'}`}
+                      ? t('explore.countOf', { shown: progress.shown, total: progress.total })
+                      : `${meals.data.length} ${t('common.meal', { count: meals.data.length })}`}
                   </span>
                 )}
               </div>
@@ -311,11 +326,11 @@ function Explore() {
                 )
               ) : (
                 <EmptyState
-                  title="No meals found"
-                  message={`No meals matched ${filterLabel}. Try another category, cuisine, or ingredient.`}
+                  title={t('explore.noMealsTitle')}
+                  message={t('explore.noMealsMatched', { filter: filterLabel })}
                   action={
                     <button type="button" className="button button--secondary" onClick={clearAll}>
-                      Clear filters
+                      {t('explore.clearFilters')}
                     </button>
                   }
                 />
@@ -325,24 +340,24 @@ function Explore() {
         </div>
       </section>
 
-      <section className="container explore-shopping" aria-label="Shopping list">
+      <section className="container explore-shopping" aria-label={t('explore.shoppingListLabel')}>
         <div className="explore-shopping-panel">
           <div className="shopping-panel-header">
             <h2 className="shopping-panel-title">
-              <Icon name="shoppingBag" size={20} /> Shopping List
+              <Icon name="shoppingBag" size={20} /> {t('explore.shoppingListTitle')}
             </h2>
             {shopping.length > 0 && (
               <span className="shopping-count">
-                {shopping.length} item{shopping.length === 1 ? '' : 's'}
+                {shopping.length} {t('explore.shoppingItemCount', { count: shopping.length })}
               </span>
             )}
           </div>
-          <p className="panel-subtitle">
-            Keep a quick list of what you need to buy next time you shop.
-          </p>
+          <p className="panel-subtitle">{t('explore.shoppingListLead')}</p>
 
           <div className="ingredient-input-row">
-            <label className="visually-hidden" htmlFor="shopping-item-input">Add item to shopping list</label>
+            <label className="visually-hidden" htmlFor="shopping-item-input">
+              {t('explore.addShoppingItemLabel')}
+            </label>
             <input
               id="shopping-item-input"
               className="ingredient-input"
@@ -355,7 +370,7 @@ function Explore() {
                   handleAddShoppingItem()
                 }
               }}
-              placeholder="Add an item, e.g. tomatoes"
+              placeholder={t('explore.shoppingItemPlaceholder')}
               autoComplete="off"
             />
             <button
@@ -364,7 +379,7 @@ function Explore() {
               onClick={handleAddShoppingItem}
               disabled={!shoppingInput.trim()}
             >
-              <Icon name="plus" size={18} /> Add
+              <Icon name="plus" size={18} /> {t('common.add')}
             </button>
           </div>
 
@@ -377,13 +392,13 @@ function Explore() {
                       type="checkbox"
                       checked={item.checked}
                       onChange={() => handleToggleShoppingItem(item.id)}
-                      aria-label={`Mark ${item.name} as collected`}
+                      aria-label={t('explore.markCollected', { name: item.name })}
                     />
                     <span>{item.name}</span>
                     <button
                       type="button"
                       className="shopping-item-remove"
-                      aria-label={`Remove ${item.name}`}
+                      aria-label={t('explore.removeItem', { name: item.name })}
                       onClick={() => handleRemoveShoppingItem(item.id)}
                     >
                       <Icon name="trash" size={16} />
@@ -393,12 +408,12 @@ function Explore() {
               </ul>
               {collectedCount > 0 && (
                 <button type="button" className="link-button" onClick={handleClearCollected}>
-                  Clear {collectedCount} collected
+                  {t('explore.clearCollected', { count: collectedCount })}
                 </button>
               )}
             </>
           ) : (
-            <p className="shopping-empty">No items yet. Add something you need to buy.</p>
+            <p className="shopping-empty">{t('explore.shoppingEmpty')}</p>
           )}
         </div>
       </section>

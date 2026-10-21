@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MealGrid from './MealGrid'
+import { useTranslation } from '../i18n/LocaleContext'
 
 // The category API (TheMealDB filter.php?c=) returns the full list in a
 // single response, so batches are prepared locally instead of refetched.
@@ -29,6 +30,7 @@ function delay(ms) {
 }
 
 function InfiniteMealGrid({ meals, batchSize = BATCH_SIZE, onProgress, ...gridProps }) {
+  const { t } = useTranslation()
   const uniqueMeals = useMemo(() => dedupe(meals || []), [meals])
   const total = uniqueMeals.length
   const [visibleCount, setVisibleCount] = useState(batchSize)
@@ -138,19 +140,19 @@ function InfiniteMealGrid({ meals, batchSize = BATCH_SIZE, onProgress, ...gridPr
         {status === 'loading' && (
           <p className="grid-status-msg" role="status">
             <span className="search-suggest-spinner" aria-hidden="true" />
-            Loading more meals…
+            {t('mealGrid.loadingMore')}
           </p>
         )}
         {status === 'error' && (
           <p className="grid-status-msg grid-status-msg--error" role="alert">
-            Couldn&apos;t load more meals.
+            {t('mealGrid.loadMoreError')}
             <button type="button" className="button button--secondary" onClick={() => loadMore()}>
-              Try again
+              {t('common.retry')}
             </button>
           </p>
         )}
         {status === 'idle' && showEnd && (
-          <p className="grid-status-msg grid-status-msg--end">You&apos;ve reached the end of this category.</p>
+          <p className="grid-status-msg grid-status-msg--end">{t('mealGrid.endOfList')}</p>
         )}
       </div>
     </>
