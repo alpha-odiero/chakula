@@ -38,7 +38,6 @@ function Explore() {
   const [areas, setAreas] = useState({ data: [], loading: true, error: null })
   const [ingredients, setIngredients] = useState({ data: [], loading: true, error: null })
   const [meals, setMeals] = useState({ data: null, loading: true, error: null })
-  const [progress, setProgress] = useState(null)
   const requestIdRef = useRef(0)
   const [searchParams, setSearchParams] = useSearchParams()
   const [ingredientSearch, setIngredientSearch] = useState('')
@@ -59,7 +58,6 @@ function Explore() {
 
   const loadMeals = useCallback((filter = activeFilter) => {
     const requestId = ++requestIdRef.current
-    setProgress(null)
     setMeals((prev) => ({ ...prev, loading: true, error: null }))
     const request = filter.type === 'category'
       ? filterByCategory(filter.value)
@@ -80,8 +78,6 @@ function Explore() {
         setMeals({ data: null, loading: false, error })
       })
   }, [activeFilter])
-
-  const reportProgress = useCallback((shown, total) => setProgress({ shown, total }), [])
 
   const dedupe = (items) => [...new Set(items)]
 
@@ -297,13 +293,6 @@ function Explore() {
                     </span>
                   </button>
                 )}
-                {!meals.loading && meals.data && (
-                  <span className="results-count">
-                    {activeFilter.value && progress && progress.total > 8
-                      ? t('explore.countOf', { shown: progress.shown, total: progress.total })
-                      : `${meals.data.length} ${t('common.meal', { count: meals.data.length })}`}
-                  </span>
-                )}
               </div>
             </div>
 
@@ -317,7 +306,6 @@ function Explore() {
                   <InfiniteMealGrid
                     key={`${activeFilter.type}:${activeFilter.value}`}
                     meals={meals.data}
-                    onProgress={reportProgress}
                     fallbackCategory={activeFilter.type === 'category' ? activeFilter.value : null}
                     fallbackArea={activeFilter.type === 'area' ? activeFilter.value : null}
                   />
