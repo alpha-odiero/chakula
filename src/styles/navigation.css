@@ -864,9 +864,11 @@
 /* Phones get a single readable column for the link groups, 44px link targets,
    and store buttons that only sit side by side when there is room for both. */
 @media (max-width: 767px) {
-  .footer-downloads {
+  /* Beat the narrow-screen `.container` padding shorthand in app.css so the
+     download band keeps its vertical padding instead of collapsing to 0. */
+  .site-footer .footer-downloads {
     padding-top: 26px;
-    padding-bottom: 24px;
+    padding-bottom: 30px;
     gap: 14px;
   }
 
@@ -906,7 +908,7 @@
     font-size: 14px;
   }
 
-  .footer-inner {
+  .site-footer .footer-inner {
     grid-template-columns: 1fr;
     gap: 26px;
     padding-top: 26px;
