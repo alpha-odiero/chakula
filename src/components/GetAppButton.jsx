@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from '../i18n/LocaleContext'
 import Icon from './Icon'
@@ -50,7 +51,8 @@ function GetAppButton({ className = 'header-cta', onNavigate }) {
         <Icon name="install" size={17} />
         {t('install.getApp')}
       </button>
-      {guideOpen && <InstallGuide onClose={() => setGuideOpen(false)} />}
+      {guideOpen &&
+        createPortal(<InstallGuide onClose={() => setGuideOpen(false)} />, document.body)}
     </>
   )
 }

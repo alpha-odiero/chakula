@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from '../i18n/LocaleContext'
 import logo from '../assets/LOGO.png'
 import StoreButtons from './StoreButtons'
+import GetAppButton from './GetAppButton'
 import { useInstallPrompt } from '../hooks/useInstallPrompt'
 import { useToast } from './Toast'
 import { isStandalone } from '../utils/platform'
@@ -64,7 +65,10 @@ function Footer() {
           <h2 id="footer-downloads-title">{t('footer.downloadsTitle', { app: appName })}</h2>
           <p>{t('footer.downloadsText')}</p>
         </div>
-        <StoreButtons onStoreUnavailable={handleStoreUnavailable} />
+        <div className="footer-download-actions">
+          <GetAppButton className="button button--primary footer-get-app" />
+          <StoreButtons onStoreUnavailable={handleStoreUnavailable} />
+        </div>
       </div>
 
       <div className="container footer-inner">

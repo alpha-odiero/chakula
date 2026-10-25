@@ -50,6 +50,12 @@ function start() {
   installed = isStandalone()
 }
 
+// Capture beforeinstallprompt as soon as this module loads. On repeat visits
+// the service worker is already active, so the browser can fire the event
+// before React effects subscribe — losing it would leave "Get app" with no
+// native prompt on mobile even though the app is installable.
+start()
+
 export function subscribeToInstallState(listener) {
   start()
   listeners.add(listener)

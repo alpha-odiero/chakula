@@ -706,6 +706,19 @@
   }
 }
 
+.footer-download-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-get-app {
+  min-height: 48px;
+  padding-inline: 20px;
+  white-space: nowrap;
+}
+
 .store-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -879,6 +892,18 @@
   .footer-downloads p {
     margin-top: 4px;
     font-size: 13px;
+  }
+
+  .footer-download-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .footer-get-app {
+    justify-content: center;
+    width: 100%;
   }
 
   .store-buttons {

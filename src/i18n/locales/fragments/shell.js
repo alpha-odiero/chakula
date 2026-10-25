@@ -39,7 +39,7 @@ export const shell = {
   'footer.information': 'Information',
   'footer.iosSoon': 'Coming soon! The {{app}} iOS app is on its way.',
   'footer.notInStores':
-    '{{app}} is not in app stores yet — use "{{getApp}}" in the header to install it from your browser.',
+    '{{app}} is not in app stores yet — tap "{{getApp}}" to install it from your browser.',
   'footer.planning': 'Planning',
   'footer.privacy': 'Privacy',
   'footer.terms': 'Terms',
